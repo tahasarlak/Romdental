@@ -1,19 +1,19 @@
-
-/* :root {
-  --primary-color: #1a2b4a;
-  --secondary-color: #f5f1e9; 
-  --accent-color: #d4af37; 
-  --text-color: #2c2c2c; 
+/* src/styles/global.css */
+:root {
+  --primary-color: #1a2b4a; /* آبی تیره عمیق - حس قدرت و اعتماد */
+  --secondary-color: #f5f1e9; /* بژ روشن - حس گرما و ظرافت */
+  --accent-color: #d4af37; /* طلایی ملایم - نماد لوکس و ثروت */
+  --text-color: #2c2c2c; /* مشکی مات - ساده و شیک */
   --white: #ffffff;
-  --gray: #8a8a8a; 
-  --shadow: 0 6px 20px rgba(0, 0, 0, 0.15); 
-  --border-radius: 12px; 
+  --gray: #8a8a8a; /* خاکستری مات - حس تعادل و مدرنیته */
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* سایه عمیق‌تر برای جلوه بیشتر */
+  --border-radius: 12px; /* گوشه‌های نرم‌تر برای ظرافت */
   --max-width: 1280px;
   --font-family: 'IranSans', 'Roboto', sans-serif;
-  --transition: all 0.4s ease; 
-} */
-/*  */
-/* 
+  --transition: all 0.4s ease; /* ترنزیشن کمی نرم‌تر */
+}
+
+
 * {
   margin: 0;
   padding: 0;
@@ -51,4 +51,4 @@ button {
 
 button:hover {
   background-color: darken(var(--accent-color), 10%);
-} */
+}
