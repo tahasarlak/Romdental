@@ -1,120 +1,135 @@
-/* src/pages/Login.module.css */
+/* src/styles/Login.module.css */
 .loginSection {
-    padding: 60px 20px;
-    min-height: 100vh;
-    background-color: #f9f9f9;
-  }
-  
-  .container {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  
+  padding: 4rem 1rem;
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--white) 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.title::after {
+  content: '';
+  width: 80px;
+  height: 4px;
+  background: var(--accent-color);
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: var(--gray);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.loginForm {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--gray);
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--text-color);
+  background: var(--white);
+  transition: border-color var(--transition);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+}
+
+.input::placeholder {
+  color: var(--gray);
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.submitButton {
+  width: 100%;
+  background: var(--accent-color);
+  color: var(--white);
+  padding: 1rem;
+  font-size: 1.1rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.submitButton:hover {
+  background: darken(var(--accent-color), 10%);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   .title {
-    font-size: 2.5rem;
-    font-weight: bold;
-    text-align: center;
-    color: #333;
-    margin-bottom: 10px;
+    font-size: 2rem;
   }
-  
+
   .subtitle {
-    font-size: 1.2rem;
-    text-align: center;
-    color: #666;
-    margin-bottom: 40px;
+    font-size: 1rem;
   }
-  
+
   .loginForm {
-    background: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 0.5s ease-in-out;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    padding: 1.5rem;
   }
-  
-  .formGroup {
-    display: flex;
-    flex-direction: column;
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.8rem;
   }
-  
-  .label {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 1rem;
-    color: #555;
-    margin-bottom: 8px;
+
+  .subtitle {
+    font-size: 0.9rem;
   }
-  
-  .input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    transition: border-color 0.3s ease;
-  }
-  
-  .input:focus {
-    border-color: #3498db;
-    outline: none;
-  }
-  
+
+  .input,
   .submitButton {
-    background-color: #3498db;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
+    font-size: 0.95rem;
   }
-  
-  .submitButton:hover {
-    background-color: #2980b9;
-  }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .loginForm {
-      padding: 20px;
-    }
-  
-    .title {
-      font-size: 2rem;
-    }
-  
-    .subtitle {
-      font-size: 1rem;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .loginForm {
-      margin: 0 10px;
-    }
-  
-    .input {
-      font-size: 0.9rem;
-    }
-  
-    .submitButton {
-      font-size: 0.9rem;
-    }
-  }
+}

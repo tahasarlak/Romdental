@@ -1,45 +1,43 @@
-
+/* src/styles/CourseDetails.module.css */
 .courseDetailsSection {
-  padding: 40px 20px;
-  background-color: var(--secondary-color);
+  padding: 4rem 1rem;
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--white) 100%);
   min-height: 100vh;
 }
 
 .container {
   max-width: var(--max-width);
   margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
 .backLink {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   color: var(--primary-color);
-  font-size: 16px;
-  margin-bottom: 20px;
+  font-size: 1rem;
+  margin-bottom: 2rem;
   transition: var(--transition);
 }
 
 .backLink:hover {
-  color: color-mix(in srgb, var(--primary-color) 90%, black);
+  color: darken(var(--primary-color), 10%);
 }
 
 .courseHeader {
   display: flex;
-  gap: 30px;
-  margin-bottom: 40px;
+  gap: 2rem;
+  margin-bottom: 2rem;
   flex-wrap: wrap;
-  background: linear-gradient(135deg, var(--white) 0%, var(--secondary-color) 100%);
-  padding: 20px;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
 }
 
 .courseImage {
-  width: 100%;
-  max-width: 400px;
+  width: 500px;
+  height: 300px;
   border-radius: var(--border-radius);
-  object-fit: cover;
   box-shadow: var(--shadow);
+  object-fit: cover;
 }
 
 .courseInfo {
@@ -47,34 +45,30 @@
 }
 
 .courseTitle {
-  font-size: 32px;
-  margin-bottom: 10px;
-  color: var(--text-color);
-  font-weight: 700;
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
 }
 
 .instructor {
-  font-size: 18px;
+  font-size: 1.1rem;
   color: var(--gray);
-  margin-bottom: 15px;
+  margin-bottom: 0.75rem;
 }
 
 .instructorLink {
-  color: var(--primary-color);
-  transition: var(--transition);
+  color: var(--accent-color);
 }
 
 .instructorLink:hover {
-  color: color-mix(in srgb, var(--primary-color) 90%, black);
+  text-decoration: underline;
 }
 
 .rating {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 16px;
-  color: var(--gray);
-  margin-bottom: 15px;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .starIcon {
@@ -82,164 +76,152 @@
 }
 
 .description {
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 1rem;
   color: var(--text-color);
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
 }
 
 .details {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
-  font-size: 16px;
+  gap: 1rem;
+  margin-bottom: 1rem;
   color: var(--gray);
-  margin-bottom: 20px;
+  font-size: 0.9rem;
 }
 
 .details span {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.3rem;
 }
 
 .shareButton {
-  background-color: transparent;
-  color: var(--primary-color);
-  border: 1px solid var(--primary-color);
-  padding: 8px 16px;
-  border-radius: var(--border-radius);
+  background: var(--gray);
+  color: var(--white);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   transition: var(--transition);
 }
 
 .shareButton:hover {
-  background-color: var(--primary-color);
-  color: var(--white);
+  background: var(--accent-color);
 }
 
 .stickyEnrollBar {
   position: sticky;
-  top: 20px;
+  top: 1rem;
   z-index: 10;
-  background-color: var(--white);
-  padding: 10px 0;
+  background: var(--white);
+  padding: 1rem;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
+  margin-bottom: 2rem;
   text-align: center;
-  margin-bottom: 20px;
 }
 
 .enrollButton {
-  background-color: var(--accent-color);
+  width: 100%;
+  max-width: 300px;
+  background: var(--accent-color);
   color: var(--white);
-  padding: 12px 24px;
+  padding: 1rem;
+  font-size: 1.1rem;
   border-radius: var(--border-radius);
-  font-size: 16px;
-  font-weight: 500;
   transition: var(--transition);
 }
 
 .enrollButton:disabled {
-  background-color: var(--gray);
+  background: var(--gray);
   cursor: not-allowed;
 }
 
 .enrollButton:hover:not(:disabled) {
-  background-color: color-mix(in srgb, var(--accent-color) 90%, black);
+  background: darken(var(--accent-color), 10%);
 }
 
 .courseContent {
-  margin-bottom: 40px;
+  background: var(--white);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
 }
 
 .courseContent h2 {
-  font-size: 24px;
-  margin-bottom: 15px;
-  color: var(--text-color);
-  font-weight: 600;
-}
-
-.courseContent p {
-  font-size: 16px;
-  line-height: 1.6;
-  color: var(--text-color);
-  margin-bottom: 20px;
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
 }
 
 .progressContainer {
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
 }
 
 .progressBar {
-  background-color: var(--gray);
+  background: var(--secondary-color);
   border-radius: 10px;
   height: 8px;
   overflow: hidden;
-  margin-bottom: 8px;
 }
 
 .progressFill {
-  background-color: var(--accent-color);
+  background: var(--accent-color);
   height: 100%;
-  transition: width 0.3s ease;
+  transition: width 0.5s ease;
 }
 
 .progressText {
-  font-size: 14px;
-  color: var(--text-color);
+  font-size: 0.85rem;
+  color: var(--gray);
+  margin-top: 0.5rem;
+  display: block;
 }
 
 .syllabus {
   list-style: none;
-  padding: 0;
-  position: relative;
+  margin-bottom: 2rem;
 }
 
 .syllabusItem {
   display: flex;
-  background-color: var(--white);
-  padding: 20px;
-  border-radius: var(--border-radius);
-  margin-bottom: 15px;
-  box-shadow: var(--shadow);
-  transition: var(--transition);
-  cursor: pointer;
-}
-
-.syllabusItem:hover {
-  transform: translateY(-2px);
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--gray);
 }
 
 .syllabusTimeline {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 40px;
-  position: relative;
+  gap: 0.5rem;
 }
 
 .timelineDot {
-  width: 24px;
-  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--white);
-  border-radius: 50%;
-  z-index: 1;
+  width: 24px;
+  height: 24px;
+}
+
+.completedIcon,
+.lockIcon,
+.playIcon {
+  color: var(--accent-color);
+}
+
+.locked .lockIcon {
+  color: var(--gray);
 }
 
 .timelineLine {
   width: 2px;
   height: 100%;
-  background-color: var(--gray);
-  position: absolute;
-  top: 24px;
-  left: 50%;
-  transform: translateX(-50%);
+  background: var(--gray);
 }
 
 .syllabusContent {
@@ -250,57 +232,47 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--text-color);
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: background var(--transition);
+}
+
+.syllabusHeader:hover {
+  background: var(--secondary-color);
 }
 
 .syllabusTitle {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--text-color);
 }
 
 .newBadge {
-  background-color: var(--accent-color);
+  background: var(--accent-color);
   color: var(--white);
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 12px;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
 }
 
 .syllabusMeta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 1rem;
   color: var(--gray);
+  font-size: 0.9rem;
 }
 
 .metaItem {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 14px;
-}
-
-.locked {
-  opacity: 0.7;
-}
-
-.lockIcon {
-  color: #ff4d4f;
-}
-
-.playIcon {
-  color: var(--accent-color);
-}
-
-.completedIcon {
-  color: #4caf50;
+  gap: 0.3rem;
 }
 
 .expandIcon {
-  transition: var(--transition);
+  transition: transform 0.3s ease;
 }
 
 .expandIcon.expanded {
@@ -308,42 +280,32 @@
 }
 
 .previewContent {
-  margin-top: 15px;
-  padding: 15px;
-  background-color: color-mix(in srgb, var(--secondary-color) 95%, white);
-  border-radius: var(--border-radius);
-  animation: slideIn 0.3s ease;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--secondary-color);
+  border-radius: 8px;
 }
 
 .previewButton {
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   color: var(--white);
-  padding: 8px 16px;
-  border-radius: var(--border-radius);
-  font-size: 14px;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
   transition: var(--transition);
 }
 
 .previewButton:hover {
-  background-color: color-mix(in srgb, var(--primary-color) 90%, black);
+  background: darken(var(--primary-color), 10%);
 }
 
 .faq {
-  margin-top: 20px;
+  margin-bottom: 2rem;
 }
 
 .faqItem {
-  background-color: var(--white);
-  padding: 15px;
-  border-radius: var(--border-radius);
-  margin-bottom: 10px;
-  box-shadow: var(--shadow);
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--gray);
   cursor: pointer;
-  transition: var(--transition);
-}
-
-.faqItem:hover {
-  transform: translateY(-2px);
 }
 
 .faqHeader {
@@ -353,63 +315,51 @@
 }
 
 .faqHeader h3 {
-  font-size: 18px;
+  font-size: 1.1rem;
   color: var(--text-color);
-  margin: 0;
 }
 
 .faqContent {
-  margin-top: 10px;
-  padding: 10px;
-  background-color: color-mix(in srgb, var(--secondary-color) 95%, white);
-  border-radius: var(--border-radius);
-  animation: slideIn 0.3s ease;
-}
-
-.faqContent p {
-  font-size: 16px;
-  color: var(--text-color);
-  margin: 0;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--secondary-color);
+  border-radius: 8px;
 }
 
 .reviews {
-  margin-top: 20px;
+  margin-bottom: 2rem;
 }
 
 .reviewItem {
-  background-color: var(--white);
-  padding: 15px;
-  border-radius: var(--border-radius);
-  margin-bottom: 10px;
-  box-shadow: var(--shadow);
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--gray);
 }
 
 .reviewHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 0.5rem;
 }
 
 .reviewUser {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--text-color);
+  font-size: 1.1rem;
+  color: var(--primary-color);
 }
 
 .reviewRating {
   display: flex;
-  gap: 4px;
+  gap: 0.3rem;
 }
 
 .reviewComment {
-  font-size: 16px;
+  font-size: 0.95rem;
   color: var(--text-color);
-  margin-bottom: 10px;
+  margin-bottom: 0.5rem;
 }
 
 .reviewDate {
-  font-size: 14px;
+  font-size: 0.85rem;
   color: var(--gray);
 }
 
@@ -419,7 +369,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -427,59 +377,33 @@
 }
 
 .modal {
-  background-color: var(--white);
-  padding: 20px;
+  background: var(--white);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
-  max-width: 600px;
-  width: 90%;
+  max-width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
   position: relative;
-  animation: fadeIn 0.3s ease;
+  padding: 2rem;
 }
 
 .closeModalButton {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  color: var(--text-color);
-  font-size: 20px;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  color: var(--gray);
+  font-size: 1.5rem;
+  border: none;
   cursor: pointer;
 }
 
-.modalContent {
-  margin-top: 20px;
-  font-size: 16px;
-  color: var(--text-color);
-}
-
 .videoPlayer {
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
 }
 
-/* Animations */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
+/* Responsive Design */
+@media (max-width: 1024px) {
   .courseHeader {
     flex-direction: column;
     align-items: center;
@@ -488,18 +412,16 @@
   .courseImage {
     max-width: 100%;
   }
+}
 
+@media (max-width: 768px) {
+  .title,
   .courseTitle {
-    font-size: 28px;
+    font-size: 2rem;
   }
 
-  .details {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .stickyEnrollBar {
-    position: static;
+  .courseContent h2 {
+    font-size: 1.5rem;
   }
 
   .syllabusItem {
@@ -509,16 +431,40 @@
 
   .syllabusTimeline {
     flex-direction: row;
-    width: 100%;
-    justify-content: flex-start;
-    margin-bottom: 10px;
+    gap: 0.5rem;
   }
 
   .timelineLine {
     width: 100%;
     height: 2px;
-    top: 50%;
-    left: 24px;
-    transform: translateY(-50%);
+  }
+
+  .modal {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title,
+  .courseTitle {
+    font-size: 1.8rem;
+  }
+
+  .enrollButton {
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+
+  .details {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .syllabusTitle {
+    font-size: 1rem;
+  }
+
+  .faqHeader h3 {
+    font-size: 1rem;
   }
 }

@@ -1,287 +1,298 @@
-/* src/pages/Blog.module.css */
+/* src/styles/Blog.module.css */
 .blogSection {
-    padding: 60px 20px;
-    min-height: 100vh; /* برای پر کردن صفحه */
+  padding: 4rem 1rem;
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--white) 100%);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.title::after {
+  content: '';
+  width: 80px;
+  height: 4px;
+  background: var(--accent-color);
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: var(--gray);
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.searchContainer {
+  display: flex;
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  position: relative;
+  background: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 0.5rem;
+}
+
+.searchIcon {
+  color: var(--gray);
+  margin-right: 1rem;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  font-size: 1rem;
+  color: var(--text-color);
+  background: transparent;
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--gray);
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filterContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filterButton {
+  background: var(--gray);
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.filterButton:hover,
+.filterButton.active {
+  background: var(--accent-color);
+  transform: translateY(-2px);
+}
+
+.sortContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sortSelect {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--gray);
+  background: var(--white);
+  color: var(--text-color);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.blogGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.blogCard {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.blogCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.blogImage {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.blogContent {
+  padding: 1.5rem;
+}
+
+.blogTitle {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.author {
+  font-size: 1rem;
+  color: var(--gray);
+  margin-bottom: 0.75rem;
+}
+
+.excerpt {
+  font-size: 0.95rem;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  color: var(--gray);
+  font-size: 0.9rem;
+}
+
+.details span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.detailsLink {
+  background: var(--accent-color);
+  color: var(--white);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.detailsLink:hover {
+  background: darken(var(--accent-color), 10%);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.pageButton {
+  padding: 0.5rem 1rem;
+  background: var(--white);
+  color: var(--primary-color);
+  border: 1px solid var(--gray);
+  border-radius: 8px;
+  transition: var(--transition);
+}
+
+.pageButton:hover:not(:disabled) {
+  background: var(--accent-color);
+  color: var(--white);
+}
+
+.pageButton.activePage {
+  background: var(--accent-color);
+  color: var(--white);
+}
+
+.pageButton:disabled {
+  background: var(--gray);
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .blogGrid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
-  
-  .container {
-    max-width: 1200px;
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sortContainer {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .blogGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .blogCard {
+    max-width: 500px;
     margin: 0 auto;
   }
-  
-  .title {
-    font-size: 2.5rem;
-    font-weight: bold;
-    text-align: center;
-    color: #333;
-    margin-bottom: 10px;
-  }
-  
-  .subtitle {
-    font-size: 1.2rem;
-    text-align: center;
-    color: #666;
-    margin-bottom: 40px;
-  }
-  
-  /* جستجو */
-  .searchContainer {
-    display: flex;
-    align-items: center;
-    max-width: 500px;
-    margin: 0 auto 30px;
-    position: relative;
-  }
-  
-  .searchInput {
-    width: 100%;
-    padding: 12px 40px 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    transition: border-color 0.3s ease;
-  }
-  
-  .searchInput:focus {
-    border-color: #3498db;
-    outline: none;
-  }
-  
-  .searchIcon {
-    position: absolute;
-    right: 15px;
-    color: #888;
-    font-size: 1.2rem;
-  }
-  
-  /* کنترل‌ها (فیلتر و مرتب‌سازی) */
-  .controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-  
-  .filterContainer {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  
+
   .filterButton {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: #fff;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
   }
-  
-  .filterButton:hover,
-  .filterButton.active {
-    background-color: #3498db;
-    color: white;
-    border-color: #3498db;
+
+  .searchContainer {
+    max-width: 100%;
   }
-  
-  .sortContainer {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.8rem;
   }
-  
-  .sortContainer label {
-    font-size: 1rem;
-    color: #555;
-  }
-  
-  .sortSelect {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-    background: #fff;
-    cursor: pointer;
-    transition: border-color 0.3s ease;
-  }
-  
-  .sortSelect:focus {
-    border-color: #3498db;
-    outline: none;
-  }
-  
-  /* گرید پست‌ها */
-  .blogGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-  }
-  
-  .blogCard {
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    animation: fadeIn 0.5s ease-in-out;
-  }
-  
-  .blogCard:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  }
-  
-  .blogImage {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-  }
-  
-  .blogContent {
-    padding: 20px;
-  }
-  
+
   .blogTitle {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 10px;
+    font-size: 1.3rem;
   }
-  
-  .author {
-    font-size: 1rem;
-    color: #7f8c8d;
-    margin-bottom: 10px;
-  }
-  
-  .excerpt {
-    font-size: 0.95rem;
-    color: #555;
-    margin-bottom: 15px;
-    line-height: 1.5;
-  }
-  
+
   .details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    font-size: 0.9rem;
-    color: #888;
-    margin-bottom: 20px;
+    flex-direction: column;
+    gap: 0.5rem;
   }
-  
-  .details span {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  
-  .actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  
+
   .detailsLink {
-    color: #3498db;
-    text-decoration: none;
-    font-size: 1rem;
-    padding: 10px;
+    width: 100%;
   }
-  
-  .detailsLink:hover {
-    text-decoration: underline;
-  }
-  
-  /* صفحه‌بندی */
-  .pagination {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 30px;
-  }
-  
-  .pageButton {
-    padding: 8px 14px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: #fff;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-  }
-  
-  .pageButton:hover,
-  .pageButton.activePage {
-    background-color: #3498db;
-    color: white;
-    border-color: #3498db;
-  }
-  
-  /* انیمیشن ورود */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* برای موبایل */
-  @media (max-width: 768px) {
-    .blogGrid {
-      grid-template-columns: 1fr;
-    }
-  
-    .title {
-      font-size: 2rem;
-    }
-  
-    .subtitle {
-      font-size: 1rem;
-    }
-  
-    .controls {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  
-    .searchContainer {
-      width: 100%;
-    }
-  
-    .filterContainer {
-      justify-content: center;
-    }
-  
-    .actions {
-      flex-direction: column;
-      align-items: stretch;
-    }
-  
-    .detailsLink {
-      width: 100%;
-      text-align: center;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .blogCard {
-      margin: 0 10px;
-    }
-  
-    .blogTitle {
-      font-size: 1.3rem;
-    }
-  
-    .excerpt {
-      font-size: 0.9rem;
-    }
-  }
+}

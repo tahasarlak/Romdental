@@ -1,213 +1,249 @@
-
 .coursesSection {
-  padding: 40px 20px;
-  background-color: var(--secondary-color);
+  padding: 4rem 1rem;
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--white) 100%);
   min-height: 100vh;
 }
 
 .container {
   max-width: var(--max-width);
   margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
 .title {
-  font-size: 32px;
+  font-size: 2.5rem;
   font-weight: 700;
-  color: var(--text-color);
+  color: var(--primary-color);
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.title::after {
+  content: '';
+  width: 80px;
+  height: 4px;
+  background: var(--accent-color);
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
 }
 
 .subtitle {
-  font-size: 18px;
+  font-size: 1.2rem;
   color: var(--gray);
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 2.5rem;
 }
 
 .searchContainer {
   display: flex;
   align-items: center;
-  max-width: 500px;
-  margin: 0 auto 20px;
-  background-color: var(--white);
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  position: relative;
+  background: var(--white);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
-  padding: 10px;
+  padding: 0.5rem;
 }
 
 .searchIcon {
   color: var(--gray);
-  margin: 0 10px;
+  margin-right: 1rem;
 }
 
 .searchInput {
   flex: 1;
+  padding: 0.75rem;
   border: none;
-  font-size: 16px;
+  font-size: 1rem;
   color: var(--text-color);
+  background: transparent;
   outline: none;
 }
 
-.controls {
+.searchInput::placeholder {
+  color: var(--gray);
+}
+
+.filterToggle {
+  display: none;
+  color: var(--primary-color);
+}
+
+.contentWrapper {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 30px;
-  gap: 20px;
+  gap: 2rem;
+}
+
+.sidebar {
+  flex: 0 0 280px;
+  position: sticky;
+  top: 2rem;
+  align-self: flex-start;
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.mainContent {
+  flex: 1;
 }
 
 .filterContainer {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.filterContainer h3 {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
 }
 
 .filterGroup {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
 }
 
 .filterGroup label {
-  font-size: 16px;
+  font-size: 1rem;
   color: var(--text-color);
-  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 .filterButton {
-  background-color: var(--white);
-  border: 1px solid var(--gray);
-  padding: 8px 16px;
-  border-radius: var(--border-radius);
-  font-size: 14px;
-  color: var(--text-color);
-  cursor: pointer;
+  background: var(--gray);
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  margin: 0.3rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
   transition: var(--transition);
 }
 
-.filterButton:hover {
-  background-color: var(--primary-color);
-  color: var(--white);
-  border-color: var(--primary-color);
-}
-
+.filterButton:hover,
 .filterButton.active {
-  background-color: var(--accent-color);
-  color: var(--white);
-  border-color: var(--accent-color);
+  background: var(--accent-color);
+  transform: translateY(-2px);
 }
 
 .clearButton {
-  background-color: #ff4d4f;
+  background: var(--primary-color);
   color: var(--white);
-  padding: 8px 16px;
-  border-radius: var(--border-radius);
-  font-size: 14px;
-  transition: var(--transition);
+  padding: 0.75rem 1.5rem;
+  margin-top: 1rem;
+  width: 100%;
 }
 
 .clearButton:hover {
-  background-color: color-mix(in srgb, #ff4d4f 90%, black);
+  background: darken(var(--primary-color), 10%);
 }
 
 .sortContainer {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-.sortContainer label {
-  font-size: 16px;
-  color: var(--text-color);
+  gap: 0.5rem;
+  margin-bottom: 2rem;
 }
 
 .sortSelect {
-  padding: 8px;
-  border-radius: var(--border-radius);
+  padding: 0.75rem;
+  border-radius: 8px;
   border: 1px solid var(--gray);
-  font-size: 14px;
+  background: var(--white);
   color: var(--text-color);
-  background-color: var(--white);
+  font-size: 1rem;
+  cursor: pointer;
 }
 
 .coursesGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  gap: 2rem;
 }
 
 .courseCard {
-  background-color: var(--white);
+  background: var(--white);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
   overflow: hidden;
-  transition: var(--transition);
-  animation: fadeIn 0.5s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .courseCard:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .imageWrapper {
   position: relative;
+  overflow: hidden;
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
 }
 
 .courseImage {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 200px;
+  height: 100%;
   object-fit: cover;
 }
 
+
 .featuredBadge {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  background-color: var(--accent-color);
+  top: 1rem;
+  left: 1rem;
+  background: var(--accent-color);
   color: var(--white);
-  padding: 5px 10px;
-  border-radius: 12px;
-  font-size: 12px;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
 .courseContent {
-  padding: 20px;
+  padding: 1.5rem;
 }
 
 .courseTitle {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-color);
-  margin-bottom: 10px;
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
 }
 
 .instructor {
-  font-size: 16px;
+  font-size: 1rem;
   color: var(--gray);
-  margin-bottom: 10px;
+  margin-bottom: 0.5rem;
 }
 
 .instructorLink {
-  color: var(--primary-color);
-  transition: var(--transition);
+  color: var(--accent-color);
 }
 
 .instructorLink:hover {
-  color: color-mix(in srgb, var(--primary-color) 90%, black);
+  text-decoration: underline;
 }
 
 .rating {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--gray);
-  margin-bottom: 10px;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .starIcon {
@@ -215,10 +251,9 @@
 }
 
 .description {
-  font-size: 14px;
+  font-size: 0.95rem;
   color: var(--text-color);
-  line-height: 1.6;
-  margin-bottom: 15px;
+  margin-bottom: 1rem;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -228,179 +263,246 @@
 .details {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  font-size: 14px;
+  gap: 1rem;
+  margin-bottom: 1rem;
   color: var(--gray);
-  margin-bottom: 15px;
+  font-size: 0.9rem;
 }
 
 .details span {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 0.3rem;
 }
 
 .progressContainer {
-  margin-bottom: 15px;
+  margin-bottom: 1rem;
 }
 
 .progressBar {
-  background-color: var(--gray);
+  background: var(--secondary-color);
   border-radius: 10px;
-  height: 6px;
+  height: 8px;
   overflow: hidden;
 }
 
 .progressFill {
-  background-color: var(--accent-color);
+  background: var(--accent-color);
   height: 100%;
-  transition: width 0.3s ease;
+  transition: width 0.5s ease;
 }
 
 .progressText {
-  font-size: 12px;
-  color: var(--text-color);
-  margin-top: 5px;
+  font-size: 0.85rem;
+  color: var(--gray);
+  margin-top: 0.5rem;
   display: block;
 }
 
 .actions {
   display: flex;
+  gap: 0.75rem;
   flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
 }
 
 .enrollButton {
-  background-color: var(--accent-color);
+  flex: 1;
+  background: var(--accent-color);
   color: var(--white);
-  padding: 10px 20px;
-  border-radius: var(--border-radius);
-  font-size: 14px;
-  transition: var(--transition);
-}
-
-.enrollButton:hover:not(:disabled) {
-  background-color: color-mix(in srgb, var(--accent-color) 90%, black);
 }
 
 .enrollButton:disabled {
-  background-color: var(--gray);
+  background: var(--gray);
   cursor: not-allowed;
 }
 
 .detailsLink {
-  background-color: transparent;
-  border: 1px solid var(--primary-color);
-  color: var(--primary-color);
-  padding: 10px 20px;
-  border-radius: var(--border-radius);
-  font-size: 14px;
+  flex: 1;
+  text-align: center;
+  padding: 0.75rem;
+  background: var(--primary-color);
+  color: var(--white);
+  border-radius: 8px;
   transition: var(--transition);
 }
 
 .detailsLink:hover {
-  background-color: var(--primary-color);
-  color: var(--white);
+  background: darken(var(--primary-color), 10%);
 }
 
 .wishlistButton {
-  background: none;
-  border: none;
-  padding: 8px;
-  cursor: pointer;
+  background: transparent;
+  padding: 0.75rem;
+  border: 1px solid var(--gray);
+  border-radius: 8px;
 }
 
 .wishlistIcon {
   color: var(--gray);
-  transition: var(--transition);
 }
 
 .wishlistIconActive {
-  color: #ff4d4f;
+  color: var(--accent-color);
+}
+
+.noResults {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--gray);
+  margin: 2rem 0;
 }
 
 .pagination {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin-top: 30px;
+  gap: 0.5rem;
+  margin-top: 2rem;
 }
 
 .pageButton {
-  background-color: var(--white);
+  padding: 0.5rem 1rem;
+  background: var(--white);
+  color: var(--primary-color);
   border: 1px solid var(--gray);
-  padding: 8px 12px;
-  border-radius: var(--border-radius);
-  font-size: 14px;
-  color: var(--text-color);
-  cursor: pointer;
+  border-radius: 8px;
   transition: var(--transition);
 }
 
 .pageButton:hover:not(:disabled) {
-  background-color: var(--primary-color);
+  background: var(--accent-color);
   color: var(--white);
-  border-color: var(--primary-color);
+}
+
+.pageButton.activePage {
+  background: var(--accent-color);
+  color: var(--white);
 }
 
 .pageButton:disabled {
+  background: var(--gray);
   cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.activePage {
-  background-color: var(--accent-color);
-  color: var(--white);
-  border-color: var(--accent-color);
 }
 
 .loading,
-.error,
-.noResults {
+.error {
   text-align: center;
-  font-size: 18px;
-  color: var(--text-color);
-  margin: 40px 0;
+  font-size: 1.2rem;
+  color: var(--gray);
+  margin: 2rem 0;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+.modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalContent {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  max-width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modalHeader h2 {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+/* Skeleton Animation */
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  100% {
+    background-position: -200% 0;
   }
 }
 
-/* Responsive */
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .contentWrapper {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .filterToggle {
+    display: block;
+  }
+
+  .coursesGrid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
   .coursesGrid {
     grid-template-columns: 1fr;
   }
 
-  .controls {
-    flex-direction: column;
-    align-items: stretch;
+  .courseCard {
+    max-width: 500px;
+    margin: 0 auto;
   }
 
-  .filterContainer {
-    align-items: stretch;
+  .filterButton {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
   }
 
-  .filterGroup {
-    flex-direction: column;
-    align-items: flex-start;
+  .searchContainer {
+    max-width: 100%;
   }
+}
 
-  .courseImage {
-    height: 150px;
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.8rem;
   }
 
   .courseTitle {
-    font-size: 18px;
+    font-size: 1.3rem;
+  }
+
+  .details {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .enrollButton,
+  .detailsLink,
+  .wishlistButton {
+    width: 100%;
+    text-align: center;
+  }
+
+  .modalContent {
+    padding: 1.5rem;
   }
 }
