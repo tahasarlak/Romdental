@@ -21,32 +21,32 @@ const InstructorContext = createContext<InstructorContextType | undefined>(undef
 export const InstructorProvider = ({ children }: { children: ReactNode }) => {
   const [instructors, setInstructors] = useState<Instructor[]>([
     {
-      id: 1,
-      name: 'دکتر احمد رضایی',
-      specialty: 'آناتومی دندان',
-      bio: 'متخصص آناتومی دندان با بیش از ۱۵ سال تجربه در آموزش و پژوهش.',
-      image: '/assets/instructors/ahmad-rezaei.jpg',
-      experience: '۱۵ سال',
-      coursesTaught: ['دوره جامع آناتومی دندان'],
-    },
-    {
-      id: 2,
-      name: 'دکتر مریم حسینی',
-      specialty: 'پروتزهای دندانی',
-      bio: 'کارشناس پروتزهای دندانی با تمرکز بر تکنولوژی‌های مدرن.',
-      image: '/assets/instructors/maryam-hosseini.jpg',
-      experience: '۱۲ سال',
-      coursesTaught: ['پروتزهای دندانی پیشرفته'],
-    },
-    {
-      id: 3,
-      name: 'دکتر علی محمدی',
-      specialty: 'ترمیم دندان',
-      bio: 'متخصص ترمیم دندان با تجربه گسترده در کلینیک‌های پیشرفته.',
-      image: '/assets/instructors/ali-mohammadi.jpg',
-      experience: '۱۰ سال',
-      coursesTaught: ['دوره عملی ترمیمی'],
-    },
+    id: 1,
+    name: 'دکتر احمد راسته',
+    specialty: 'کونی حرفه ای',
+    bio: 'کارشناس برجسته در حوزه مشاوره و آموزش حرفه‌ای با تمرکز بر توسعه مهارت‌های فردی و تیمی.',
+    image: '/assets/instructors/ahmad-rasteh.jpg',
+    experience: '۱۵ سال',
+    coursesTaught: ['دوره جامع مهارت‌های حرفه‌ای', 'کارگاه توسعه فردی', 'سمینار مدیریت تیم'],
+  },
+  {
+    id: 2,
+    name: 'دکتر امیر لک زایی',
+    specialty: 'جق بین',
+    bio: 'متخصص آموزش‌های خلاقانه با رویکرد نوآورانه در حل مسائل و بهبود عملکرد سازمانی.',
+    image: '/assets/instructors/amir-lakzaei.jpg',
+    experience: '۱۲ سال',
+    coursesTaught: ['دوره نوآوری و خلاقیت', 'کارگاه حل مسئله', 'سمینار تفکر خلاق'],
+  },
+  {
+    id: 3,
+    name: 'بهشاد نمیدونم چی',
+    specialty: 'هیچ گوهی نیست',
+    bio: 'مشاور و مربی با تجربه در توانمندسازی افراد و توسعه استراتژی‌های موفقیت‌آمیز.',
+    image: '/assets/instructors/behshad-nemati.jpg',
+    experience: '۱۰ سال',
+    coursesTaught: ['دوره توانمندسازی شخصی', 'کارگاه استراتژی موفقیت', 'سمینار هدف‌گذاری'],
+  },
   ]);
 
   return (

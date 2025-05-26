@@ -1,7 +1,6 @@
-/* src/components/Header.module.css */
 .header {
   background-color: #2c3e50;
-  padding: 20px;
+  padding: 15px 20px; /* کاهش padding برای موبایل */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
@@ -19,11 +18,14 @@
 
 .logoContainer {
   display: flex;
-  align-items: center;
+  align-items: center; /* وسط‌چین عمودی */
+  justify-content: center; /* وسط‌چین افقی */
   gap: 10px;
+  width: 100%; /* اطمینان از اینکه کل عرض در دسترس باشه */
 }
 
 .logoImage {
+  
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -137,61 +139,97 @@
   display: none;
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.8rem; /* افزایش اندازه آیکون */
   color: #ecf0f1;
   cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.menuToggle.open {
+  transform: rotate(90deg); /* انیمیشن چرخش برای حالت باز */
 }
 
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
     align-items: flex-start;
+    padding: 10px; /* padding کمتر برای موبایل */
   }
 
   .menuToggle {
     display: block;
+    position: absolute;
+    right: 20px;
+    top: 20px;
   }
 
   .nav {
     display: none;
     width: 100%;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    background-color: #2c3e50; /* پس‌زمینه منو */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* سایه برای جذابیت */
+    padding: 20px;
+    margin-top: 10px;
+    border-radius: 8px; /* گوشه‌های گرد */
+    max-height: 0; /* برای انیمیشن */
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out; /* انیمیشن باز شدن */
   }
 
   .navOpen {
     display: flex;
+    max-height: 500px; /* ارتفاع کافی برای منو */
   }
 
   .navList {
     flex-direction: column;
     width: 100%;
     gap: 15px;
+    padding: 10px 0;
   }
 
   .navLink {
-    padding: 10px;
+    padding: 12px;
     width: 100%;
     text-align: center;
+    font-size: 1.2rem; /* فونت کمی بزرگ‌تر */
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .navLink:hover,
+  .navLink.active {
+    background-color: #34495e; /* پس‌زمینه برای حالت هاور */
+    color: #3498db;
   }
 
   .authContainer {
     flex-direction: column;
     width: 100%;
-    gap: 10px;
-    padding: 10px 0;
+    gap: 12px;
+    padding: 15px 0;
+    align-items: center;
   }
 
   .authButton,
   .signupButton,
   .logoutButton {
-    width: 100%;
+    width: 80%; /* عرض کمتر برای زیبایی */
     text-align: center;
+    padding: 10px;
+    font-size: 1.1rem; /* فونت بزرگ‌تر */
   }
 
   .userProfile {
     flex-direction: column;
     align-items: center;
     width: 100%;
+    padding: 10px 0;
+  }
+
+  .userName {
+    font-size: 1.1rem; /* فونت بزرگ‌تر */
   }
 }

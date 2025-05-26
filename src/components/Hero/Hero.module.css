@@ -49,6 +49,71 @@
   transform: translateY(0);
 }
 
+.subtitle {
+  font-size: 26px;
+  font-weight: 400;
+  margin-bottom: 20px;
+  opacity: 1;
+  transform: translateY(-10px);
+}
+.buttonIcon {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.primaryButton:hover .buttonIcon,
+.secondaryButton:hover .buttonIcon {
+  transform: translateX(5px);
+}
+
+.extraInfo {
+  font-size: 22px;
+  font-weight: 300;
+ opacity: 1;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s;
+}
+
+.extraInfoVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.primaryButton,
+.secondaryButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  text-decoration: none;
+  color: var(--white);
+  border: none;
+}
+.wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.2), transparent); /* افکت موج ساده */
+  z-index: 1;
+  animation: waveAnimation 10s linear infinite;
+}
+
+@keyframes waveAnimation {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-1000px); }
+}
 /* انیمیشن‌ها */
 @keyframes subtleZoom {
   0% { transform: scale(1); }
@@ -57,8 +122,51 @@
 
 /* ریسپانسیو */
 @media (max-width: 768px) {
-  .title {
-    font-size: 36px;
+  .hero {
+    padding: 40px 15px;
+    min-height: 80vh; /* کاهش ارتفاع برای موبایل */
   }
-  /* بقیه استایل‌های ریسپانسیو */
+
+  .title {
+    font-size: 36px; /* فونت کوچکتر اما خوانا */
+  }
+
+  .subtitle {
+    font-size: 20px;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+
+  .extraInfo {
+    font-size: 18px;
+  }
+
+  .wave {
+    height: 60px; /* موج کوچکتر برای موبایل */
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 28px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+  }
+
+  .buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    max-width: 300px;
+  }
 }
