@@ -1,0 +1,524 @@
+
+.courseDetailsSection {
+  padding: 40px 20px;
+  background-color: var(--secondary-color);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.backLink {
+  display: flex;
+  align-items: center;
+  color: var(--primary-color);
+  font-size: 16px;
+  margin-bottom: 20px;
+  transition: var(--transition);
+}
+
+.backLink:hover {
+  color: color-mix(in srgb, var(--primary-color) 90%, black);
+}
+
+.courseHeader {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, var(--white) 0%, var(--secondary-color) 100%);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.courseImage {
+  width: 100%;
+  max-width: 400px;
+  border-radius: var(--border-radius);
+  object-fit: cover;
+  box-shadow: var(--shadow);
+}
+
+.courseInfo {
+  flex: 1;
+}
+
+.courseTitle {
+  font-size: 32px;
+  margin-bottom: 10px;
+  color: var(--text-color);
+  font-weight: 700;
+}
+
+.instructor {
+  font-size: 18px;
+  color: var(--gray);
+  margin-bottom: 15px;
+}
+
+.instructorLink {
+  color: var(--primary-color);
+  transition: var(--transition);
+}
+
+.instructorLink:hover {
+  color: color-mix(in srgb, var(--primary-color) 90%, black);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: var(--gray);
+  margin-bottom: 15px;
+}
+
+.starIcon {
+  color: var(--accent-color);
+}
+
+.description {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 20px;
+}
+
+.details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-size: 16px;
+  color: var(--gray);
+  margin-bottom: 20px;
+}
+
+.details span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shareButton {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  padding: 8px 16px;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.shareButton:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.stickyEnrollBar {
+  position: sticky;
+  top: 20px;
+  z-index: 10;
+  background-color: var(--white);
+  padding: 10px 0;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.enrollButton {
+  background-color: var(--accent-color);
+  color: var(--white);
+  padding: 12px 24px;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.enrollButton:disabled {
+  background-color: var(--gray);
+  cursor: not-allowed;
+}
+
+.enrollButton:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--accent-color) 90%, black);
+}
+
+.courseContent {
+  margin-bottom: 40px;
+}
+
+.courseContent h2 {
+  font-size: 24px;
+  margin-bottom: 15px;
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.courseContent p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 20px;
+}
+
+.progressContainer {
+  margin-bottom: 20px;
+}
+
+.progressBar {
+  background-color: var(--gray);
+  border-radius: 10px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  background-color: var(--accent-color);
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.syllabus {
+  list-style: none;
+  padding: 0;
+  position: relative;
+}
+
+.syllabusItem {
+  display: flex;
+  background-color: var(--white);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  margin-bottom: 15px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.syllabusItem:hover {
+  transform: translateY(-2px);
+}
+
+.syllabusTimeline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40px;
+  position: relative;
+}
+
+.timelineDot {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--white);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.timelineLine {
+  width: 2px;
+  height: 100%;
+  background-color: var(--gray);
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.syllabusContent {
+  flex: 1;
+}
+
+.syllabusHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.syllabusTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.newBadge {
+  background-color: var(--accent-color);
+  color: var(--white);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.syllabusMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--gray);
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.locked {
+  opacity: 0.7;
+}
+
+.lockIcon {
+  color: #ff4d4f;
+}
+
+.playIcon {
+  color: var(--accent-color);
+}
+
+.completedIcon {
+  color: #4caf50;
+}
+
+.expandIcon {
+  transition: var(--transition);
+}
+
+.expandIcon.expanded {
+  transform: rotate(180deg);
+}
+
+.previewContent {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: color-mix(in srgb, var(--secondary-color) 95%, white);
+  border-radius: var(--border-radius);
+  animation: slideIn 0.3s ease;
+}
+
+.previewButton {
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: 8px 16px;
+  border-radius: var(--border-radius);
+  font-size: 14px;
+  transition: var(--transition);
+}
+
+.previewButton:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 90%, black);
+}
+
+.faq {
+  margin-top: 20px;
+}
+
+.faqItem {
+  background-color: var(--white);
+  padding: 15px;
+  border-radius: var(--border-radius);
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.faqItem:hover {
+  transform: translateY(-2px);
+}
+
+.faqHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.faqHeader h3 {
+  font-size: 18px;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.faqContent {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: color-mix(in srgb, var(--secondary-color) 95%, white);
+  border-radius: var(--border-radius);
+  animation: slideIn 0.3s ease;
+}
+
+.faqContent p {
+  font-size: 16px;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.reviews {
+  margin-top: 20px;
+}
+
+.reviewItem {
+  background-color: var(--white);
+  padding: 15px;
+  border-radius: var(--border-radius);
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.reviewUser {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.reviewRating {
+  display: flex;
+  gap: 4px;
+}
+
+.reviewComment {
+  font-size: 16px;
+  color: var(--text-color);
+  margin-bottom: 10px;
+}
+
+.reviewDate {
+  font-size: 14px;
+  color: var(--gray);
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: var(--white);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  max-width: 600px;
+  width: 90%;
+  position: relative;
+  animation: fadeIn 0.3s ease;
+}
+
+.closeModalButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  color: var(--text-color);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.modalContent {
+  margin-top: 20px;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+.videoPlayer {
+  margin-bottom: 20px;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .courseHeader {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .courseImage {
+    max-width: 100%;
+  }
+
+  .courseTitle {
+    font-size: 28px;
+  }
+
+  .details {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .stickyEnrollBar {
+    position: static;
+  }
+
+  .syllabusItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .syllabusTimeline {
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+  }
+
+  .timelineLine {
+    width: 100%;
+    height: 2px;
+    top: 50%;
+    left: 24px;
+    transform: translateY(-50%);
+  }
+}

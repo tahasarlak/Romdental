@@ -1,0 +1,162 @@
+.footer {
+  background: linear-gradient(180deg, #2c3e5f 0%, #1a2b4a 100%); /* گرادیان ملایم‌تر از آبی تیره */
+  color: var(--white);
+  padding: 60px 20px 20px;
+  position: relative;
+  font-family: var(--font-family);
+  direction: rtl;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+}
+
+.section {
+  padding: 20px;
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent-color);
+  margin-bottom: 15px;
+  transition: var(--transition);
+}
+
+.logo:hover {
+  color: lighten(var(--accent-color), 10%);
+}
+
+.description {
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.9;
+  margin-bottom: 20px;
+}
+
+.copyright {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--accent-color);
+  margin-bottom: 20px;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+}
+
+.link {
+  color: var(--white);
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 2.2;
+  transition: var(--transition);
+}
+
+.link:hover {
+  color: var(--accent-color);
+}
+
+.newsletterForm {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.newsletterInput {
+  padding: 10px 15px;
+  font-size: 14px;
+  border: none;
+  border-radius: var(--border-radius);
+  width: 100%;
+  max-width: 200px;
+  background-color: var(--white);
+  color: var(--text-color);
+  font-family: var(--font-family);
+  transition: var(--transition);
+}
+
+.newsletterInput:focus {
+  outline: none;
+  box-shadow: var(--shadow);
+}
+
+.newsletterInput::placeholder {
+  color: var(--gray);
+  opacity: 0.8;
+}
+
+.newsletterButton {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: var(--accent-color);
+  color: var(--white);
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.newsletterButton:hover {
+  background-color: darken(var(--accent-color), 10%);
+}
+
+.socialIcons {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-start;
+}
+
+.socialLink {
+  color: var(--white);
+  font-size: 24px;
+  transition: var(--transition);
+}
+
+.socialLink:hover {
+  color: var(--accent-color);
+  transform: scale(1.1);
+}
+
+.bottomBar {
+  text-align: center;
+  padding: 15px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 20px;
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .socialIcons {
+    justify-content: center;
+  }
+
+  .newsletterForm {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .newsletterInput {
+    max-width: 100%;
+  }
+
+  .logo {
+    font-size: 24px;
+  }
+}

@@ -1,0 +1,47 @@
+/* src/components/Testimonials.module.css */
+.testimonials {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.title {
+  font-size: 32px;
+  margin-bottom: 40px;
+  color: var(--primary-color);
+}
+
+.list {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.card {
+  background-color: var(--white);
+  padding: 30px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.text {
+  font-style: italic;
+  margin-bottom: 15px;
+}
+
+.name {
+  color: var(--accent-color);
+  margin-bottom: 5px;
+}
+
+.role {
+  color: var(--gray);
+  font-size: 14px;
+}
+
+.likes {
+  font-size: 0.9rem; /* اندازه فونت کوچیک‌تر */
+  color: var(--gray); /* هم‌رنگ با role برای هماهنگی */
+  margin-top: 10px; /* فاصله از role */
+}

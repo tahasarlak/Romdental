@@ -1,0 +1,287 @@
+/* src/pages/Instructors.module.css */
+.instructorsSection {
+  padding: 60px 20px;
+  min-height: 100vh; /* برای پر کردن صفحه */
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  text-align: center;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+/* جستجو */
+.searchContainer {
+  display: flex;
+  align-items: center;
+  max-width: 500px;
+  margin: 0 auto 30px;
+  position: relative;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.3s ease;
+}
+
+.searchInput:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.searchIcon {
+  position: absolute;
+  right: 15px;
+  color: #888;
+  font-size: 1.2rem;
+}
+
+/* کنترل‌ها (فیلتر و مرتب‌سازی) */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.filterContainer {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filterButton {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.filterButton:hover,
+.filterButton.active {
+  background-color: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.sortContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sortContainer label {
+  font-size: 1rem;
+  color: #555;
+}
+
+.sortSelect {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.sortSelect:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+/* گرید اساتید */
+.instructorsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.instructorCard {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.instructorCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.instructorImage {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.instructorContent {
+  padding: 20px;
+}
+
+.instructorName {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.specialty {
+  font-size: 1rem;
+  color: #7f8c8d;
+  margin-bottom: 10px;
+}
+
+.bio {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 20px;
+}
+
+.details span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.detailsLink {
+  color: #3498db;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 10px;
+}
+
+.detailsLink:hover {
+  text-decoration: underline;
+}
+
+/* صفحه‌بندی */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.pageButton {
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.pageButton:hover,
+.pageButton.activePage {
+  background-color: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+/* انیمیشن ورود */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* برای موبایل */
+@media (max-width: 768px) {
+  .instructorsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .searchContainer {
+    width: 100%;
+  }
+
+  .filterContainer {
+    justify-content: center;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .detailsLink {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .instructorCard {
+    margin: 0 10px;
+  }
+
+  .instructorName {
+    font-size: 1.3rem;
+  }
+
+  .bio {
+    font-size: 0.9rem;
+  }
+}

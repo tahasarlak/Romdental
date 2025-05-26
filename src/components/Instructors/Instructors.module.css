@@ -1,0 +1,120 @@
+.instructors {
+    padding: 80px 20px;
+    text-align: center;
+    position: relative;
+  }
+  
+  .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+  
+  .title {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    transform: translateY(50px);
+    transition: transform 0.8s ease;
+  }
+  
+  .titleVisible {
+    transform: translateY(0);
+  }
+  
+  .subtitle {
+    font-size: 20px;
+    color: var(--gray);
+    margin-bottom: 50px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.85;
+  }
+  
+  .instructorList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+  }
+  
+  .card {
+    background-color: var(--white);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    transform: translateY(30px);
+    transition: transform 0.5s ease, box-shadow 0.3s ease;
+  }
+  
+  .cardVisible {
+    transform: translateY(0);
+  }
+  
+  .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  .instructorImage {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 3px solid var(--accent-color);
+    transition: transform 0.3s ease;
+  }
+  
+  .card:hover .instructorImage {
+    transform: scale(1.05);
+  }
+  
+  .instructorName {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+  }
+  
+  .instructorSpecialty {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--accent-color);
+    margin-bottom: 15px;
+  }
+  
+  .instructorDesc {
+    font-size: 14px;
+    color: var(--text-color);
+    line-height: 1.6;
+    opacity: 0.9;
+  }
+  
+  /* ریسپانسیو */
+  @media (max-width: 768px) {
+    .title {
+      font-size: 36px;
+    }
+  
+    .subtitle {
+      font-size: 18px;
+    }
+  
+    .instructorImage {
+      width: 120px;
+      height: 120px;
+    }
+  
+    .instructorName {
+      font-size: 20px;
+    }
+  
+    .instructorSpecialty {
+      font-size: 14px;
+    }
+  
+    .instructorDesc {
+      font-size: 13px;
+    }
+  }

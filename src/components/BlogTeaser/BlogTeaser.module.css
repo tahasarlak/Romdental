@@ -1,0 +1,41 @@
+/* src/components/BlogTeaser.module.css */
+.blog {
+  padding: 60px 20px;
+}
+
+.title {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 40px;
+  color: var(--primary-color);
+}
+
+.posts {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.card {
+  background-color: var(--white);
+  padding: 25px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.cardTitle {
+  color: var(--primary-color);
+  margin-bottom: 15px;
+}
+
+.readMore {
+  color: var(--accent-color);
+  font-weight: 500;
+}
