@@ -6,14 +6,20 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SearchIcon from '@mui/icons-material/Search';
 import StarIcon from '@mui/icons-material/Star';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import PeopleIcon from '@mui/icons-material/People';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import DeleteIcon from '@mui/icons-material/Delete';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import Tooltip from '@mui/material/Tooltip';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import styles from './Courses.module.css';
 import { useCourseContext } from '../../Context/CourseContext';
+import { useInstructorContext } from '../../Context/InstructorContext';
+import { useReviewContext } from '../../Context/ReviewContext';
+import { useCartContext } from '../../Context/CartContext';
+import { useWishlistContext } from '../../Context/WishlistContext';
 
 interface Course {
   id: number;
@@ -30,37 +36,50 @@ interface Course {
   isFeatured: boolean;
   enrollmentCount: number;
   syllabus: { completed?: boolean }[];
-  reviews: { rating: number }[];
   tags?: string[];
   prerequisites?: string[];
+  courseType: 'Online' | 'Offline' | 'In-Person' | 'Hybrid';
+}
+
+interface ReviewItem {
+  id: number;
+  courseId: number;
+  user: string;
+  rating: number;
+  comment: string;
+  date: string;
 }
 
 const Courses: React.FC = () => {
   const { courses } = useCourseContext();
+  const { instructors } = useInstructorContext();
+  const { reviews } = useReviewContext();
+  const { addToCart, removeFromCart, cartItems } = useCartContext();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlistContext();
   const navigate = useNavigate();
   const [filterLevel, setFilterLevel] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterInstructor, setFilterInstructor] = useState<string>('all');
+  const [filterCourseType, setFilterCourseType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('title');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [openModal, setOpenModal] = useState<boolean>(false); // State for modal
-  const coursesPerPage = 6;
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const coursesPerPage = 8;
 
-  // Mock enrollment status
   const [enrolledCourses, setEnrolledCourses] = useState<number[]>([1]);
-  const [wishlist, setWishlist] = useState<number[]>([]);
 
-  // Derive unique filter options
+  const instructorNames = useMemo(() => new Set(instructors.map((instructor) => instructor.name)), [instructors]);
+
   const uniqueLevels = useMemo(() => ['all', ...new Set(courses.map((course) => course.level)).values()].sort(), [courses]);
   const uniqueCategories = useMemo(() => ['all', ...new Set(courses.map((course) => course.category)).values()].sort(), [courses]);
   const uniqueInstructors = useMemo(() => ['all', ...new Set(courses.map((course) => course.instructor)).values()].sort(), [courses]);
   const uniqueStatuses = useMemo(() => ['all', 'open', 'closed'], [courses]);
+  const uniqueCourseTypes = useMemo(() => ['all', 'Online', 'Offline', 'In-Person', 'Hybrid'], [courses]);
 
-  // Simulate data fetching
   useEffect(() => {
     setIsLoading(true);
     setTimeout(() => {
@@ -77,6 +96,7 @@ const Courses: React.FC = () => {
       .filter((course) => filterCategory === 'all' ? true : course.category === filterCategory)
       .filter((course) => filterStatus === 'all' ? true : filterStatus === 'open' ? course.isOpen : !course.isOpen)
       .filter((course) => filterInstructor === 'all' ? true : course.instructor === filterInstructor)
+      .filter((course) => filterCourseType === 'all' ? true : course.courseType === filterCourseType)
       .filter((course) =>
         course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         course.instructor.toLowerCase().includes(searchQuery.toLowerCase())
@@ -86,14 +106,20 @@ const Courses: React.FC = () => {
         if (sortBy === 'price') return parseInt(a.price.replace(/[^0-9]/g, '')) - parseInt(b.price.replace(/[^0-9]/g, ''));
         if (sortBy === 'startDate') return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
         if (sortBy === 'rating') {
-          const avgRatingA = a.reviews.length > 0 ? a.reviews.reduce((sum, r) => sum + r.rating, 0) / a.reviews.length : 0;
-          const avgRatingB = b.reviews.length > 0 ? b.reviews.reduce((sum, r) => sum + r.rating, 0) / b.reviews.length : 0;
+          const courseReviewsA = reviews.filter((review) => review.courseId === a.id);
+          const courseReviewsB = reviews.filter((review) => review.courseId === b.id);
+          const avgRatingA = courseReviewsA.length > 0
+            ? courseReviewsA.reduce((sum: number, r: ReviewItem) => sum + r.rating, 0) / courseReviewsA.length
+            : 0;
+          const avgRatingB = courseReviewsB.length > 0
+            ? courseReviewsB.reduce((sum: number, r: ReviewItem) => sum + r.rating, 0) / courseReviewsB.length
+            : 0;
           return avgRatingB - avgRatingA;
         }
         if (sortBy === 'enrollment') return b.enrollmentCount - a.enrollmentCount;
         return 0;
       });
-  }, [courses, filterLevel, filterCategory, filterStatus, filterInstructor, searchQuery, sortBy]);
+  }, [courses, filterLevel, filterCategory, filterStatus, filterInstructor, filterCourseType, searchQuery, sortBy, reviews]);
 
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
@@ -105,21 +131,34 @@ const Courses: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const handleEnroll = useCallback((courseId: number) => {
-    if (!enrolledCourses.includes(courseId)) {
-      navigate(`/checkout/${courseId}`);
-    }
-  }, [enrolledCourses, navigate]);
+  const isCartItem = useCallback((courseId: number) => {
+    return cartItems.some((item) => item.id === courseId);
+  }, [cartItems]);
 
-  const toggleWishlist = useCallback((courseId: number) => {
-    setWishlist((prev) => prev.includes(courseId) ? prev.filter((id) => id !== courseId) : [...prev, courseId]);
-  }, []);
+  const handleAddToCart = useCallback((course: Course) => {
+    if (isCartItem(course.id)) {
+      removeFromCart(course.id);
+      setEnrolledCourses((prev) => prev.filter((id) => id !== course.id));
+    } else {
+      addToCart({ id: course.id, title: course.title, price: course.price });
+      setEnrolledCourses((prev) => [...prev, course.id]);
+    }
+  }, [addToCart, removeFromCart, isCartItem, setEnrolledCourses]);
+
+  const handleWishlistToggle = useCallback((courseId: number) => {
+    if (isInWishlist(courseId, 'course')) {
+      removeFromWishlist(courseId, 'course');
+    } else {
+      addToWishlist(courseId, 'course');
+    }
+  }, [addToWishlist, removeFromWishlist, isInWishlist]);
 
   const clearFilters = useCallback(() => {
     setFilterLevel('all');
     setFilterCategory('all');
     setFilterStatus('all');
     setFilterInstructor('all');
+    setFilterCourseType('all');
     setSearchQuery('');
     setSortBy('title');
     setCurrentPage(1);
@@ -128,7 +167,6 @@ const Courses: React.FC = () => {
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
-  // Filter content to be reused in modal and sidebar
   const renderFilters = () => (
     <div className={styles.filterContainer}>
       <h3>فیلترها</h3>
@@ -184,6 +222,19 @@ const Courses: React.FC = () => {
           </button>
         ))}
       </div>
+      <div className={styles.filterGroup}>
+        <label>نوع دوره:</label>
+        {uniqueCourseTypes.map((courseType) => (
+          <button
+            key={courseType}
+            className={`${styles.filterButton} ${filterCourseType === courseType ? styles.active : ''}`}
+            onClick={() => setFilterCourseType(courseType)}
+            aria-pressed={filterCourseType === courseType}
+          >
+            {courseType === 'all' ? 'همه' : courseType === 'Online' ? 'آنلاین' : courseType === 'Offline' ? 'آفلاین' : courseType === 'In-Person' ? 'حضوری' : 'ترکیبی'}
+          </button>
+        ))}
+      </div>
       <button
         className={styles.clearButton}
         onClick={clearFilters}
@@ -193,6 +244,134 @@ const Courses: React.FC = () => {
       </button>
     </div>
   );
+
+  const renderCourseCard = (course: Course) => {
+    const isEnrolled = enrolledCourses.includes(course.id);
+    const completedItems = (course.syllabus || []).filter((item) => item.completed).length;
+    const totalItems = (course.syllabus || []).length;
+    const progressPercentage = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
+    const courseReviews = reviews.filter((review: ReviewItem) => review.courseId === course.id);
+    const averageRating = courseReviews.length > 0
+      ? (courseReviews.reduce((sum: number, r: ReviewItem) => sum + r.rating, 0) / courseReviews.length).toFixed(1)
+      : '0.0';
+
+    return (
+      <div
+        key={course.id}
+        className={styles.courseCard}
+        role="article"
+        aria-labelledby={`course-title-${course.id}`}
+      >
+        <div className={styles.imageWrapper}>
+          <div className={styles.imageContainer}>
+            <img
+              src={course.image}
+              alt={course.title}
+              className={styles.courseImage}
+              loading="lazy"
+              onError={(e) => { e.currentTarget.src = '/assets/fallback.jpg'; }}
+            />
+            <div className={styles.imageSkeleton} />
+          </div>
+          {course.isFeatured && (
+            <span className={styles.featuredBadge}>ویژه</span>
+          )}
+        </div>
+        <div className={styles.courseContent}>
+          <h2 id={`course-title-${course.id}`} className={styles.courseTitle}>
+            {course.title}
+          </h2>
+          <p className={styles.instructor}>
+            استاد:{' '}
+            {instructorNames.has(course.instructor) ? (
+              <Link
+                to={`/instructors/${course.instructor.replace(' ', '-')}`}
+                className={styles.instructorLink}
+                aria-label={`مشاهده پروفایل ${course.instructor}`}
+              >
+                {course.instructor}
+              </Link>
+            ) : (
+              <span>{course.instructor} (اطلاعات استاد در دسترس نیست)</span>
+            )}
+          </p>
+          <div className={styles.rating}>
+            <StarIcon className={styles.starIcon} />
+            <span>{averageRating} ({courseReviews.length} نظر)</span>
+          </div>
+          <p className={styles.description}>{course.description}</p>
+          <div className={styles.details}>
+            <Tooltip title="مدت دوره">
+              <span><AccessTimeIcon /> {course.duration}</span>
+            </Tooltip>
+            <Tooltip title="سطح دوره">
+              <span><TrendingUpIcon /> {course.level}</span>
+            </Tooltip>
+            <Tooltip title="قیمت دوره">
+              <span><AttachMoneyIcon /> {course.price}</span>
+            </Tooltip>
+            <Tooltip title="تاریخ شروع">
+              <span><CalendarTodayIcon /> {course.startDate}</span>
+            </Tooltip>
+            <Tooltip title="تعداد ثبت‌نام">
+              <span><PeopleIcon /> {course.enrollmentCount} نفر</span>
+            </Tooltip>
+            <Tooltip title="نوع دوره">
+              <span>{course.courseType === 'Online' ? 'آنلاین' : course.courseType === 'Offline' ? 'آفلاین' : course.courseType === 'In-Person' ? 'حضوری' : 'ترکیبی'}</span>
+            </Tooltip>
+          </div>
+          {isEnrolled && totalItems > 0 && (
+            <div className={styles.progressContainer}>
+              <div className={styles.progressBar}>
+                <div className={styles.progressFill} style={{ width: `${progressPercentage}%` }} />
+              </div>
+              <span className={styles.progressText}>
+                {Math.round(progressPercentage)}% کامل شده
+              </span>
+            </div>
+          )}
+          <div className={styles.actions}>
+            <button
+              className={`${styles.enrollButton} ${isCartItem(course.id) ? styles.addedToCart : ''}`}
+              disabled={!course.isOpen}
+              onClick={() => handleAddToCart(course)}
+              aria-label={isCartItem(course.id) ? 'حذف از سبد خرید' : course.isOpen ? 'افزودن به سبد خرید' : 'ثبت‌نام بسته است'}
+            >
+              {isCartItem(course.id) ? (
+                <>
+                  <DeleteIcon className={styles.removeIcon} />
+                  افزوده شده
+                </>
+              ) : course.isOpen ? (
+                'افزودن به سبد خرید'
+              ) : (
+                'ثبت‌نام بسته است'
+              )}
+            </button>
+        
+            <Link
+              to={`/courses/${course.id}`}
+              className={styles.detailsLink}
+              aria-label={`جزئیات بیشتر درباره ${course.title}`}
+            >
+              جزئیات بیشتر
+            </Link>
+                <button
+              className={`${styles.wishlistButton} ${isInWishlist(course.id, 'course') ? styles.wishlistActive : ''}`}
+              onClick={() => handleWishlistToggle(course.id)}
+              aria-label={isInWishlist(course.id, 'course') ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}
+            >
+              {isInWishlist(course.id, 'course') ? (
+                <FavoriteIcon className={styles.wishlistIconActive} />
+              ) : (
+                <FavoriteBorderIcon className={styles.wishlistIcon} />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   if (isLoading) {
     return (
@@ -264,115 +443,11 @@ const Courses: React.FC = () => {
             </div>
 
             <div className={styles.coursesGrid}>
-              {currentCourses.map((course) => {
-                const isEnrolled = enrolledCourses.includes(course.id);
-                const completedItems = (course.syllabus || []).filter((item) => item.completed).length;
-                const totalItems = (course.syllabus || []).length;
-                const progressPercentage = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
-                const averageRating = course.reviews.length > 0
-                  ? (course.reviews.reduce((sum, r) => sum + r.rating, 0) / course.reviews.length).toFixed(1)
-                  : '0.0';
-
-                return (
-                  <div
-                    key={course.id}
-                    className={styles.courseCard}
-                    role="article"
-                    aria-labelledby={`course-title-${course.id}`}
-                  >
-                    <div className={styles.imageWrapper}>
-                      <div className={styles.imageContainer}>
-                        <img
-                          src={course.image}
-                          alt={course.title}
-                          className={styles.courseImage}
-                          loading="lazy"
-                          onError={(e) => { e.currentTarget.src = '/assets/logo.jpg'; }}
-                        />
-                        <div className={styles.imageSkeleton} />
-                      </div>
-                      {course.isFeatured && (
-                        <span className={styles.featuredBadge}>ویژه</span>
-                      )}
-                    </div>
-                    <div className={styles.courseContent}>
-                      <h2 id={`course-title-${course.id}`} className={styles.courseTitle}>
-                        {course.title}
-                      </h2>
-                      <p className={styles.instructor}>
-                        استاد:{' '}
-                        <Link to={`/instructors/${course.instructor.replace(' ', '-')}`} className={styles.instructorLink}>
-                          {course.instructor}
-                        </Link>
-                      </p>
-                      <div className={styles.rating}>
-                        <StarIcon className={styles.starIcon} />
-                        <span>{averageRating} ({course.reviews.length} نظر)</span>
-                      </div>
-                      <p className={styles.description}>{course.description}</p>
-                      <div className={styles.details}>
-                        <Tooltip title="مدت دوره">
-                          <span><AccessTimeIcon /> {course.duration}</span>
-                        </Tooltip>
-                        <Tooltip title="سطح دوره">
-                          <span><TrendingUpIcon /> {course.level}</span>
-                        </Tooltip>
-                        <Tooltip title="قیمت دوره">
-                          <span><AttachMoneyIcon /> {course.price}</span>
-                        </Tooltip>
-                        <Tooltip title="تاریخ شروع">
-                          <span><CalendarTodayIcon /> {course.startDate}</span>
-                        </Tooltip>
-                        <Tooltip title="تعداد ثبت‌نام">
-                          <span><PeopleIcon /> {course.enrollmentCount} نفر</span>
-                        </Tooltip>
-                      </div>
-                      {isEnrolled && totalItems > 0 && (
-                        <div className={styles.progressContainer}>
-                          <div className={styles.progressBar}>
-                            <div className={styles.progressFill} style={{ width: `${progressPercentage}%` }} />
-                          </div>
-                          <span className={styles.progressText}>
-                            {Math.round(progressPercentage)}% کامل شده
-                          </span>
-                        </div>
-                      )}
-                      <div className={styles.actions}>
-                        <button
-                          className={styles.enrollButton}
-                          disabled={!course.isOpen || isEnrolled}
-                          onClick={() => handleEnroll(course.id)}
-                          aria-label={isEnrolled ? 'شما در این دوره ثبت‌نام کرده‌اید' : course.isOpen ? 'ثبت‌نام در دوره' : 'ثبت‌نام بسته است'}
-                        >
-                          {isEnrolled ? 'ثبت‌نام شده' : course.isOpen ? 'ثبت‌نام در دوره' : 'ثبت‌نام بسته است'}
-                        </button>
-                        <Link
-                          to={`/courses/${course.id}`}
-                          className={styles.detailsLink}
-                          aria-label={`جزئیات بیشتر درباره ${course.title}`}
-                        >
-                          جزئیات بیشتر
-                        </Link>
-                        <Tooltip title={wishlist.includes(course.id) ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}>
-                          <button
-                            className={styles.wishlistButton}
-                            onClick={() => toggleWishlist(course.id)}
-                            aria-label={wishlist.includes(course.id) ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}
-                          >
-                            <FavoriteBorderIcon
-                              className={wishlist.includes(course.id) ? styles.wishlistIconActive : styles.wishlistIcon}
-                            />
-                          </button>
-                        </Tooltip>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {currentCourses.map(renderCourseCard)}
             </div>
 
             {filteredCourses.length === 0 && (
-              <p className={styles.noResults}>هیچ دوره‌ای یافت نشد.</p>
+              <p className={styles.noResults}>هیچ دوره‌ای یافت نشد。</p>
             )}
 
             {totalPages > 1 && (

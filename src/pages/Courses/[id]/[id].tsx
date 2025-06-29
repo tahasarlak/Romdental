@@ -17,6 +17,7 @@ import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import DescriptionIcon from '@mui/icons-material/Description';
 import styles from './CourseDetails.module.css';
 import { useCourseContext } from '../../../Context/CourseContext';
+import { useReviewContext } from '../../../Context/ReviewContext';
 
 // Interface for syllabus items
 interface SyllabusItem {
@@ -41,6 +42,7 @@ interface FaqItem {
 // Interface for review items
 interface ReviewItem {
   id: number;
+  courseId: number;
   user: string;
   rating: number;
   comment: string;
@@ -59,15 +61,20 @@ interface Course {
   price: string;
   startDate: string;
   isOpen: boolean;
+  isFeatured: boolean;
+  enrollmentCount: number;
   syllabus: SyllabusItem[];
   faqs: FaqItem[];
-  reviews: ReviewItem[];
+  tags?: string[];
+  prerequisites?: string[];
+  courseType: 'Online' | 'Offline' | 'In-Person' | 'Hybrid';
 }
 
 const CourseDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { courses } = useCourseContext();
+  const { reviews } = useReviewContext();
   const [expandedSyllabus, setExpandedSyllabus] = useState<number | null>(null);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -78,6 +85,7 @@ const CourseDetails: React.FC = () => {
   const [isEnrolled, setIsEnrolled] = useState(false); // Mock enrollment status
 
   const course = courses.find((c) => c.id === parseInt(id || ''));
+  const courseReviews = reviews.filter((review) => review.courseId === parseInt(id || ''));
 
   const toggleSyllabus = useCallback((id: number) => {
     setExpandedSyllabus(expandedSyllabus === id ? null : id);
@@ -134,11 +142,11 @@ const CourseDetails: React.FC = () => {
   const progressPercentage = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
 
   // Calculate average rating and total reviews
-  const totalReviews = (course?.reviews || []).length;
+  const totalReviews = courseReviews.length;
   const averageRating =
     totalReviews > 0
       ? (
-          (course?.reviews || []).reduce((sum, review) => sum + review.rating, 0) /
+          courseReviews.reduce((sum: number, review: ReviewItem) => sum + review.rating, 0) /
           totalReviews
         ).toFixed(1)
       : '0.0';
@@ -248,188 +256,188 @@ const CourseDetails: React.FC = () => {
             </button>
           </div>
 
-          {/* Course Content */}
-          <div className={styles.courseContent}>
-            <h2>درباره این دوره</h2>
-            <p>
-              این دوره با هدف ارتقای مهارت‌های شما در زمینه {course.title} طراحی
-              شده است. با شرکت در این دوره، شما با جدیدترین تکنیک‌ها و ابزارهای
-              مرتبط آشنا خواهید شد.
-            </p>
+         {/* Course Content */}
+<div className={styles.courseContent}>
+  <h2>درباره این دوره</h2>
+  <p>
+    این دوره با هدف ارتقای مهارت‌های شما در زمینه {course.title} طراحی شده است. با شرکت در این دوره، شما با جدیدترین تکنیک‌ها و ابزارهای مرتبط آشنا خواهید شد.
+  </p>
 
-            <h2>سرفصل‌های دوره</h2>
-            {isEnrolled && totalItems > 0 && (
-              <div className={styles.progressContainer}>
-                <div className={styles.progressBar}>
-                  <div
-                    className={styles.progressFill}
-                    style={{ width: `${progressPercentage}%` }}
-                  />
-                </div>
-                <span className={styles.progressText}>
-                  {completedItems} از {totalItems} درس کامل شده (
-                  {Math.round(progressPercentage)}%)
-                </span>
-              </div>
+  <h2>سرفصل‌های دوره</h2>
+  {isEnrolled && totalItems > 0 && (
+    <div className={styles.progressContainer}>
+      <div className={styles.progressBar}>
+        <div
+          className={styles.progressFill}
+          style={{ width: `${progressPercentage}%` }}
+        />
+      </div>
+      <span className={styles.progressText}>
+        {completedItems} از {totalItems} درس کامل شده (
+        {Math.round(progressPercentage)}%)
+      </span>
+    </div>
+  )}
+  <ul className={styles.syllabus}>
+    {(course.syllabus || []).map((item: SyllabusItem, index) => (
+      <li
+        key={item.id}
+        className={`${styles.syllabusItem} ${
+          item.isLocked && !isEnrolled ? styles.locked : styles.unlocked
+        }`}
+      >
+        <div className={styles.syllabusTimeline}>
+          <div className={styles.timelineDot}>
+            {item.completed ? (
+              <CheckCircleIcon className={styles.completedIcon} />
+            ) : item.isLocked && !isEnrolled ? (
+              <LockIcon className={styles.lockIcon} />
+            ) : (
+              <PlayCircleOutlineIcon className={styles.playIcon} />
             )}
-            <ul className={styles.syllabus}>
-              {(course.syllabus || []).map((item: SyllabusItem, index) => (
-                <li
-                  key={item.id}
-                  className={`${styles.syllabusItem} ${
-                    item.isLocked && !isEnrolled ? styles.locked : styles.unlocked
-                  }`}
-                >
-                  <div className={styles.syllabusTimeline}>
-                    <div className={styles.timelineDot}>
-                      {item.completed ? (
-                        <CheckCircleIcon className={styles.completedIcon} />
-                      ) : item.isLocked && !isEnrolled ? (
-                        <LockIcon className={styles.lockIcon} />
-                      ) : (
-                        <PlayCircleOutlineIcon className={styles.playIcon} />
-                      )}
-                    </div>
-                    {index < (course.syllabus || []).length - 1 && (
-                      <div className={styles.timelineLine} />
-                    )}
-                  </div>
-                  <div className={styles.syllabusContent}>
-                    <div
-                      className={styles.syllabusHeader}
-                      onClick={() => toggleSyllabus(item.id)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => e.key === 'Enter' && toggleSyllabus(item.id)}
-                      aria-expanded={expandedSyllabus === item.id}
-                    >
-                      <div className={styles.syllabusTitle}>
-                        <span>{item.title}</span>
-                        {item.isNew && <span className={styles.newBadge}>جدید</span>}
-                      </div>
-                      <div className={styles.syllabusMeta}>
-                        <span className={styles.metaItem}>
-                          {item.contentType === 'video' && <VideoLibraryIcon />}
-                          {item.contentType === 'text' && <DescriptionIcon />}
-                          {item.contentType === 'quiz' && <StarIcon />}
-                          {item.contentType}
-                        </span>
-                        <span className={styles.metaItem}>
-                          <AccessTimeIcon /> {item.duration}
-                        </span>
-                        <ExpandMoreIcon
-                          className={`${styles.expandIcon} ${
-                            expandedSyllabus === item.id ? styles.expanded : ''
-                          }`}
-                        />
-                      </div>
-                    </div>
-                    {expandedSyllabus === item.id &&
-                      (!item.isLocked || isEnrolled) && (
-                        <div className={styles.previewContent}>
-                          {item.previewContent && <p>{item.previewContent}</p>}
-                          {(item.previewContent || item.videoUrl) && (
-                            <button
-                              className={styles.previewButton}
-                              onClick={() => openPreviewModal(item)}
-                              aria-label={`مشاهده پیش‌نمایش ${item.title}`}
-                            >
-                              مشاهده پیش‌نمایش
-                            </button>
-                          )}
-                        </div>
-                      )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-
-            {/* FAQ Section */}
-            <h2>سوالات متداول</h2>
-            <div className={styles.faq}>
-              {(course.faqs || []).map((faq: FaqItem) => (
-                <div
-                  key={faq.id}
-                  className={styles.faqItem}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => toggleFaq(faq.id)}
-                  onKeyDown={(e) => e.key === 'Enter' && toggleFaq(faq.id)}
-                  aria-expanded={expandedFaq === faq.id}
-                >
-                  <div className={styles.faqHeader}>
-                    <h3>{faq.question}</h3>
-                    <ExpandMoreIcon
-                      className={`${styles.expandIcon} ${
-                        expandedFaq === faq.id ? styles.expanded : ''
-                      }`}
-                    />
-                  </div>
-                  {expandedFaq === faq.id && (
-                    <div className={styles.faqContent}>
-                      <p>{faq.answer}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-              {(!course.faqs || course.faqs.length === 0) && (
-                <p>سوالی برای این دوره ثبت نشده است.</p>
-              )}
+          </div>
+          {index < (course.syllabus || []).length - 1 && (
+            <div className={styles.timelineLine} />
+          )}
+        </div>
+        <div className={styles.syllabusContent}>
+          <div
+            className={styles.syllabusHeader}
+            onClick={() => toggleSyllabus(item.id)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && toggleSyllabus(item.id)}
+            aria-expanded={expandedSyllabus === item.id}
+          >
+            <div className={styles.syllabusTitle}>
+              <span>{item.title}</span>
+              {item.isNew && <span className={styles.newBadge}>جدید</span>}
             </div>
-
-            {/* Reviews Section */}
-            <h2>نظرات کاربران</h2>
-            <div className={styles.reviews}>
-              {(course.reviews || []).length > 0 ? (
-                course.reviews.map((review) => (
-                  <div key={review.id} className={styles.reviewItem}>
-                    <div className={styles.reviewHeader}>
-                      <span className={styles.reviewUser}>{review.user}</span>
-                      <div className={styles.reviewRating}>
-                        {Array.from({ length: review.rating }, (_, i) => (
-                          <StarIcon key={i} className={styles.starIcon} />
-                        ))}
-                      </div>
-                    </div>
-                    <p className={styles.reviewComment}>{review.comment}</p>
-                    <span className={styles.reviewDate}>{review.date}</span>
-                  </div>
-                ))
-              ) : (
-                <p>هنوز نظری برای این دوره ثبت نشده است.</p>
-              )}
+            <div className={styles.syllabusMeta}>
+              <span className={styles.metaItem}>
+                {item.contentType === 'video' && <VideoLibraryIcon />}
+                {item.contentType === 'text' && <DescriptionIcon />}
+                {item.contentType === 'quiz' && <StarIcon />}
+                {item.contentType}
+              </span>
+              <span className={styles.metaItem}>
+                <AccessTimeIcon /> {item.duration}
+              </span>
+              <ExpandMoreIcon
+                className={`${styles.expandIcon} ${
+                  expandedSyllabus === item.id ? styles.expanded : ''
+                }`}
+              />
             </div>
           </div>
-        </div>
-
-        {/* Preview Modal */}
-        {isModalOpen && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
-              <button
-                className={styles.closeModalButton}
-                onClick={closeModal}
-                aria-label="بستن پیش‌نمایش"
-              >
-                ×
-              </button>
-              <div className={styles.modalContent}>
-                {modalContent.videoUrl && (
-                  <ReactPlayer
-                    url={modalContent.videoUrl}
-                    width="100%"
-                    height="auto"
-                    controls
-                    className={styles.videoPlayer}
-                  />
-                )}
-                {modalContent.text && <p>{modalContent.text}</p>}
-              </div>
+          {expandedSyllabus === item.id && (!item.isLocked || isEnrolled) && (
+            <div className={styles.previewContent}>
+              {item.previewContent && <p>{item.previewContent}</p>}
+              {(item.previewContent || item.videoUrl) && (
+                <button
+                  className={styles.previewButton}
+                  onClick={() => openPreviewModal(item)}
+                  aria-label={`مشاهده پیش‌نمایش ${item.title}`}
+                >
+                  مشاهده پیش‌نمایش
+                </button>
+              )}
             </div>
+          )}
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  {/* FAQ Section */}
+  <h2>سوالات متداول</h2>
+  <div className={styles.faq}>
+    {(course.faqs || []).map((faq: FaqItem) => (
+      <div
+        key={faq.id}
+        className={styles.faqItem}
+        role="button"
+        tabIndex={0}
+        onClick={() => toggleFaq(faq.id)}
+        onKeyDown={(e) => e.key === 'Enter' && toggleFaq(faq.id)}
+        aria-expanded={expandedFaq === faq.id}
+      >
+        <div className={styles.faqHeader}>
+          <h3>{faq.question}</h3>
+          <ExpandMoreIcon
+            className={`${styles.expandIcon} ${
+              expandedFaq === faq.id ? styles.expanded : ''
+            }`}
+          />
+        </div>
+        {expandedFaq === faq.id && (
+          <div className={styles.faqContent}>
+            <p>{faq.answer}</p>
           </div>
         )}
-      </section>
-    </>
+      </div>
+    ))}
+    {(!course.faqs || course.faqs.length === 0) && (
+      <p>سوالی برای این دوره ثبت نشده است.</p>
+    )}
+  </div>
+
+  {/* Reviews Section */}
+  <h2>نظرات کاربران</h2>
+  <div className={styles.reviews}>
+    {courseReviews.length > 0 ? (
+      courseReviews.map((review) => (
+        <div key={review.id} className={styles.reviewItem}>
+          <div className={styles.reviewHeader}>
+            <span className={styles.reviewUser}>{review.user}</span>
+            <div className={styles.reviewRating}>
+              {Array.from({ length: review.rating }, (_, i) => (
+                <StarIcon key={i} className={styles.starIcon} />
+              ))}
+            </div>
+          </div>
+          <p className={styles.reviewComment}>{review.comment}</p>
+          <span className={styles.reviewDate}>{review.date}</span>
+        </div>
+      ))
+    ) : (
+      <p>هنوز نظری برای این دوره ثبت نشده است.</p>
+    )}
+  </div>
+</div> {/* Close courseContent div */}
+</div> {/* Close container div */}
+</section>
+
+{/* Preview Modal */}
+{isModalOpen && (
+  <div className={styles.modalOverlay}>
+    <div className={styles.modal}>
+      <button
+        className={styles.closeModalButton}
+        onClick={closeModal}
+        aria-label="بستن پیش‌نمایش"
+      >
+        ×
+      </button>
+      <div className={styles.modalContent}>
+        {modalContent.videoUrl && (
+          <ReactPlayer
+            url={modalContent.videoUrl}
+            width="100%"
+            height="auto"
+            controls
+            className={styles.videoPlayer}
+          />
+        )}
+        {modalContent.text && <p>{modalContent.text}</p>}
+      </div>
+    </div>
+  </div>
+)}
+</>
+
+     
+    
   );
 };
 

@@ -1,6 +1,6 @@
 .header {
   background-color: #2c3e50;
-  padding: 15px 20px; /* کاهش padding برای موبایل */
+  padding: 15px 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
@@ -18,14 +18,13 @@
 
 .logoContainer {
   display: flex;
-  align-items: center; /* وسط‌چین عمودی */
-  justify-content: center; /* وسط‌چین افقی */
+  align-items: center;
+  justify-content: center;
   gap: 10px;
-  width: 100%; /* اطمینان از اینکه کل عرض در دسترس باشه */
+  width: 100%;
 }
 
 .logoImage {
-  
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -60,6 +59,15 @@
 
 .navLink:hover,
 .navLink.active {
+  color: #3498db;
+}
+
+.cartIcon {
+  color: #ecf0f1;
+  font-size: 1.5rem;
+}
+
+.cartIcon:hover {
   color: #3498db;
 }
 
@@ -139,21 +147,84 @@
   display: none;
   background: none;
   border: none;
-  font-size: 1.8rem; /* افزایش اندازه آیکون */
+  font-size: 1.8rem;
   color: #ecf0f1;
   cursor: pointer;
   transition: transform 0.3s ease;
 }
 
 .menuToggle.open {
-  transform: rotate(90deg); /* انیمیشن چرخش برای حالت باز */
+  transform: rotate(90deg);
+}
+
+.cartModal {
+  display: flex;
+  justify-content: flex-end;
+  direction: rtl;
+}
+
+.cartModalContent {
+  background-color: #fff;
+  width: 300px;
+  height: 100vh;
+  padding: 20px;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
+  transform: translateX(0%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.cartModalContent[open] {
+  transform: translateX(0);
+}
+
+.cartModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.cartModalHeader h2 {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.cartModalBody {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.cartItemList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cartItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.cartItem span {
+  color: #2c3e50;
+}
+
+.cartModalFooter {
+  padding-top: 10px;
+  border-top: 1px solid #e0e0e0;
 }
 
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
     align-items: flex-start;
-    padding: 10px; /* padding کمتر برای موبایل */
+    padding: 10px;
   }
 
   .menuToggle {
@@ -168,19 +239,19 @@
     width: 100%;
     flex-direction: column;
     align-items: center;
-    background-color: #2c3e50; /* پس‌زمینه منو */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* سایه برای جذابیت */
+    background-color: #2c3e50;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     padding: 20px;
     margin-top: 10px;
-    border-radius: 8px; /* گوشه‌های گرد */
-    max-height: 0; /* برای انیمیشن */
+    border-radius: 8px;
+    max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease-in-out; /* انیمیشن باز شدن */
+    transition: max-height 0.3s ease-in-out;
   }
 
   .navOpen {
     display: flex;
-    max-height: 500px; /* ارتفاع کافی برای منو */
+    max-height: 500px;
   }
 
   .navList {
@@ -194,14 +265,26 @@
     padding: 12px;
     width: 100%;
     text-align: center;
-    font-size: 1.2rem; /* فونت کمی بزرگ‌تر */
+    font-size: 1.2rem;
     border-radius: 5px;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   .navLink:hover,
   .navLink.active {
-    background-color: #34495e; /* پس‌زمینه برای حالت هاور */
+    background-color: #34495e;
+    color: #3498db;
+  }
+
+  .cartIcon {
+    font-size: 1.8rem;
+    padding: 12px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .cartIcon:hover {
+    background-color: #34495e;
     color: #3498db;
   }
 
@@ -216,10 +299,10 @@
   .authButton,
   .signupButton,
   .logoutButton {
-    width: 80%; /* عرض کمتر برای زیبایی */
+    width: 80%;
     text-align: center;
     padding: 10px;
-    font-size: 1.1rem; /* فونت بزرگ‌تر */
+    font-size: 1.1rem;
   }
 
   .userProfile {
@@ -230,6 +313,10 @@
   }
 
   .userName {
-    font-size: 1.1rem; /* فونت بزرگ‌تر */
+    font-size: 1.1rem;
+  }
+
+  .cartModalContent {
+    width: 100%;
   }
 }

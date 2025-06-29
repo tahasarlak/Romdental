@@ -1,0 +1,103 @@
+.instructorDetailsSection {
+  padding: 4rem 2rem;
+  background: linear-gradient(180deg, var(--white) 0%, var(--secondary-color) 100%);
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.container h1 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  font-weight: 700;
+  position: relative;
+}
+
+.container h1::after {
+  content: '';
+  display: block;
+  width: 100px;
+  height: 4px;
+  background: var(--accent-color);
+  margin: 0.5rem auto;
+  border-radius: var(--border-radius);
+}
+
+.instructorImage {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  margin: 1rem 0;
+  object-fit: cover;
+}
+
+.container p {
+  font-size: 1.1rem;
+  color: var(--text-color);
+  margin: 0.5rem 0;
+}
+
+.container strong {
+  color: var(--primary-color);
+}
+
+.container h2 {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  margin: 1.5rem 0 1rem;
+}
+
+.container ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 2rem;
+}
+
+.container li {
+  font-size: 1rem;
+  color: var(--text-color);
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--gray);
+}
+
+.backLink {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--accent-color);
+  color: var(--white);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.backLink:hover {
+  background-color: darken(var(--accent-color), 10%);
+}
+
+.error {
+  font-size: 1.5rem;
+  color: var(--gray);
+  text-align: center;
+  margin: 4rem 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container h1 {
+    font-size: 2rem;
+  }
+
+  .instructorImage {
+    max-width: 250px;
+  }
+
+  .container h2 {
+    font-size: 1.5rem;
+  }
+}

@@ -1,4 +1,4 @@
-/* src/styles/Instructors.module.css */
+/* src/pages/Instructors/Instructors.module.css */
 .instructorsSection {
   padding: 4rem 1rem;
   background: linear-gradient(135deg, var(--secondary-color) 0%, var(--white) 100%);
@@ -6,7 +6,6 @@
 }
 
 .container {
-  max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 1.5rem;
 }
@@ -44,6 +43,7 @@
   align-items: center;
   max-width: 600px;
   margin: 0 auto 2rem;
+  position: relative;
   background: var(--white);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
@@ -69,25 +69,60 @@
   color: var(--gray);
 }
 
-.controls {
+.filterToggle {
+  display: none;
+  color: var(--primary-color);
+}
+
+.contentWrapper {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  gap: 1.5rem;
-  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.sidebar {
+  flex: 0 0 280px;
+  position: sticky;
+  top: 2rem;
+  align-self: flex-start;
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.mainContent {
+  flex: 1;
 }
 
 .filterContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.filterContainer h3 {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.filterGroup {
+  margin-bottom: 1.5rem;
+}
+
+.filterGroup label {
+  font-size: 1rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 .filterButton {
   background: var(--gray);
   color: var(--white);
   padding: 0.5rem 1rem;
+  margin: 0.3rem;
   border-radius: 8px;
   font-size: 0.9rem;
   transition: var(--transition);
@@ -99,10 +134,27 @@
   transform: translateY(-2px);
 }
 
+.clearButton {
+  background: var(--primary-color);
+  color: var(--white);
+  padding: 0.75rem 1.5rem;
+  margin-top: 1rem;
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.clearButton:hover {
+  background: darken(var(--primary-color), 10%);
+}
+
 .sortContainer {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin-bottom: 2rem;
 }
 
 .sortSelect {
@@ -117,7 +169,7 @@
 
 .instructorsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
 }
 
@@ -134,11 +186,15 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
+.imageWrapper {
+  position: relative;
+  overflow: hidden;
+}
+
 .instructorImage {
   width: 100%;
-  height: 200px;
+  height: 200px; /* Fixed height for consistency */
   object-fit: cover;
-  display: block;
 }
 
 .instructorContent {
@@ -154,7 +210,18 @@
 .specialty {
   font-size: 1rem;
   color: var(--gray);
+  margin-bottom: 0.5rem;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-bottom: 0.75rem;
+}
+
+.starIcon {
+  color: var(--accent-color);
 }
 
 .bio {
@@ -184,20 +251,47 @@
 
 .actions {
   display: flex;
-  justify-content: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .detailsLink {
-  background: var(--accent-color);
-  color: var(--white);
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  transition: var(--transition);
+  flex: 1;
   text-align: center;
+  padding: 0.75rem;
+  background: var(--primary-color);
+  color: var(--white);
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: var(--transition);
 }
 
 .detailsLink:hover {
-  background: darken(var(--accent-color), 10%);
+  background: darken(var(--primary-color), 10%);
+}
+
+.wishlistButton {
+  background: transparent;
+  padding: 0.75rem;
+  border: 1px solid var(--gray);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.wishlistIcon {
+  color: var(--gray);
+}
+
+.wishlistIconActive {
+  color: var(--accent-color);
+}
+
+.noResults {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--gray);
+  margin: 2rem 0;
 }
 
 .pagination {
@@ -213,6 +307,7 @@
   color: var(--primary-color);
   border: 1px solid var(--gray);
   border-radius: 8px;
+  cursor: pointer;
   transition: var(--transition);
 }
 
@@ -231,20 +326,59 @@
   cursor: not-allowed;
 }
 
+.loading,
+.error {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--gray);
+  margin: 2rem 0;
+}
+
+.modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalContent {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  max-width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modalHeader h2 {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .instructorsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  }
-
-  .controls {
+  .contentWrapper {
     flex-direction: column;
-    align-items: stretch;
   }
 
-  .sortContainer {
-    width: 100%;
-    justify-content: flex-start;
+  .sidebar {
+    display: none;
+  }
+
+  .filterToggle {
+    display: block;
+  }
+
+  .instructorsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
 }
 
@@ -290,7 +424,17 @@
     gap: 0.5rem;
   }
 
-  .detailsLink {
+  .actions {
+    flex-direction: column;
+  }
+
+  .detailsLink,
+  .wishlistButton {
     width: 100%;
+    text-align: center;
+  }
+
+  .modalContent {
+    padding: 1.5rem;
   }
 }
