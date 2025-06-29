@@ -46,7 +46,7 @@ const App: React.FC = () => {
             </BlogProvider>
           </InstructorProvider>
         </CourseProvider>
-      </AuthProvider>
+      </AuthProvider> 
     </div>
   );
 };
