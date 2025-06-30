@@ -27,7 +27,7 @@ interface Course {
   instructor: string;
   description: string;
   duration: string;
-  level: string;
+  courseNumber: string;
   category: string;
   image: string;
   price: string;
@@ -39,6 +39,7 @@ interface Course {
   tags?: string[];
   prerequisites?: string[];
   courseType: 'Online' | 'Offline' | 'In-Person' | 'Hybrid';
+  university: string;
 }
 
 interface ReviewItem {
@@ -57,11 +58,12 @@ const Courses: React.FC = () => {
   const { addToCart, removeFromCart, cartItems } = useCartContext();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlistContext();
   const navigate = useNavigate();
-  const [filterLevel, setFilterLevel] = useState<string>('all');
+  const [filterCourseNumber, setFilterCourseNumber] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterInstructor, setFilterInstructor] = useState<string>('all');
   const [filterCourseType, setFilterCourseType] = useState<string>('all');
+  const [filterUniversity, setFilterUniversity] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('title');
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -74,11 +76,12 @@ const Courses: React.FC = () => {
 
   const instructorNames = useMemo(() => new Set(instructors.map((instructor) => instructor.name)), [instructors]);
 
-  const uniqueLevels = useMemo(() => ['all', ...new Set(courses.map((course) => course.level)).values()].sort(), [courses]);
+  const uniqueCourseNumbers = useMemo(() => ['all', ...new Set(courses.map((course) => course.courseNumber)).values()].sort(), [courses]);
   const uniqueCategories = useMemo(() => ['all', ...new Set(courses.map((course) => course.category)).values()].sort(), [courses]);
   const uniqueInstructors = useMemo(() => ['all', ...new Set(courses.map((course) => course.instructor)).values()].sort(), [courses]);
   const uniqueStatuses = useMemo(() => ['all', 'open', 'closed'], [courses]);
   const uniqueCourseTypes = useMemo(() => ['all', 'Online', 'Offline', 'In-Person', 'Hybrid'], [courses]);
+  const uniqueUniversities = useMemo(() => ['all', 'Smashko', 'Piragova', 'RUDN', 'Sechenov'].sort(), [courses]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -92,11 +95,12 @@ const Courses: React.FC = () => {
 
   const filteredCourses = useMemo(() => {
     return courses
-      .filter((course) => filterLevel === 'all' ? true : course.level === filterLevel)
+      .filter((course) => filterCourseNumber === 'all' ? true : course.courseNumber === filterCourseNumber)
       .filter((course) => filterCategory === 'all' ? true : course.category === filterCategory)
       .filter((course) => filterStatus === 'all' ? true : filterStatus === 'open' ? course.isOpen : !course.isOpen)
       .filter((course) => filterInstructor === 'all' ? true : course.instructor === filterInstructor)
       .filter((course) => filterCourseType === 'all' ? true : course.courseType === filterCourseType)
+      .filter((course) => filterUniversity === 'all' ? true : course.university === filterUniversity)
       .filter((course) =>
         course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         course.instructor.toLowerCase().includes(searchQuery.toLowerCase())
@@ -119,7 +123,7 @@ const Courses: React.FC = () => {
         if (sortBy === 'enrollment') return b.enrollmentCount - a.enrollmentCount;
         return 0;
       });
-  }, [courses, filterLevel, filterCategory, filterStatus, filterInstructor, filterCourseType, searchQuery, sortBy, reviews]);
+  }, [courses, filterCourseNumber, filterCategory, filterStatus, filterInstructor, filterCourseType, filterUniversity, searchQuery, sortBy, reviews]);
 
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
@@ -154,11 +158,12 @@ const Courses: React.FC = () => {
   }, [addToWishlist, removeFromWishlist, isInWishlist]);
 
   const clearFilters = useCallback(() => {
-    setFilterLevel('all');
+    setFilterCourseNumber('all');
     setFilterCategory('all');
     setFilterStatus('all');
     setFilterInstructor('all');
     setFilterCourseType('all');
+    setFilterUniversity('all');
     setSearchQuery('');
     setSortBy('title');
     setCurrentPage(1);
@@ -171,15 +176,15 @@ const Courses: React.FC = () => {
     <div className={styles.filterContainer}>
       <h3>فیلترها</h3>
       <div className={styles.filterGroup}>
-        <label>سطح:</label>
-        {uniqueLevels.map((level) => (
+        <label>کورس:</label>
+        {uniqueCourseNumbers.map((courseNumber) => (
           <button
-            key={level}
-            className={`${styles.filterButton} ${filterLevel === level ? styles.active : ''}`}
-            onClick={() => setFilterLevel(level)}
-            aria-pressed={filterLevel === level}
+            key={courseNumber}
+            className={`${styles.filterButton} ${filterCourseNumber === courseNumber ? styles.active : ''}`}
+            onClick={() => setFilterCourseNumber(courseNumber)}
+            aria-pressed={filterCourseNumber === courseNumber}
           >
-            {level === 'all' ? 'همه' : level}
+            {courseNumber === 'all' ? 'همه' : courseNumber}
           </button>
         ))}
       </div>
@@ -232,6 +237,19 @@ const Courses: React.FC = () => {
             aria-pressed={filterCourseType === courseType}
           >
             {courseType === 'all' ? 'همه' : courseType === 'Online' ? 'آنلاین' : courseType === 'Offline' ? 'آفلاین' : courseType === 'In-Person' ? 'حضوری' : 'ترکیبی'}
+          </button>
+        ))}
+      </div>
+      <div className={styles.filterGroup}>
+        <label>دانشگاه:</label>
+        {uniqueUniversities.map((university) => (
+          <button
+            key={university}
+            className={`${styles.filterButton} ${filterUniversity === university ? styles.active : ''}`}
+            onClick={() => setFilterUniversity(university)}
+            aria-pressed={filterUniversity === university}
+          >
+            {university === 'all' ? 'همه' : university}
           </button>
         ))}
       </div>
@@ -304,8 +322,8 @@ const Courses: React.FC = () => {
             <Tooltip title="مدت دوره">
               <span><AccessTimeIcon /> {course.duration}</span>
             </Tooltip>
-            <Tooltip title="سطح دوره">
-              <span><TrendingUpIcon /> {course.level}</span>
+            <Tooltip title="کورس">
+              <span><TrendingUpIcon /> {course.courseNumber}</span>
             </Tooltip>
             <Tooltip title="قیمت دوره">
               <span><AttachMoneyIcon /> {course.price}</span>
@@ -318,6 +336,9 @@ const Courses: React.FC = () => {
             </Tooltip>
             <Tooltip title="نوع دوره">
               <span>{course.courseType === 'Online' ? 'آنلاین' : course.courseType === 'Offline' ? 'آفلاین' : course.courseType === 'In-Person' ? 'حضوری' : 'ترکیبی'}</span>
+            </Tooltip>
+            <Tooltip title="دانشگاه">
+              <span>{course.university}</span>
             </Tooltip>
           </div>
           {isEnrolled && totalItems > 0 && (
@@ -348,7 +369,6 @@ const Courses: React.FC = () => {
                 'ثبت‌نام بسته است'
               )}
             </button>
-        
             <Link
               to={`/courses/${course.id}`}
               className={styles.detailsLink}
@@ -356,7 +376,7 @@ const Courses: React.FC = () => {
             >
               جزئیات بیشتر
             </Link>
-                <button
+            <button
               className={`${styles.wishlistButton} ${isInWishlist(course.id, 'course') ? styles.wishlistActive : ''}`}
               onClick={() => handleWishlistToggle(course.id)}
               aria-label={isInWishlist(course.id, 'course') ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}
@@ -437,7 +457,7 @@ const Courses: React.FC = () => {
                 <option value="title">عنوان</option>
                 <option value="price">قیمت</option>
                 <option value="startDate">تاریخ شروع</option>
-                <option value="rating">امتیاز</option>
+                <option value="rating">محبوب‌ترین</option>
                 <option value="enrollment">تعداد ثبت‌نام</option>
               </select>
             </div>

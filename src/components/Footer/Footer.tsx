@@ -61,7 +61,7 @@ const Footer: React.FC = () => {
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
               <InstagramIcon />
             </a>
-            <a href="https://telegram.me" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+            <a href="https://telegram.me/rom-dental" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
               <TelegramIcon />
             </a>
             <a href="https://whatsapp.com" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>

@@ -2,15 +2,20 @@ import React, { useState } from 'react';
 import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
+import PhoneIcon from '@mui/icons-material/Phone';
+import SchoolIcon from '@mui/icons-material/School';
 import styles from './Signup.module.css';
 import { useAuthContext } from '../../Context/AuthContext';
 
 const Signup: React.FC = () => {
   const { signup } = useAuthContext();
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
+    phone: '',
+    university: '',
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -23,8 +28,14 @@ const Signup: React.FC = () => {
     e.preventDefault();
     setError(null);
     try {
-      await signup(formData.name, formData.email, formData.password);
-      setFormData({ name: '', email: '', password: '' });
+      await signup(
+        `${formData.firstName} ${formData.lastName}`,
+        formData.email,
+        formData.password,
+        formData.phone,
+        formData.university
+      );
+      setFormData({ firstName: '', lastName: '', email: '', password: '', phone: '', university: '' });
       alert('ثبت‌نام با موفقیت انجام شد!');
     } catch (error: any) {
       setError(error.message || 'خطا در ثبت‌نام!');
@@ -39,16 +50,32 @@ const Signup: React.FC = () => {
 
         <form onSubmit={handleSubmit} className={styles.signupForm}>
           <div className={styles.formGroup}>
-            <label htmlFor="name" className={styles.label}>
+            <label htmlFor="firstName" className={styles.label}>
               <PersonIcon /> نام
             </label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={formData.name}
+              id="firstName"
+              name="firstName"
+              value={formData.firstName}
               onChange={handleChange}
               placeholder="نام خود را وارد کنید"
+              className={styles.input}
+              required
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="lastName" className={styles.label}>
+              <PersonIcon /> نام خانوادگی
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              placeholder="نام خانوادگی خود را وارد کنید"
               className={styles.input}
               required
             />
@@ -81,6 +108,38 @@ const Signup: React.FC = () => {
               value={formData.password}
               onChange={handleChange}
               placeholder="رمز عبور خود را وارد کنید"
+              className={styles.input}
+              required
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="phone" className={styles.label}>
+              <PhoneIcon /> شماره تماس
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="شماره تماس خود را وارد کنید"
+              className={styles.input}
+              required
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="university" className={styles.label}>
+              <SchoolIcon /> دانشگاه
+            </label>
+            <input
+              type="text"
+              id="university"
+              name="university"
+              value={formData.university}
+              onChange={handleChange}
+              placeholder="دانشگاه خود را وارد کنید"
               className={styles.input}
               required
             />

@@ -1,120 +1,211 @@
 .instructors {
-    padding: 80px 20px;
-    text-align: center;
-    position: relative;
+  padding: 80px 20px;
+  text-align: center;
+  position: relative;
+  background-color: var(--secondary-color, #f9fafb);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.instructors.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.container {
+  max-width: var(--max-width, 1200px);
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--primary-color, #1f2937);
+  margin-bottom: 20px;
+  transform: translateY(50px);
+  transition: transform 0.8s ease, opacity 0.8s ease;
+  opacity: 0;
+}
+
+.titleVisible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.subtitle {
+  font-size: 20px;
+  color: var(--gray, #4b5563);
+  margin-bottom: 50px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.subtitleVisible {
+  opacity: 0.85;
+  transform: translateY(0);
+}
+
+.instructorList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.card {
+  background-color: var(--white, #ffffff);
+  padding: 25px;
+  border-radius: var(--border-radius, 12px);
+  box-shadow: var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.1));
+  transform: translateY(30px);
+  transition: transform 0.5s ease, box-shadow 0.3s ease, opacity 0.5s ease;
+  opacity: 0;
+}
+
+.card.cardVisible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.instructorImage {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 3px solid var(--accent-color, #10b981);
+  transition: transform 0.3s ease;
+}
+
+.card:hover .instructorImage {
+  transform: scale(1.05);
+}
+
+.instructorName {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--primary-color, #1f2937);
+  margin-bottom: 10px;
+}
+
+.instructorSpecialty {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--accent-color, #10b981);
+  margin-bottom: 15px;
+}
+
+.instructorDesc {
+  font-size: 14px;
+  color: var(--text-color, #4b5563);
+  line-height: 1.6;
+  opacity: 0.9;
+  margin-bottom: 15px;
+}
+
+.instructorExperience {
+  font-size: 14px;
+  color: var(--gray, #6b7280);
+  margin-bottom: 15px;
+}
+
+.coursesTaught {
+  font-size: 14px;
+  color: var(--gray, #6b7280);
+  text-align: right;
+}
+
+.coursesTaught ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.coursesTaught li {
+  margin: 5px 0;
+}
+
+.noInstructors {
+  font-size: 1.2rem;
+  color: var(--gray, #6b7280);
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.viewAllContainer {
+  margin-top: 50px;
+  text-align: center;
+}
+
+.viewAllButton {
+  display: inline-block;
+  background-color: var(--button-bg, #3b82f6);
+  color: var(--white, #ffffff);
+  padding: 12px 24px;
+  border-radius: var(--border-radius, 8px);
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.viewAllButton:hover {
+  background-color: var(--button-hover-bg, #2563eb);
+}
+
+@media (max-width: 768px) {
+  .instructors {
+    padding: 60px 15px;
   }
-  
-  .container {
-    max-width: var(--max-width);
-    margin: 0 auto;
-  }
-  
+
   .title {
-    font-size: 48px;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 20px;
-    transform: translateY(50px);
-    transition: transform 0.8s ease;
+    font-size: 36px;
   }
-  
-  .titleVisible {
-    transform: translateY(0);
-  }
-  
+
   .subtitle {
-    font-size: 20px;
-    color: var(--gray);
-    margin-bottom: 50px;
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
-    opacity: 0.85;
+    font-size: 18px;
   }
-  
+
   .instructorList {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
+    grid-template-columns: 1fr;
   }
-  
-  .card {
-    background-color: var(--white);
-    padding: 25px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    transform: translateY(30px);
-    transition: transform 0.5s ease, box-shadow 0.3s ease;
-  }
-  
-  .cardVisible {
-    transform: translateY(0);
-  }
-  
-  .card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-  }
-  
+
   .instructorImage {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 20px;
-    border: 3px solid var(--accent-color);
-    transition: transform 0.3s ease;
+    width: 120px;
+    height: 120px;
   }
-  
-  .card:hover .instructorImage {
-    transform: scale(1.05);
-  }
-  
+
   .instructorName {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--primary-color);
-    margin-bottom: 10px;
+    font-size: 20px;
   }
-  
+
   .instructorSpecialty {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--accent-color);
-    margin-bottom: 15px;
-  }
-  
-  .instructorDesc {
     font-size: 14px;
-    color: var(--text-color);
-    line-height: 1.6;
-    opacity: 0.9;
   }
-  
-  /* ریسپانسیو */
-  @media (max-width: 768px) {
-    .title {
-      font-size: 36px;
-    }
-  
-    .subtitle {
-      font-size: 18px;
-    }
-  
-    .instructorImage {
-      width: 120px;
-      height: 120px;
-    }
-  
-    .instructorName {
-      font-size: 20px;
-    }
-  
-    .instructorSpecialty {
-      font-size: 14px;
-    }
-  
-    .instructorDesc {
-      font-size: 13px;
-    }
+
+  .instructorDesc {
+    font-size: 13px;
   }
+
+  .instructorExperience {
+    font-size: 13px;
+  }
+
+  .coursesTaught {
+    font-size: 13px;
+  }
+
+  .viewAllButton {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+}

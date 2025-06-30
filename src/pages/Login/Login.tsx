@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
+import PhoneIcon from '@mui/icons-material/Phone';
 import styles from './Login.module.css';
 import { useAuthContext } from '../../Context/AuthContext';
 
 const Login: React.FC = () => {
   const { login } = useAuthContext();
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '',
     password: '',
   });
   const [error, setError] = useState<string | null>(null);
@@ -21,8 +22,8 @@ const Login: React.FC = () => {
     e.preventDefault();
     setError(null);
     try {
-      await login(formData.email, formData.password);
-      setFormData({ email: '', password: '' });
+      await login(formData.identifier, formData.password);
+      setFormData({ identifier: '', password: '' });
       alert('ورود با موفقیت انجام شد!');
     } catch (error: any) {
       setError(error.message || 'خطا در ورود!');
@@ -37,16 +38,16 @@ const Login: React.FC = () => {
 
         <form onSubmit={handleSubmit} className={styles.loginForm}>
           <div className={styles.formGroup}>
-            <label htmlFor="email" className={styles.label}>
-              <EmailIcon /> ایمیل
+            <label htmlFor="identifier" className={styles.label}>
+              <EmailIcon /> ایمیل یا شماره تلفن
             </label>
             <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
+              type="text"
+              id="identifier"
+              name="identifier"
+              value={formData.identifier}
               onChange={handleChange}
-              placeholder="ایمیل خود را وارد کنید"
+              placeholder="ایمیل یا شماره تلفن خود را وارد کنید"
               className={styles.input}
               required
             />

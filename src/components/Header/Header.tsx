@@ -9,10 +9,15 @@ import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import Tooltip from '@mui/material/Tooltip';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import PersonIcon from '@mui/icons-material/Person';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { isAuthenticated, user, logout } = useAuthContext();
   const { cartItems, removeFromCart } = useCartContext();
   const navigate = useNavigate();
@@ -21,17 +26,37 @@ const Header: React.FC = () => {
   useEffect(() => {
     setIsMenuOpen(false);
     setIsCartOpen(false);
+    setAnchorEl(null);
   }, [location.pathname]);
 
   const handleNavLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.stopPropagation();
     setIsMenuOpen(false);
     setIsCartOpen(false);
+    setAnchorEl(null);
   };
 
   const handleProceedToCheckout = () => {
     setIsCartOpen(false);
-    navigate('/checkout/multiple');
+    navigate('/checkout/mulitple');
+  };
+
+  const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleProfileNavigation = (path: string) => {
+    navigate(path);
+    handleProfileClose();
+  };
+
+  // Get first two words of the user's name for tooltip
+  const getShortName = (name: string) => {
+    return name.split(' ').slice(0, 2).join(' ');
   };
 
   return (
@@ -113,6 +138,7 @@ const Header: React.FC = () => {
                   onClick={() => {
                     setIsCartOpen(true);
                     setIsMenuOpen(false);
+                    setAnchorEl(null);
                   }}
                   aria-label="باز کردن سبد خرید"
                 >
@@ -125,21 +151,45 @@ const Header: React.FC = () => {
           <div className={styles.authContainer}>
             {isAuthenticated && user ? (
               <div className={styles.userProfile}>
-                <img
-                  src={user.profilePicture || '/assets/default-profile.jpg'}
-                  alt={user.name}
-                  className={styles.profilePicture}
-                />
-                <span className={styles.userName}>{user.name}</span>
-                <button
-                  onClick={() => {
-                    logout();
-                    handleNavLinkClick({ stopPropagation: () => {} } as any);
+                <Tooltip title={getShortName(user.name)}>
+                  <IconButton
+                    onClick={handleProfileClick}
+                    aria-label="باز کردن منوی پروفایل"
+                    className={styles.profileIcon}
+                  >
+                    <img
+                      src={user.profilePicture || '/assets/default-profile.jpg'}
+                      alt={user.name}
+                      className={styles.profilePicture}
+                    />
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleProfileClose}
+                  PaperProps={{
+                    style: {
+                      width: '200px',
+                    },
                   }}
-                  className={styles.logoutButton}
                 >
-                  خروج
-                </button>
+                  <MenuItem onClick={() => handleProfileNavigation('/profile')}>
+                    <PersonIcon style={{ marginRight: '8px' }} /> پروفایل
+                  </MenuItem>
+                  <MenuItem onClick={() => handleProfileNavigation('/wishlist')}>
+                    <FavoriteIcon style={{ marginRight: '8px' }} /> علاقه‌مندی‌ها
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      logout();
+                      handleProfileClose();
+                      navigate('/');
+                    }}
+                  >
+                    <CloseIcon style={{ marginRight: '8px' }} /> خروج
+                  </MenuItem>
+                </Menu>
               </div>
             ) : (
               <>

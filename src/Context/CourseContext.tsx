@@ -25,7 +25,7 @@ interface Course {
   instructor: string;
   description: string;
   duration: string;
-  level: 'مبتدی' | 'متوسط' | 'پیشرفته';
+  courseNumber: string;
   category: 'آناتومی' | 'پروتز' | 'ترمیمی' | 'عمومی';
   image: string;
   price: string;
@@ -38,6 +38,7 @@ interface Course {
   tags?: string[];
   prerequisites?: string[];
   courseType: 'Online' | 'Offline' | 'In-Person' | 'Hybrid';
+  university: string;
 }
 
 interface CourseContextType {
@@ -55,10 +56,10 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
     {
       id: 1,
       title: 'دوره جامع آناتومی دندان',
-      instructor: 'دکتر احمد رضایی',
-      description: 'آموزش کامل آناتومی دندان با تمرکز بر تکنیک‌های عملی و تئوری پیشرفته.',
+      instructor: 'احمد رضایی',
+      description: 'آموزش کامل آناتومی دندان با تمرکز بر تکنیک‌های عملی و تئوری پیشرفته برای درس آناتومی دانشگاه سماشکو.',
       duration: '8 هفته',
-      level: 'متوسط' as const,
+      courseNumber: 'Course 1',
       category: 'آناتومی' as const,
       image: '/assets/courses/anatomy.jpg',
       price: '۴,۵۰۰,۰۰۰ تومان',
@@ -118,14 +119,15 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       tags: ['آناتومی', 'دندانپزشکی', 'عملی'],
       prerequisites: ['آشنایی اولیه با دندانپزشکی'],
       courseType: 'Online' as const,
+      university: 'Smashko',
     },
     {
       id: 2,
       title: 'پروتزهای دندانی پیشرفته',
-      instructor: 'دکتر مریم حسینی',
-      description: 'طراحی و ساخت پروتزهای دندانی با استفاده از تکنولوژی‌های روز دنیا.',
+      instructor: 'مریم حسینی',
+      description: 'طراحی و ساخت پروتزهای دندانی با استفاده از تکنولوژی‌های روز دنیا برای درس پروتز دانشگاه پیراگوا.',
       duration: '10 هفته',
-      level: 'پیشرفته' as const,
+      courseNumber: 'Course 2',
       category: 'پروتز' as const,
       image: '/assets/courses/prosthesis.jpg',
       price: '۶,۰۰۰,۰۰۰ تومان',
@@ -182,14 +184,15 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       tags: ['پروتز', 'تکنولوژی', 'پیشرفته'],
       prerequisites: ['دوره آناتومی دندان', 'آشنایی با CAD/CAM'],
       courseType: 'Hybrid' as const,
+      university: 'Piragova',
     },
     {
       id: 3,
       title: 'دوره عملی ترمیمی',
-      instructor: 'دکتر علی محمدی',
-      description: 'تمرین عملی ترمیم دندان با متریال‌های مدرن و شبیه‌سازی کلینیکی.',
+      instructor: 'علی محمدی',
+      description: 'تمرین عملی ترمیم دندان با متریال‌های مدرن و شبیه‌سازی کلینیکی برای درس ترمیمی دانشگاه رودن.',
       duration: '6 هفته',
-      level: 'مبتدی' as const,
+      courseNumber: 'Course 1',
       category: 'ترمیمی' as const,
       image: '/assets/courses/restorative.jpg',
       price: '۳,۸۰۰,۰۰۰ تومان',
@@ -248,14 +251,15 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       tags: ['ترمیمی', 'عملی', 'مبتدی'],
       prerequisites: [],
       courseType: 'In-Person' as const,
+      university: 'RUDN',
     },
     {
       id: 4,
       title: 'دوره مقدماتی دندانپزشکی عمومی',
-      instructor: 'دکتر سارا احمدی',
-      description: 'آشنایی با مفاهیم پایه دندانپزشکی و تکنیک‌های اولیه.',
+      instructor: 'سارا احمدی',
+      description: 'آشنایی با مفاهیم پایه دندانپزشکی و تکنیک‌های اولیه برای درس عمومی دانشگاه سچینوا.',
       duration: '5 هفته',
-      level: 'مبتدی' as const,
+      courseNumber: 'Course 1',
       category: 'عمومی' as const,
       image: '/assets/courses/general-dentistry.jpg',
       price: '۲,۵۰۰,۰۰۰ تومان',
@@ -314,14 +318,15 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       tags: ['دندانپزشکی', 'مبتدی', 'عمومی'],
       prerequisites: [],
       courseType: 'Online' as const,
+      university: 'Sechenov',
     },
     {
       id: 5,
       title: 'دوره پیشرفته ایمپلنت دندانی',
-      instructor: 'دکتر رضا کاظمی',
-      description: 'آموزش تکنیک‌های پیشرفته ایمپلنتولوژی با تمرکز بر روش‌های جراحی.',
+      instructor: 'رضا کاظمی',
+      description: 'آموزش تکنیک‌های پیشرفته ایمپلنتولوژی با تمرکز بر روش‌های جراحی برای درس ایمپلنت دانشگاه سماشکو.',
       duration: '12 هفته',
-      level: 'پیشرفته' as const,
+      courseNumber: 'Course 3',
       category: 'پروتز' as const,
       image: '/assets/courses/implant.jpg',
       price: '۷,۵۰۰,۰۰۰ تومان',
@@ -378,14 +383,15 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       tags: ['ایمپلنت', 'جراحی', 'پیشرفته'],
       prerequisites: ['دوره دندانپزشکی عمومی', 'آشنایی با جراحی'],
       courseType: 'In-Person' as const,
+      university: 'Smashko',
     },
     {
       id: 6,
       title: 'دوره ترمیمی پیشرفته',
-      instructor: 'دکتر نازنین موسوی',
-      description: 'آموزش تکنیک‌های پیشرفته ترمیمی با متریال‌های نوین.',
+      instructor: 'نازنین موسوی',
+      description: 'آموزش تکنیک‌های پیشرفته ترمیمی با متریال‌های نوین برای درس ترمیمی دانشگاه پیراگوا.',
       duration: '8 هفته',
-      level: 'متوسط' as const,
+      courseNumber: 'Course 2',
       category: 'ترمیمی' as const,
       image: '/assets/courses/advanced-restorative.jpg',
       price: '۴,۸۰۰,۰۰۰ تومان',
@@ -444,14 +450,15 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       tags: ['ترمیمی', 'پیشرفته', 'عملی'],
       prerequisites: ['دوره عملی ترمیمی'],
       courseType: 'Hybrid' as const,
+      university: 'Piragova',
     },
     {
       id: 7,
       title: 'دوره مدیریت کلینیک دندانپزشکی',
-      instructor: 'دکتر مهدی شریفی',
-      description: 'آموزش مدیریت کلینیک‌های دندانپزشکی و بهینه‌سازی فرآیندها.',
+      instructor: 'مهدی شریفی',
+      description: 'آموزش مدیریت کلینیک‌های دندانپزشکی و بهینه‌سازی فرآیندها برای درس مدیریت دانشگاه سچینوا.',
       duration: '6 هفته',
-      level: 'متوسط' as const,
+      courseNumber: 'Course 3',
       category: 'عمومی' as const,
       image: '/assets/courses/clinic-management.jpg',
       price: '۳,۲۰۰,۰۰۰ تومان',
@@ -509,14 +516,15 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       tags: ['مدیریت', 'کلینیک', 'عمومی'],
       prerequisites: ['آشنایی با دندانپزشکی عمومی'],
       courseType: 'Online' as const,
+      university: 'Sechenov',
     },
     {
       id: 8,
       title: 'دوره ارتودنسی مقدماتی',
-      instructor: 'دکتر حسین کاظمی',
-      description: 'آشنایی با مفاهیم پایه ارتودنسی و تکنیک‌های اولیه.',
+      instructor: 'حسین کاظمی',
+      description: 'آشنایی با مفاهیم پایه ارتودنسی و تکنیک‌های اولیه برای درس ارتودنسی دانشگاه رودن.',
       duration: '7 هفته',
-      level: 'مبتدی' as const,
+      courseNumber: 'Course 1',
       category: 'عمومی' as const,
       image: '/assets/courses/orthodontics.jpg',
       price: '۴,۰۰۰,۰۰۰ تومان',
@@ -575,14 +583,15 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       tags: ['ارتودنسی', 'مبتدی', 'عملی'],
       prerequisites: [],
       courseType: 'In-Person' as const,
+      university: 'RUDN',
     },
     {
       id: 9,
       title: 'دوره جراحی دهان و دندان',
-      instructor: 'دکتر بهرام رحیمی',
-      description: 'آموزش تکنیک‌های جراحی دهان و دندان با تمرکز بر روش‌های پیشرفته.',
+      instructor: 'بهرام رحیمی',
+      description: 'آموزش تکنیک‌های جراحی دهان و دندان با تمرکز بر روش‌های پیشرفته برای درس جراحی دانشگاه سماشکو.',
       duration: '10 هفته',
-      level: 'پیشرفته' as const,
+      courseNumber: 'Course 4',
       category: 'عمومی' as const,
       image: '/assets/courses/oral-surgery.jpg',
       price: '۶,۵۰۰,۰۰۰ تومان',
@@ -639,14 +648,15 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       tags: ['جراحی', 'دهان', 'پیشرفته'],
       prerequisites: ['دوره دندانپزشکی عمومی'],
       courseType: 'Hybrid' as const,
+      university: 'Smashko',
     },
     {
       id: 10,
       title: 'دوره تکنیک‌های لیزر در دندانپزشکی',
-      instructor: 'دکتر فاطمه رحیمی',
-      description: 'آموزش استفاده از لیزر در درمان‌های دندانپزشکی.',
+      instructor: 'فاطمه رحیمی',
+      description: 'آموزش استفاده از لیزر در درمان‌های دندانپزشکی برای درس لیزر دانشگاه سچینوا.',
       duration: '6 هفته',
-      level: 'متوسط' as const,
+      courseNumber: 'Course 2',
       category: 'عمومی' as const,
       image: '/assets/courses/laser-dentistry.jpg',
       price: '۴,۲۰۰,۰۰۰ تومان',
@@ -705,6 +715,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       tags: ['لیزر', 'دندانپزشکی', 'متوسط'],
       prerequisites: ['آشنایی با دندانپزشکی عمومی'],
       courseType: 'Offline' as const,
+      university: 'Sechenov',
     },
   ].filter((course) => {
     const isValid = instructorNames.has(course.instructor);
@@ -721,11 +732,12 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       const updatedCourses = typeof newCourses === 'function' ? newCourses(prev) : newCourses;
       const validCourses = updatedCourses.filter((course) => {
         const isValid = instructorNames.has(course.instructor) &&
-          ['مبتدی', 'متوسط', 'پیشرفته'].includes(course.level) &&
           ['آناتومی', 'پروتز', 'ترمیمی', 'عمومی'].includes(course.category) &&
-          ['Online', 'Offline', 'In-Person', 'Hybrid'].includes(course.courseType);
+          ['Online', 'Offline', 'In-Person', 'Hybrid'].includes(course.courseType) &&
+          ['Course 1', 'Course 2', 'Course 3', 'Course 4', 'Course 5'].includes(course.courseNumber) &&
+          ['Smashko', 'Piragova', 'RUDN', 'Sechenov'].includes(course.university);
         if (!isValid) {
-          console.warn(`دوره ${course.title} به دلیل استاد، سطح، دسته‌بندی یا نوع دوره نامعتبر حذف شد.`);
+          console.warn(`دوره ${course.title} به دلیل استاد، دسته‌بندی، نوع دوره، کورس یا دانشگاه نامعتبر حذف شد.`);
         }
         return isValid;
       });

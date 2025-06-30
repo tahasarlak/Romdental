@@ -1,7 +1,6 @@
-// src/context/InstructorContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-// رابط برای تعریف ساختار یک استاد
+// Interface for defining the structure of an instructor
 interface Instructor {
   id: number;
   name: string;
@@ -12,104 +11,104 @@ interface Instructor {
   coursesTaught: string[];
 }
 
-// رابط برای تعریف نوع کانتکست
+// Interface for defining the context type
 interface InstructorContextType {
   instructors: Instructor[];
   setInstructors: React.Dispatch<React.SetStateAction<Instructor[]>>;
 }
 
-// ایجاد کانتکست
+// Create context
 const InstructorContext = createContext<InstructorContextType | undefined>(undefined);
 
-// ارائه‌دهنده کانتکست برای مدیریت لیست اساتید
+// Context provider for managing the list of instructors
 export const InstructorProvider = ({ children }: { children: ReactNode }) => {
   const [instructors, setInstructors] = useState<Instructor[]>([
     {
       id: 1,
-      name: 'دکتر احمد رضایی',
+      name: 'احمد رضایی',
       specialty: 'آناتومی دندان',
-      bio: 'کارشناس برجسته در حوزه مشاوره و آموزش حرفه‌ای با تمرکز بر توسعه مهارت‌های فردی و تیمی.',
+      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه سماشکو، متخصص آموزش آناتومی دندان',
       image: '/assets/instructors/ahmad-rezaei.jpg',
       experience: '۱۵ سال',
-      coursesTaught: ['دوره جامع آناتومی دندان', 'کارگاه توسعه فردی', 'سمینار مدیریت تیم'],
+      coursesTaught: ['دوره جامع آناتومی دندان'],
     },
     {
       id: 2,
-      name: 'دکتر مریم حسینی',
+      name: 'مریم حسینی',
       specialty: 'پروتزهای دندانی',
-      bio: 'متخصص آموزش‌های خلاقانه با رویکرد نوآورانه در حل مسائل و بهبود عملکرد سازمانی.',
+      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه پیراگوا، متخصص پروتزهای دندانی',
       image: '/assets/instructors/maryam-hosseini.jpg',
       experience: '۱۲ سال',
-      coursesTaught: ['پروتزهای دندانی پیشرفته', 'کارگاه حل مسئله', 'سمینار تفکر خلاق'],
+      coursesTaught: ['پروتزهای دندانی پیشرفته'],
     },
     {
       id: 3,
-      name: 'دکتر علی محمدی',
+      name: 'علی محمدی',
       specialty: 'ترمیم دندان',
-      bio: 'مشاور و مربی با تجربه در توانمندسازی افراد و توسعه استراتژی‌های موفقیت‌آمیز.',
+      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه رودن، متخصص ترمیم دندان',
       image: '/assets/instructors/ali-mohammadi.jpg',
       experience: '۱۰ سال',
-      coursesTaught: ['دوره عملی ترمیمی', 'کارگاه استراتژی موفقیت', 'سمینار هدف‌گذاری'],
+      coursesTaught: ['دوره عملی ترمیمی'],
     },
     {
       id: 4,
-      name: 'دکتر سارا احمدی',
+      name: 'سارا احمدی',
       specialty: 'دندانپزشکی عمومی',
-      bio: 'متخصص آموزش مفاهیم پایه دندانپزشکی با تمرکز بر تکنیک‌های اولیه.',
+      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه سچینوا، با تمرکز بر آموزش دندانپزشکی پایه',
       image: '/assets/instructors/sara-ahmadi.jpg',
       experience: '۸ سال',
       coursesTaught: ['دوره مقدماتی دندانپزشکی عمومی'],
     },
     {
       id: 5,
-      name: 'دکتر رضا کاظمی',
+      name: 'رضا کاظمی',
       specialty: 'ایمپلنتولوژی',
-      bio: 'متخصص تکنیک‌های پیشرفته ایمپلنتولوژی و جراحی دندانی.',
+      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه سماشکو، متخصص ایمپلنت دندانی',
       image: '/assets/instructors/reza-kazemi.jpg',
       experience: '۱۴ سال',
       coursesTaught: ['دوره پیشرفته ایمپلنت دندانی'],
     },
     {
       id: 6,
-      name: 'دکتر نازنین موسوی',
+      name: 'نازنین موسوی',
       specialty: 'ترمیم پیشرفته',
-      bio: 'کارشناس تکنیک‌های پیشرفته ترمیمی با متریال‌های نوین.',
+      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه پیراگوا، متخصص مواد نوین ترمیمی',
       image: '/assets/instructors/nazanin-mousavi.jpg',
       experience: '۱۱ سال',
       coursesTaught: ['دوره ترمیمی پیشرفته'],
     },
     {
       id: 7,
-      name: 'دکتر مهدی شریفی',
+      name: 'مهدی شریفی',
       specialty: 'مدیریت کلینیک',
-      bio: 'متخصص مدیریت کلینیک‌های دندانپزشکی و بهینه‌سازی فرآیندها.',
+      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه سچینوا، متخصص مدیریت کلینیک‌های دندانپزشکی',
       image: '/assets/instructors/mehdi-sharifi.jpg',
       experience: '۱۳ سال',
       coursesTaught: ['دوره مدیریت کلینیک دندانپزشکی'],
     },
     {
       id: 8,
-      name: 'دکتر حسین کاظمی',
+      name: 'حسین کاظمی',
       specialty: 'ارتودنسی',
-      bio: 'متخصص آموزش مفاهیم پایه ارتودنسی و تکنیک‌های اولیه.',
+      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه رودن، متخصص ارتودنسی مقدماتی',
       image: '/assets/instructors/hossein-kazemi.jpg',
       experience: '۹ سال',
       coursesTaught: ['دوره ارتودنسی مقدماتی'],
     },
     {
       id: 9,
-      name: 'دکتر بهرام رحیمی',
+      name: 'بهرام رحیمی',
       specialty: 'جراحی دهان',
-      bio: 'متخصص جراحی دهان و دندان با تمرکز بر روش‌های پیشرفته.',
+      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه سماشکو، متخصص جراحی دهان و دندان',
       image: '/assets/instructors/bahram-rahimi.jpg',
       experience: '۱۶ سال',
       coursesTaught: ['دوره جراحی دهان و دندان'],
     },
     {
       id: 10,
-      name: 'دکتر فاطمه رحیمی',
+      name: 'فاطمه رحیمی',
       specialty: 'لیزر در دندانپزشکی',
-      bio: 'متخصص استفاده از لیزر در درمان‌های دندانپزشکی.',
+      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه سچینوا، متخصص لیزر درمانی در دندانپزشکی',
       image: '/assets/instructors/fatemeh-rahimi.jpg',
       experience: '۱۰ سال',
       coursesTaught: ['دوره تکنیک‌های لیزر در دندانپزشکی'],
@@ -123,7 +122,7 @@ export const InstructorProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// هوک برای استفاده از کانتکست
+// Hook for using the context
 export const useInstructorContext = () => {
   const context = useContext(InstructorContext);
   if (!context) {

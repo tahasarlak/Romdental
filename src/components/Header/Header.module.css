@@ -71,6 +71,23 @@
   color: #3498db;
 }
 
+.profileIcon {
+  padding: 0;
+  margin-left: 8px;
+  color: #ecf0f1;
+}
+
+.profileIcon:hover {
+  color: #3498db;
+}
+
+.profilePicture {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .authContainer {
   display: flex;
   align-items: center;
@@ -114,18 +131,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.profilePicture {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.userName {
-  color: #ecf0f1;
-  font-size: 1rem;
 }
 
 .logoutButton {
@@ -276,14 +281,16 @@
     color: #3498db;
   }
 
-  .cartIcon {
+  .cartIcon,
+  .profileIcon {
     font-size: 1.8rem;
     padding: 12px;
     width: 100%;
     text-align: center;
   }
 
-  .cartIcon:hover {
+  .cartIcon:hover,
+  .profileIcon:hover {
     background-color: #34495e;
     color: #3498db;
   }
@@ -310,10 +317,6 @@
     align-items: center;
     width: 100%;
     padding: 10px 0;
-  }
-
-  .userName {
-    font-size: 1.1rem;
   }
 
   .cartModalContent {

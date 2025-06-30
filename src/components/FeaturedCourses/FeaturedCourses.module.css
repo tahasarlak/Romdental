@@ -1,18 +1,19 @@
-/* src/components/FeaturedCourses.module.css */
 .featured {
   padding: 60px 20px;
-  background-color: var(--secondary-color);
+  background-color: var(--secondary-color, #f9fafb);
+  text-align: center;
 }
 
 .title {
   text-align: center;
   font-size: 32px;
+  font-weight: bold;
   margin-bottom: 40px;
-  color: var(--primary-color);
+  color: var(--primary-color, #1f2937);
 }
 
 .courses {
-  max-width: var(--max-width);
+  max-width: var(--max-width, 1200px);
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -20,23 +21,122 @@
 }
 
 .card {
-  background-color: var(--white);
+  background-color: var(--white, #ffffff);
   padding: 25px;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
-  transition: var(--transition);
+  border-radius: var(--border-radius, 12px);
+  box-shadow: var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.1));
+  transition: var(--transition, transform 0.3s ease, box-shadow 0.3s ease);
 }
 
 .card:hover {
   transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.cardImage {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: var(--border-radius, 12px) var(--border-radius, 12px) 0 0;
+}
+
+.cardContent {
+  padding: 15px 0;
 }
 
 .cardTitle {
-  color: var(--primary-color);
+  color: var(--primary-color, #1f2937);
+  font-size: 1.5rem;
+  font-weight: 600;
   margin-bottom: 15px;
+}
+
+.cardDescription {
+  font-size: 1rem;
+  color: #4b5563;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.cardDetails {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 15px;
+}
+
+.cardDetails p {
+  margin: 8px 0;
+}
+
+.cardPrice {
+  font-weight: bold;
+  color: var(--price-color, #10b981);
 }
 
 .enrollButton {
   margin-top: 20px;
   width: 100%;
+  background-color: var(--button-bg, #3b82f6);
+  color: #ffffff;
+  padding: 12px;
+  border-radius: var(--border-radius, 8px);
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.enrollButton:hover {
+  background-color: var(--button-hover-bg, #2563eb);
+}
+
+.noCourses {
+  font-size: 1.2rem;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.viewAllContainer {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.viewAllButton {
+  display: inline-block;
+  background-color: var(--button-bg, #3b82f6);
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: var(--border-radius, 8px);
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.viewAllButton:hover {
+  background-color: var(--button-hover-bg, #2563eb);
+}
+
+@media (max-width: 768px) {
+  .featured {
+    padding: 40px 15px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .courses {
+    grid-template-columns: 1fr;
+  }
+
+  .cardImage {
+    height: 150px;
+  }
+
+  .viewAllButton {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
 }

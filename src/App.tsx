@@ -16,11 +16,11 @@ import { CourseProvider } from './Context/CourseContext';
 import { InstructorProvider } from './Context/InstructorContext';
 import { TestimonialProvider } from './Context/TestimonialContext';
 import { ReviewProvider } from './Context/ReviewContext';
-import './styles/global.css';
-import CourseDetails from './pages/Courses/[id]/[id]';
-import InstructorDetails from './pages/Instructors/InstructorDetails/InstructorDetails';
-import Checkout from './pages/Checkout/[id]';
 import { WishlistProvider } from './Context/WishlistContext';
+import InstructorDetails from './pages/Instructors/InstructorDetails/InstructorDetails';
+import './styles/global.css';
+import Checkout from './pages/Checkout/[id]';
+import CourseDetails from './pages/Courses/[id]/[id]';
 
 const App: React.FC = () => {
   return (
@@ -34,22 +34,22 @@ const App: React.FC = () => {
                   <ContactProvider>
                     <TestimonialProvider>
                       <WishlistProvider>
-                      <Router>
-                        <Layout>
-                          <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/courses" element={<Courses />} />
-                            <Route path="/instructors" element={<Instructors />} />
-                            <Route path="/instructors/:instructorName" element={<InstructorDetails />} />
-                            <Route path="/blog" element={<Blog />} />
-                            <Route path="/contact" element={<Contact />} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/signup" element={<Signup />} />
-                            <Route path="/courses/:id" element={<CourseDetails />} />
-                            <Route path="/checkout/:id" element={<Checkout />} />
-                          </Routes>
-                        </Layout>
-                      </Router>
+                        <Router>
+                          <Layout>
+                            <Routes>
+                              <Route path="/" element={<Home />} />
+                              <Route path="/courses" element={<Courses />} />
+                              <Route path="/instructors" element={<Instructors />} />
+                              <Route path="/instructors/:instructorName" element={<InstructorDetails />} />
+                              <Route path="/blog" element={<Blog />} />
+                              <Route path="/contact" element={<Contact />} />
+                              <Route path="/login" element={<Login />} />
+                              <Route path="/signup" element={<Signup />} />
+                              <Route path="/courses/:id" element={<CourseDetails />} />
+                              <Route path="/checkout/:id" element={<Checkout />} />
+                            </Routes>
+                          </Layout>
+                        </Router>
                       </WishlistProvider>
                     </TestimonialProvider>
                   </ContactProvider>
