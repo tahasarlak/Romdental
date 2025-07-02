@@ -1,17 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
-import StarIcon from '@mui/icons-material/Star';
-import PeopleIcon from '@mui/icons-material/People';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import DeleteIcon from '@mui/icons-material/Delete';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import Tooltip from '@mui/material/Tooltip';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import styles from './Courses.module.css';
@@ -20,6 +10,8 @@ import { useInstructorContext } from '../../Context/InstructorContext';
 import { useReviewContext } from '../../Context/ReviewContext';
 import { useCartContext } from '../../Context/CartContext';
 import { useWishlistContext } from '../../Context/WishlistContext';
+import CourseCard from '../../components/CourseCard/CourseCard';
+import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 
 interface Course {
   id: number;
@@ -31,6 +23,8 @@ interface Course {
   category: string;
   image: string;
   price: string;
+  discountPrice?: string;
+  discountMiPercentage?: number;
   startDate: string;
   isOpen: boolean;
   isFeatured: boolean;
@@ -76,9 +70,9 @@ const Courses: React.FC = () => {
 
   const instructorNames = useMemo(() => new Set(instructors.map((instructor) => instructor.name)), [instructors]);
 
-  const uniqueCourseNumbers = useMemo(() => ['all', ...new Set(courses.map((course) => course.courseNumber)).values()].sort(), [courses]);
-  const uniqueCategories = useMemo(() => ['all', ...new Set(courses.map((course) => course.category)).values()].sort(), [courses]);
-  const uniqueInstructors = useMemo(() => ['all', ...new Set(courses.map((course) => course.instructor)).values()].sort(), [courses]);
+  const uniqueCourseNumbers = useMemo(() => ['all', ...new Set(courses.map((course) => course.courseNumber))].sort(), [courses]);
+  const uniqueCategories = useMemo(() => ['all', ...new Set(courses.map((course) => course.category))].sort(), [courses]);
+  const uniqueInstructors = useMemo(() => ['all', ...new Set(courses.map((course) => course.instructor))].sort(), [courses]);
   const uniqueStatuses = useMemo(() => ['all', 'open', 'closed'], [courses]);
   const uniqueCourseTypes = useMemo(() => ['all', 'Online', 'Offline', 'In-Person', 'Hybrid'], [courses]);
   const uniqueUniversities = useMemo(() => ['all', 'Smashko', 'Piragova', 'RUDN', 'Sechenov'].sort(), [courses]);
@@ -107,7 +101,11 @@ const Courses: React.FC = () => {
       )
       .sort((a, b) => {
         if (sortBy === 'title') return a.title.localeCompare(b.title);
-        if (sortBy === 'price') return parseInt(a.price.replace(/[^0-9]/g, '')) - parseInt(b.price.replace(/[^0-9]/g, ''));
+        if (sortBy === 'price') {
+          const priceA = a.discountPrice ? parseInt(a.discountPrice.replace(/[^0-9]/g, '')) : parseInt(a.price.replace(/[^0-9]/g, ''));
+          const priceB = b.discountPrice ? parseInt(b.discountPrice.replace(/[^0-9]/g, '')) : parseInt(b.price.replace(/[^0-9]/g, ''));
+          return priceA - priceB;
+        }
         if (sortBy === 'startDate') return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
         if (sortBy === 'rating') {
           const courseReviewsA = reviews.filter((review) => review.courseId === a.id);
@@ -144,7 +142,7 @@ const Courses: React.FC = () => {
       removeFromCart(course.id);
       setEnrolledCourses((prev) => prev.filter((id) => id !== course.id));
     } else {
-      addToCart({ id: course.id, title: course.title, price: course.price });
+      addToCart({ id: course.id, title: course.title, price: course.discountPrice || course.price });
       setEnrolledCourses((prev) => [...prev, course.id]);
     }
   }, [addToCart, removeFromCart, isCartItem, setEnrolledCourses]);
@@ -263,136 +261,6 @@ const Courses: React.FC = () => {
     </div>
   );
 
-  const renderCourseCard = (course: Course) => {
-    const isEnrolled = enrolledCourses.includes(course.id);
-    const completedItems = (course.syllabus || []).filter((item) => item.completed).length;
-    const totalItems = (course.syllabus || []).length;
-    const progressPercentage = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
-    const courseReviews = reviews.filter((review: ReviewItem) => review.courseId === course.id);
-    const averageRating = courseReviews.length > 0
-      ? (courseReviews.reduce((sum: number, r: ReviewItem) => sum + r.rating, 0) / courseReviews.length).toFixed(1)
-      : '0.0';
-
-    return (
-      <div
-        key={course.id}
-        className={styles.courseCard}
-        role="article"
-        aria-labelledby={`course-title-${course.id}`}
-      >
-        <div className={styles.imageWrapper}>
-          <div className={styles.imageContainer}>
-            <img
-              src={course.image}
-              alt={course.title}
-              className={styles.courseImage}
-              loading="lazy"
-              onError={(e) => { e.currentTarget.src = '/assets/fallback.jpg'; }}
-            />
-            <div className={styles.imageSkeleton} />
-          </div>
-          {course.isFeatured && (
-            <span className={styles.featuredBadge}>ویژه</span>
-          )}
-        </div>
-        <div className={styles.courseContent}>
-          <h2 id={`course-title-${course.id}`} className={styles.courseTitle}>
-            {course.title}
-          </h2>
-          <p className={styles.instructor}>
-            استاد:{' '}
-            {instructorNames.has(course.instructor) ? (
-              <Link
-                to={`/instructors/${course.instructor.replace(' ', '-')}`}
-                className={styles.instructorLink}
-                aria-label={`مشاهده پروفایل ${course.instructor}`}
-              >
-                {course.instructor}
-              </Link>
-            ) : (
-              <span>{course.instructor} (اطلاعات استاد در دسترس نیست)</span>
-            )}
-          </p>
-          <div className={styles.rating}>
-            <StarIcon className={styles.starIcon} />
-            <span>{averageRating} ({courseReviews.length} نظر)</span>
-          </div>
-          <p className={styles.description}>{course.description}</p>
-          <div className={styles.details}>
-            <Tooltip title="مدت دوره">
-              <span><AccessTimeIcon /> {course.duration}</span>
-            </Tooltip>
-            <Tooltip title="کورس">
-              <span><TrendingUpIcon /> {course.courseNumber}</span>
-            </Tooltip>
-            <Tooltip title="قیمت دوره">
-              <span><AttachMoneyIcon /> {course.price}</span>
-            </Tooltip>
-            <Tooltip title="تاریخ شروع">
-              <span><CalendarTodayIcon /> {course.startDate}</span>
-            </Tooltip>
-            <Tooltip title="تعداد ثبت‌نام">
-              <span><PeopleIcon /> {course.enrollmentCount} نفر</span>
-            </Tooltip>
-            <Tooltip title="نوع دوره">
-              <span>{course.courseType === 'Online' ? 'آنلاین' : course.courseType === 'Offline' ? 'آفلاین' : course.courseType === 'In-Person' ? 'حضوری' : 'ترکیبی'}</span>
-            </Tooltip>
-            <Tooltip title="دانشگاه">
-              <span>{course.university}</span>
-            </Tooltip>
-          </div>
-          {isEnrolled && totalItems > 0 && (
-            <div className={styles.progressContainer}>
-              <div className={styles.progressBar}>
-                <div className={styles.progressFill} style={{ width: `${progressPercentage}%` }} />
-              </div>
-              <span className={styles.progressText}>
-                {Math.round(progressPercentage)}% کامل شده
-              </span>
-            </div>
-          )}
-          <div className={styles.actions}>
-            <button
-              className={`${styles.enrollButton} ${isCartItem(course.id) ? styles.addedToCart : ''}`}
-              disabled={!course.isOpen}
-              onClick={() => handleAddToCart(course)}
-              aria-label={isCartItem(course.id) ? 'حذف از سبد خرید' : course.isOpen ? 'افزودن به سبد خرید' : 'ثبت‌نام بسته است'}
-            >
-              {isCartItem(course.id) ? (
-                <>
-                  <DeleteIcon className={styles.removeIcon} />
-                  افزوده شده
-                </>
-              ) : course.isOpen ? (
-                'افزودن به سبد خرید'
-              ) : (
-                'ثبت‌نام بسته است'
-              )}
-            </button>
-            <Link
-              to={`/courses/${course.id}`}
-              className={styles.detailsLink}
-              aria-label={`جزئیات بیشتر درباره ${course.title}`}
-            >
-              جزئیات بیشتر
-            </Link>
-            <button
-              className={`${styles.wishlistButton} ${isInWishlist(course.id, 'course') ? styles.wishlistActive : ''}`}
-              onClick={() => handleWishlistToggle(course.id)}
-              aria-label={isInWishlist(course.id, 'course') ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}
-            >
-              {isInWishlist(course.id, 'course') ? (
-                <FavoriteIcon className={styles.wishlistIconActive} />
-              ) : (
-                <FavoriteBorderIcon className={styles.wishlistIcon} />
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   if (isLoading) {
     return (
       <section className={styles.coursesSection}>
@@ -416,7 +284,8 @@ const Courses: React.FC = () => {
   return (
     <section className={styles.coursesSection}>
       <div className={styles.container}>
-        <h1 className={styles.title}>دوره‌های آموزشی روم دنتال</h1>
+      <Breadcrumb />
+    <h1 className={styles.title}>دوره‌های آموزشی روم دنتال</h1>
         <p className={styles.subtitle}>
           با بهترین اساتید و محتوای به‌روز، مهارت‌های خود را ارتقا دهید
         </p>
@@ -463,7 +332,26 @@ const Courses: React.FC = () => {
             </div>
 
             <div className={styles.coursesGrid}>
-              {currentCourses.map(renderCourseCard)}
+              {currentCourses.map((course) => {
+                const courseReviews = reviews.filter((review: ReviewItem) => review.courseId === course.id);
+                const averageRating = courseReviews.length > 0
+                  ? (courseReviews.reduce((sum: number, r: ReviewItem) => sum + r.rating, 0) / courseReviews.length).toFixed(1)
+                  : '0.0';
+                return (
+                  <CourseCard
+                    key={course.id}
+                    course={course}
+                    isEnrolled={enrolledCourses.includes(course.id)}
+                    isCartItem={isCartItem}
+                    handleAddToCart={handleAddToCart}
+                    handleWishlistToggle={handleWishlistToggle}
+                    isInWishlist={isInWishlist}
+                    instructorNames={instructorNames}
+                    averageRating={averageRating}
+                    courseReviewsLength={courseReviews.length}
+                  />
+                );
+              })}
             </div>
 
             {filteredCourses.length === 0 && (

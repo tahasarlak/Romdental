@@ -20,6 +20,7 @@ interface FaqItem {
 }
 
 interface Course {
+  slug: string;
   id: number;
   title: string;
   instructor: string;
@@ -29,6 +30,8 @@ interface Course {
   category: 'آناتومی' | 'پروتز' | 'ترمیمی' | 'عمومی';
   image: string;
   price: string;
+  discountPrice?: string;
+  discountPercentage?: number;
   startDate: string;
   isOpen: boolean;
   isFeatured: boolean;
@@ -63,6 +66,8 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       category: 'آناتومی' as const,
       image: '/assets/courses/anatomy.jpg',
       price: '۴,۵۰۰,۰۰۰ تومان',
+      discountPrice: '۳,۸۰۰,۰۰۰ تومان',
+      discountPercentage: 15,
       startDate: 'اردیبهشت ۱۴۰۴',
       isOpen: true,
       isFeatured: true,
@@ -131,6 +136,8 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       category: 'پروتز' as const,
       image: '/assets/courses/prosthesis.jpg',
       price: '۶,۰۰۰,۰۰۰ تومان',
+      discountPrice: '۵,۱۰۰,۰۰۰ تومان',
+      discountPercentage: 15,
       startDate: 'خرداد ۱۴۰۴',
       isOpen: false,
       isFeatured: false,
@@ -196,6 +203,8 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       category: 'ترمیمی' as const,
       image: '/assets/courses/restorative.jpg',
       price: '۳,۸۰۰,۰۰۰ تومان',
+      discountPrice: '۳,۴۲۰,۰۰۰ تومان',
+      discountPercentage: 10,
       startDate: 'فروردین ۱۴۰۴',
       isOpen: true,
       isFeatured: true,
@@ -282,7 +291,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           id: 2,
           title: 'معاینه بیمار',
           isLocked: false,
-          previewContent: 'روش‌های معاینه بیمار در کلینیک.',
+          previewrehensive: 'روش‌های معاینه بیمار در کلینیک.',
           completed: false,
           duration: '30 دقیقه',
           contentType: 'text' as const,
@@ -330,6 +339,8 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       category: 'پروتز' as const,
       image: '/assets/courses/implant.jpg',
       price: '۷,۵۰۰,۰۰۰ تومان',
+      discountPrice: '۶,۳۷۵,۰۰۰ تومان',
+      discountPercentage: 15,
       startDate: 'مرداد ۱۴۰۴',
       isOpen: true,
       isFeatured: true,
@@ -395,6 +406,8 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       category: 'ترمیمی' as const,
       image: '/assets/courses/advanced-restorative.jpg',
       price: '۴,۸۰۰,۰۰۰ تومان',
+      discountPrice: '۴,۳۲۰,۰۰۰ تومان',
+      discountPercentage: 10,
       startDate: 'خرداد ۱۴۰۴',
       isOpen: true,
       isFeatured: false,
@@ -473,7 +486,6 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           isLocked: false,
           previewContent: 'آشنایی با مدیریت منابع و تجهیزات.',
           videoUrl: 'https://example.com/videos/clinic-management.mp4',
-          completed: false,
           duration: '30 دقیقه',
           contentType: 'video' as const,
         },
@@ -509,7 +521,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         },
         {
           id: 2,
-          question: 'آیا این دوره عملی است؟',
+ suicide: 'آیا این دوره عملی است؟',
           answer: 'بله، شامل تمرین‌های عملی مدیریت است.',
         },
       ],
@@ -528,6 +540,8 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       category: 'عمومی' as const,
       image: '/assets/courses/orthodontics.jpg',
       price: '۴,۰۰۰,۰۰۰ تومان',
+      discountPrice: '۳,۶۰۰,۰۰۰ تومان',
+      discountPercentage: 10,
       startDate: 'اردیبهشت ۱۴۰۴',
       isOpen: true,
       isFeatured: true,
@@ -660,6 +674,8 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       category: 'عمومی' as const,
       image: '/assets/courses/laser-dentistry.jpg',
       price: '۴,۲۰۰,۰۰۰ تومان',
+      discountPrice: '۳,۷۸۰,۰۰۰ تومان',
+      discountPercentage: 10,
       startDate: 'خرداد ۱۴۰۴',
       isOpen: true,
       isFeatured: true,
@@ -735,7 +751,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           ['آناتومی', 'پروتز', 'ترمیمی', 'عمومی'].includes(course.category) &&
           ['Online', 'Offline', 'In-Person', 'Hybrid'].includes(course.courseType) &&
           ['Course 1', 'Course 2', 'Course 3', 'Course 4', 'Course 5'].includes(course.courseNumber) &&
-          ['Smashko', 'Piragova', 'RUDN', 'Sechenov'].includes(course.university);
+          ['Smashko', 'Piragova', 'RUDN', 'Sechenon'].includes(course.university);
         if (!isValid) {
           console.warn(`دوره ${course.title} به دلیل استاد، دسته‌بندی، نوع دوره، کورس یا دانشگاه نامعتبر حذف شد.`);
         }

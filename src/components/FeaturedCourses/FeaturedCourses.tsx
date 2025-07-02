@@ -3,34 +3,43 @@ import { Link } from 'react-router-dom';
 import styles from './FeaturedCourses.module.css';
 import { useCourseContext } from '../../Context/CourseContext';
 import { useInstructorContext } from '../../Context/InstructorContext';
+import CourseCard from '../CourseCard/CourseCard'; 
 
 interface Course {
-  isOpen: boolean;
   id: number;
   title: string;
-  description: string;
   instructor: string;
+  description: string;
   duration: string;
+  courseNumber: string;
+  category: string;
   image: string;
   price: string;
-  courseNumber: string;
-  courseType: 'Online' | 'Offline' | 'In-Person' | 'Hybrid';
+  discountPrice?: string;
+  discountPercentage?: number;
+  startDate: string;
+  isOpen: boolean;
   isFeatured: boolean;
+  enrollmentCount: number;
+  syllabus: { completed?: boolean }[];
+  tags?: string[];
+  prerequisites?: string[];
+  courseType: 'Online' | 'Offline' | 'In-Person' | 'Hybrid';
   university: string;
 }
 
 const getRandomCourses = (courses: Course[], count: number): Course[] => {
   const featuredCourses = courses.filter((course) => course.isFeatured && course.isOpen);
   const otherCourses = courses.filter((course) => !course.isFeatured && course.isOpen);
-  
+
   const shuffledFeatured = [...featuredCourses].sort(() => Math.random() - 0.5);
   const shuffledOthers = [...otherCourses].sort(() => Math.random() - 0.5);
-  
+
   const selectedCourses = [
     ...shuffledFeatured.slice(0, Math.min(count, featuredCourses.length)),
     ...shuffledOthers.slice(0, count - Math.min(count, featuredCourses.length)),
   ].slice(0, count);
-  
+
   return selectedCourses;
 };
 
@@ -38,6 +47,8 @@ const FeaturedCourses: React.FC = () => {
   const { courses } = useCourseContext();
   const { instructors } = useInstructorContext();
   const [isVisible, setIsVisible] = useState(false);
+  const [cartItems, setCartItems] = useState<number[]>([]);
+  const [wishlist, setWishlist] = useState<number[]>([]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,15 +66,38 @@ const FeaturedCourses: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const instructorImageMap = useMemo(() => {
-    const map = new Map<string, string>();
-    instructors.forEach((instructor) => map.set(instructor.name, instructor.image));
-    return map;
+  const instructorNames = useMemo(() => {
+    return new Set(instructors.map((instructor) => instructor.name));
   }, [instructors]);
 
   const featuredCourses = useMemo(() => {
     return getRandomCourses(courses, 3);
   }, [courses]);
+
+  const handleAddToCart = (course: Course) => {
+    setCartItems((prev) =>
+      prev.includes(course.id)
+        ? prev.filter((id) => id !== course.id)
+        : [...prev, course.id]
+    );
+  };
+
+  const handleWishlistToggle = (courseId: number) => {
+    setWishlist((prev) =>
+      prev.includes(courseId)
+        ? prev.filter((id) => id !== courseId)
+        : [...prev, courseId]
+    );
+  };
+
+  const isCartItem = (courseId: number) => cartItems.includes(courseId);
+
+  const isInWishlist = (id: number, type: 'course' | 'instructor') => {
+    if (type === 'course') {
+      return wishlist.includes(id);
+    }
+    return false;
+  };
 
   return (
     <section className={`${styles.featured} ${isVisible ? styles.visible : ''}`}>
@@ -74,42 +108,18 @@ const FeaturedCourses: React.FC = () => {
         <div className={styles.courses}>
           {featuredCourses.length > 0 ? (
             featuredCourses.map((course, index) => (
-              <div
+              <CourseCard
                 key={course.id}
-                className={`${styles.card} ${isVisible ? styles.cardVisible : ''}`}
-                style={{ transitionDelay: `${index * 0.2}s` }}
-              >
-                <img
-                  src={course.image}
-                  alt={course.title}
-                  className={styles.cardImage}
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.src = '/assets/courses/placeholder.jpg';
-                  }}
-                />
-                <div className={styles.cardContent}>
-                  <h3 className={styles.cardTitle}>{course.title}</h3>
-                  <p className={styles.cardDescription}>{course.description}</p>
-                  <div className={styles.cardDetails}>
-                    <div className={styles.instructorInfo}>
-                      <img
-                        src={instructorImageMap.get(course.instructor) || '/assets/instructors/placeholder.jpg'}
-                        alt={course.instructor}
-                        className={styles.instructorImage}
-                        loading="lazy"
-                      />
-                      <p>مدرس: {course.instructor}</p>
-                    </div>
-                    <p>مدت: {course.duration}</p>
-                    <p>کورس: {course.courseNumber}</p>
-                    <p>نوع: {course.courseType === 'Online' ? 'آنلاین' : course.courseType === 'Offline' ? 'آفلاین' : course.courseType === 'In-Person' ? 'حضوری' : 'ترکیبی'}</p>
-                    <p>دانشگاه: {course.university}</p>
-                    <p className={styles.cardPrice}>قیمت: {course.price}</p>
-                  </div>
-                  <button className={styles.enrollButton}>ثبت‌نام</button>
-                </div>
-              </div>
+                course={course}
+                isEnrolled={false} // فرض می‌کنیم کاربر در این دوره‌ها ثبت‌نام نکرده است
+                isCartItem={isCartItem}
+                handleAddToCart={handleAddToCart}
+                handleWishlistToggle={handleWishlistToggle}
+                isInWishlist={isInWishlist}
+                instructorNames={instructorNames}
+                averageRating="4.5" // مقدار پیش‌فرض برای نمونه
+                courseReviewsLength={10} // مقدار پیش‌فرض برای نمونه
+              />
             ))
           ) : (
             <p className={styles.noCourses}>دوره‌ای برای نمایش وجود ندارد.</p>

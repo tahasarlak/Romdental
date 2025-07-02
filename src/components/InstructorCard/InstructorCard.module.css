@@ -1,0 +1,134 @@
+.instructorCard {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition);
+}
+
+.instructorCard:hover {
+  transform: translateY(-5px);
+}
+
+.imageWrapper {
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+}
+
+.instructorImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.instructorContent {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.instructorName {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.specialty {
+  font-size: 1rem;
+  color: var(--text-color);
+  margin: 0.5rem 0;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5rem 0;
+  color: var(--text-color);
+}
+
+.starIcon {
+  color: var(--accent-color);
+  margin-right: 0.25rem;
+}
+
+.bio {
+  font-size: 0.9rem;
+  color: var(--text-color);
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.details {
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.details span {
+  font-size: 0.9rem;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.detailsLink {
+  padding: 0.5rem 1rem;
+  background-color: var(--accent-color);
+  color: var(--white);
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.detailsLink:hover {
+  background-color: darken(var(--accent-color), 10%);
+}
+
+.wishlistButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.wishlistIcon, .wishlistIconActive {
+  font-size: 1.5rem;
+}
+
+.wishlistIcon {
+  color: var(--gray);
+}
+
+.wishlistIconActive {
+  color: var(--accent-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .instructorName {
+    font-size: 1.3rem;
+  }
+
+  .imageWrapper {
+    height: 150px;
+  }
+
+  .instructorContent {
+    padding: 1rem;
+  }
+}

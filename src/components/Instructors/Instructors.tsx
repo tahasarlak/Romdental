@@ -1,26 +1,19 @@
+// src/components/Instructors/Instructors.tsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Instructors.module.css';
-import { useInstructorContext } from '../../Context/InstructorContext';
+import { useInstructorContext, Instructor } from '../../Context/InstructorContext'; // Import Instructor interface
+import InstructorCard from '../InstructorCard/InstructorCard';
 
 const getRandomInstructors = (instructors: Instructor[], count: number): Instructor[] => {
   const shuffled = [...instructors].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
 };
 
-interface Instructor {
-  id: number;
-  name: string;
-  specialty: string;
-  bio: string;
-  image: string;
-  experience: string;
-  coursesTaught: string[];
-}
-
 const Instructors: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
   const { instructors } = useInstructorContext();
+  const [isVisible, setIsVisible] = useState(false);
+  const [wishlist, setWishlist] = useState<number[]>([]);
 
   // Select three random instructors
   const displayedInstructors = useMemo(() => {
@@ -44,6 +37,21 @@ const Instructors: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const toggleWishlist = (instructorId: number) => {
+    setWishlist((prev) =>
+      prev.includes(instructorId)
+        ? prev.filter((id) => id !== instructorId)
+        : [...prev, instructorId]
+    );
+  };
+
+  const isInWishlist = (id: number, type: 'course' | 'instructor') => {
+    if (type === 'instructor') {
+      return wishlist.includes(id);
+    }
+    return false;
+  };
+
   return (
     <section className={`${styles.instructors} ${isVisible ? styles.visible : ''}`}>
       <div className={styles.container}>
@@ -58,30 +66,13 @@ const Instructors: React.FC = () => {
             displayedInstructors.map((instructor, index) => (
               <div
                 key={instructor.id}
-                className={`${styles.card} ${isVisible ? styles.cardVisible : ''}`}
                 style={{ transitionDelay: `${index * 0.2}s` }}
               >
-                <img
-                  src={instructor.image}
-                  alt={instructor.name}
-                  className={styles.instructorImage}
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.src = '/assets/instructors/placeholder.jpg';
-                  }}
+                <InstructorCard
+                  instructor={instructor}
+                  toggleWishlist={toggleWishlist}
+                  isInWishlist={isInWishlist}
                 />
-                <h3 className={styles.instructorName}>{instructor.name}</h3>
-                <p className={styles.instructorSpecialty}>{instructor.specialty}</p>
-                <p className={styles.instructorDesc}>{instructor.bio}</p>
-                <p className={styles.instructorExperience}>تجربه: {instructor.experience}</p>
-                <div className={styles.coursesTaught}>
-                  <strong>دوره‌های تدریس‌شده:</strong>
-                  <ul>
-                    {instructor.coursesTaught.map((course, courseIndex) => (
-                      <li key={courseIndex}>{course}</li>
-                    ))}
-                  </ul>
-                </div>
               </div>
             ))
           ) : (

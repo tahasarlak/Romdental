@@ -1,55 +1,61 @@
 .loginSection {
-  padding: 4rem 1rem;
-  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--white) 100%);
   min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-}
-
-.container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-}
-
-.title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--primary-color);
-  text-align: center;
-  margin-bottom: 1rem;
+  justify-content: center;
+  background-image: url('/public/assets/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   position: relative;
 }
 
-.title::after {
+.loginSection::before {
   content: '';
-  width: 80px;
-  height: 4px;
-  background: var(--accent-color);
   position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 2px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.container {
+  position: relative;
+  z-index: 2;
+  max-width: 400px;
+  width: 100%;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 2rem;
+  color: #006064;
+  margin-bottom: 0.5rem;
+  text-align: center;
 }
 
 .subtitle {
-  font-size: 1.2rem;
-  color: var(--gray);
-  text-align: center;
+  font-size: 1rem;
+  color: #666;
   margin-bottom: 2rem;
+  text-align: center;
 }
 
 .loginForm {
-  background: var(--white);
-  padding: 2rem;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .formGroup {
-  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .label {
@@ -57,78 +63,48 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 1rem;
-  color: var(--text-color);
-  margin-bottom: 0.5rem;
+  color: #333;
 }
 
 .input {
-  width: 100%;
   padding: 0.75rem;
-  border: 1px solid var(--gray);
-  border-radius: 8px;
   font-size: 1rem;
-  color: var(--text-color);
-  background: var(--white);
-  transition: border-color var(--transition);
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
-}
-
-.input::placeholder {
-  color: var(--gray);
+  border-color: #00acc1;
 }
 
 .error {
   color: #d32f2f;
   font-size: 0.9rem;
-  margin-bottom: 1rem;
   text-align: center;
 }
 
 .submitButton {
-  width: 100%;
-  background: var(--accent-color);
-  color: var(--white);
-  padding : 1rem;
+  background: #00acc1;
+  color: #fff;
+  padding: 1rem;
   font-size: 1.1rem;
-  border-radius: var(--border-radius);
-  transition: var(--transition);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 .submitButton:hover {
-  background: darken(var(--accent-color), 10%);
+  background: #008c9e;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .title {
-    font-size: 2rem;
-  }
-
-  .subtitle {
-    font-size: 1rem;
-  }
-
-  .loginForm {
-    padding: 1.5rem;
-  }
+.link {
+  color: #00acc1;
+  text-decoration: none;
 }
 
-@media (max-width: 480px) {
-  .title {
-    font-size: 1.8rem;
-  }
-
-  .subtitle {
-    font-size: 0.9rem;
-  }
-
-  .input,
-  .submitButton {
-    font-size: 0.95rem;
-  }
+.link:hover {
+  text-decoration: underline;
 }

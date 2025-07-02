@@ -1,0 +1,59 @@
+
+.wishlistContainer {
+  max-width: var(--max-width);
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.navBar {
+  background-color: var(--primary-color) !important;
+  box-shadow: var(--shadow);
+  border-radius: var(--border-radius);
+}
+
+.wishlistCard {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  margin-top: 2rem;
+  padding: 1.5rem;
+}
+
+.wishlistTitle {
+  color: var(--primary-color);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.wishlistItem {
+  border-bottom: 1px solid var(--gray);
+  padding: 1rem 0;
+  transition: var(--transition);
+}
+
+.wishlistItem:hover {
+  background-color: var(--secondary-color);
+}
+
+.courseLink {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.courseLink:hover {
+  color: darken(var(--primary-color), 10%);
+}
+
+.backButton {
+  background-color: var(--accent-color) !important;
+  color: var(--white) !important;
+  border-radius: var(--border-radius) !important;
+  padding: 0.75rem 1.5rem !important;
+  transition: var(--transition) !important;
+}
+
+.backButton:hover {
+  background-color: darken(var(--accent-color), 10%) !important;
+}

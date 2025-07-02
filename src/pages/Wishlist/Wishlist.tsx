@@ -1,55 +1,116 @@
-// src/pages/Wishlist/Wishlist.tsx
 import React from 'react';
-import { useWishlistContext } from '../../Context/WishlistContext';
-import { useCourseContext } from '../../Context/CourseContext';
-import { useInstructorContext } from '../../Context/InstructorContext';
+
 import styles from './Wishlist.module.css';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Box from '@mui/material/Box';
+import Rating from '@mui/material/Rating';
+import { Link } from 'react-router-dom';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import { Button } from '@mui/material';
+import { useCourseContext } from '../../Context/CourseContext';
+import { useReviewContext } from '../../Context/ReviewContext';
+import { useWishlistContext } from '../../Context/WishlistContext';
+
 
 const Wishlist: React.FC = () => {
-  const { wishlist } = useWishlistContext();
+  const { wishlist, removeFromWishlist } = useWishlistContext();
   const { courses } = useCourseContext();
-  const { instructors } = useInstructorContext();
+  const { reviews } = useReviewContext();
 
-  const courseWishlist = wishlist
-    .filter((item) => item.type === 'course')
-    .map((item) => courses.find((course) => course.id === item.id))
-    .filter((course): course is NonNullable<typeof course> => !!course);
+  const getCourseDetails = (courseId: number) => {
+    return courses.find((course) => course.id === courseId) || { id: courseId, title: `دوره ${courseId}`, description: 'بدون توضیحات' };
+  };
 
-  const instructorWishlist = wishlist
-    .filter((item) => item.type === 'instructor')
-    .map((item) => instructors.find((instructor) => instructor.id === item.id))
-    .filter((instructor): instructor is NonNullable<typeof instructor> => !!instructor);
+  const getCourseReviews = (courseId: number) => {
+    return reviews.filter((review) => review.courseId === courseId);
+  };
 
   return (
-    <section className={styles.wishlistSection}>
-      <div className={styles.container}>
-        <h1 className={styles.title}>لیست علاقه‌مندی‌ها</h1>
-        {wishlist.length === 0 ? (
-          <p className={styles.noItems}>هیچ موردی در لیست علاقه‌مندی‌ها وجود ندارد.</p>
-        ) : (
-          <>
-            <h2>دوره‌ها</h2>
-            <div className={styles.coursesGrid}>
-              {courseWishlist.map((course) => (
-                <div key={course.id} className={styles.item}>
-                  <h3>{course.title}</h3>
-                  <p>استاد: {course.instructor}</p>
-                </div>
-              ))}
-            </div>
-            <h2>اساتید</h2>
-            <div className={styles.instructorsGrid}>
-              {instructorWishlist.map((instructor) => (
-                <div key={instructor.id} className={styles.item}>
-                  <h3>{instructor.name}</h3>
-                  <p>تخصص: {instructor.specialty}</p>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    </section>
+    <div className={styles.wishlistContainer}>
+      <AppBar position="static" className={styles.navBar}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            داشبورد کاربر
+          </Typography>
+          <Button color="inherit" component={Link} to="/profile">پروفایل</Button>
+          <Button color="inherit" component={Link} to="/wishlist">لیست علاقه‌مندی‌ها</Button>
+        </Toolbar>
+      </AppBar>
+      <Card className={styles.wishlistCard} role="region" aria-labelledby="wishlist-title">
+        <CardContent>
+          <Typography id="wishlist-title" variant="h5" className={styles.wishlistTitle}>
+            لیست علاقه‌مندی‌ها
+          </Typography>
+          <List>
+            {wishlist.length ? (
+              wishlist.map((item) => {
+                if (item.type === 'course') {
+                  const course = getCourseDetails(item.id);
+                  const courseReviews = getCourseReviews(item.id);
+                  const averageRating = courseReviews.length
+                    ? courseReviews.reduce((sum, review) => sum + review.rating, 0) / courseReviews.length
+                    : 0;
+
+                  return (
+                    <ListItem
+                      key={item.id}
+                      className={styles.wishlistItem}
+                      secondaryAction={
+                        <IconButton
+                          edge="end"
+                          onClick={() => removeFromWishlist(item.id, item.type)}
+                          aria-label={`حذف ${course.title} از لیست علاقه‌مندی‌ها`}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      }
+                    >
+                      <ListItemText
+                        primary={
+                          <Link to={`/courses/${item.id}`} className={styles.courseLink}>
+                            {course.title}
+                          </Link>
+                        }
+                        secondary={
+                          <Box>
+                            <Typography variant="body2">{course.description}</Typography>
+                            <Rating value={averageRating} readOnly precision={0.5} />
+                            <Typography variant="caption">
+                              ({courseReviews.length} نقد)
+                            </Typography>
+                          </Box>
+                        }
+                      />
+                    </ListItem>
+                  );
+                }
+                return null; // Handle instructor type if needed
+              })
+            ) : (
+              <Typography variant="body2">لیست علاقه‌مندی‌ها خالی است</Typography>
+            )}
+          </List>
+          <Box sx={{ mt: 2 }}>
+            <Button
+              variant="outlined"
+              component={Link}
+              to="/profile"
+              className={styles.backButton}
+            >
+              بازگشت به پروفایل
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

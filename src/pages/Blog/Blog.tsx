@@ -1,16 +1,14 @@
-// src/pages/Blog.tsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import SearchIcon from '@mui/icons-material/Search'; // آیکون جستجو
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // آیکون تقویم
-import TagIcon from '@mui/icons-material/Tag'; // آیکون برچسب
+import SearchIcon from '@mui/icons-material/Search';
 import styles from './Blog.module.css';
 import { useBlogContext } from '../../Context/BlogContext';
+import BlogCard from '../../components/BlogCard/BlogCard';
+import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 
 interface BlogPost {
   id: number;
   title: string;
-    author: string;
+  author: string;
   category: string;
   excerpt: string;
   image: string;
@@ -54,7 +52,7 @@ const Blog: React.FC = () => {
 
   return (
     <section className={styles.blogSection}>
-      <div className={styles.container}>
+      <div className={styles.container}><Breadcrumb />
         <h1 className={styles.title}>وبلاگ روم دنتال</h1>
         <p className={styles.subtitle}>
           آخرین اخبار، مقالات و نکات دندانپزشکی را اینجا بخوانید
@@ -103,30 +101,7 @@ const Blog: React.FC = () => {
         {/* گرید پست‌ها */}
         <div className={styles.blogGrid}>
           {currentPosts.map((post) => (
-            <div key={post.id} className={styles.blogCard}>
-              <img
-                src={post.image}
-                alt={post.title}
-                className={styles.blogImage}
-              />
-              <div className={styles.blogContent}>
-                <h2 className={styles.blogTitle}>{post.title}</h2>
-                <p className={styles.author}>نویسنده: {post.author}</p>
-                <p className={styles.excerpt}>{post.excerpt}</p>
-                <div className={styles.details}>
-                  <span><CalendarTodayIcon /> تاریخ: {post.date}</span>
-                  <span><TagIcon /> برچسب‌ها: {post.tags.join(', ')}</span>
-                </div>
-                <div className={styles.actions}>
-                  <Link
-                    to={`/blog/${post.id}`}
-                    className={styles.detailsLink}
-                  >
-                    ادامه مطلب
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <BlogCard key={post.id} post={post} />
           ))}
         </div>
 

@@ -15,7 +15,6 @@ const Home: React.FC = () => {
       <WhyUs />
       <Instructors />
       <FeaturedCourses />
-      <Testimonials />
       <BlogTeaser />
       <Stats />
       <CTA />

@@ -2,6 +2,26 @@
 .blog {
   padding: 60px 20px;
 }
+.viewAllContainer {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.viewAllButton {
+  display: inline-block;
+  background-color: var(--button-bg, #3b82f6);
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: var(--border-radius, 8px);
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.viewAllButton:hover {
+  background-color: var(--button-hover-bg, #2563eb);
+}
 
 .title {
   text-align: center;

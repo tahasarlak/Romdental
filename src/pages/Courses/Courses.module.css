@@ -493,6 +493,38 @@
   color: var(--primary-color);
 }
 
+.priceContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.originalPrice {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.discountPrice {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tag {
+  background-color: #e0f7fa;
+  color: #006064;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
 /* Skeleton Animation */
 @keyframes skeleton-loading {
   0% {

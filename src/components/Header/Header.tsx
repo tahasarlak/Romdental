@@ -13,6 +13,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import PersonIcon from '@mui/icons-material/Person';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import Avatar from '@mui/material/Avatar';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,10 +55,17 @@ const Header: React.FC = () => {
     handleProfileClose();
   };
 
-  // Get first two words of the user's name for tooltip
+  // Get first name for tooltip
   const getShortName = (name: string) => {
-    return name.split(' ').slice(0, 2).join(' ');
+    return name.split(' ')[0];
   };
+
+  // Select default profile picture based on gender
+  const defaultProfilePicture = user?.gender === 'مرد' 
+    ? '/assets/male-profile.jpg' 
+    : user?.gender === 'زن' 
+    ? '/assets/female-profile.jpg' 
+    : '/assets/default-profile.jpg';
 
   return (
     <header className={styles.header}>
@@ -73,7 +81,7 @@ const Header: React.FC = () => {
               alt="روم دنتال - سماشکو"
               className={styles.logoImage}
             />
-            <h1 className={styles.logoText}>روم دنتال</h1>
+            <h1 className={styles.logoText}> ROM dental</h1>
           </div>
         </NavLink>
         <button
@@ -157,8 +165,8 @@ const Header: React.FC = () => {
                     aria-label="باز کردن منوی پروفایل"
                     className={styles.profileIcon}
                   >
-                    <img
-                      src={user.profilePicture || '/assets/default-profile.jpg'}
+                    <Avatar
+                      src={user.profilePicture || defaultProfilePicture}
                       alt={user.name}
                       className={styles.profilePicture}
                     />

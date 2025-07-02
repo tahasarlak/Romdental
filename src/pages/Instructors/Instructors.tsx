@@ -1,15 +1,7 @@
-// src/pages/Instructors/Instructors.tsx
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
-import WorkIcon from '@mui/icons-material/Work';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import StarIcon from '@mui/icons-material/Star';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import PeopleIcon from '@mui/icons-material/People'; // Added correct import
-import Tooltip from '@mui/material/Tooltip';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
@@ -19,6 +11,8 @@ import { useCourseContext } from '../../Context/CourseContext';
 import { useReviewContext } from '../../Context/ReviewContext';
 import { useWishlistContext } from '../../Context/WishlistContext';
 import { useAuthContext } from '../../Context/AuthContext';
+import InstructorCard from '../../components/InstructorCard/InstructorCard';
+import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 
 interface Instructor {
   id: number;
@@ -170,63 +164,6 @@ const Instructors: React.FC = () => {
     </div>
   );
 
-  // Render instructor card
-  const renderInstructorCard = (instructor: Instructor & { averageRating: string; totalStudents: number }) => (
-    <div key={instructor.id} className={styles.instructorCard} role="article" aria-labelledby={`instructor-title-${instructor.id}`}>
-      <div className={styles.imageWrapper}>
-        <img
-          src={instructor.image}
-          alt={instructor.name}
-          className={styles.instructorImage}
-          loading="lazy"
-          onError={(e) => { e.currentTarget.src = '/assets/logo.jpg'; }}
-        />
-      </div>
-      <div className={styles.instructorContent}>
-        <h2 id={`instructor-title-${instructor.id}`} className={styles.instructorName}>{instructor.name}</h2>
-        <p className={styles.specialty}>تخصص: {instructor.specialty}</p>
-        <div className={styles.rating}>
-          <StarIcon className={styles.starIcon} />
-          <span>{instructor.averageRating} ({instructor.coursesTaught.length} دوره)</span>
-        </div>
-        <p className={styles.bio}>{instructor.bio}</p>
-        <div className={styles.details}>
-          <Tooltip title="تجربه">
-            <span><AccessTimeIcon /> تجربه: {instructor.experience}</span>
-          </Tooltip>
-          <Tooltip title="تعداد دوره‌ها">
-            <span><WorkIcon /> دوره‌ها: {instructor.coursesTaught.length > 0 ? instructor.coursesTaught.join(', ') : 'بدون دوره'}</span>
-          </Tooltip>
-          <Tooltip title="تعداد دانشجویان">
-            <span><PeopleIcon /> دانشجویان: {instructor.totalStudents} نفر</span>
-          </Tooltip>
-        </div>
-        <div className={styles.actions}>
-          <Link
-            to={`/instructors/${instructor.name.replace(' ', '-')}`}
-            className={styles.detailsLink}
-            aria-label={`جزئیات بیشتر درباره ${instructor.name}`}
-          >
-            جزئیات بیشتر
-          </Link>
-          <Tooltip title={isInWishlist(instructor.id, 'instructor') ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}>
-            <button
-              className={styles.wishlistButton}
-              onClick={() => toggleWishlist(instructor.id)}
-              aria-label={isInWishlist(instructor.id, 'instructor') ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}
-            >
-              {isInWishlist(instructor.id, 'instructor') ? (
-                <FavoriteIcon className={styles.wishlistIconActive} />
-              ) : (
-                <FavoriteBorderIcon className={styles.wishlistIcon} />
-              )}
-            </button>
-          </Tooltip>
-        </div>
-      </div>
-    </div>
-  );
-
   if (isLoading) {
     return (
       <section className={styles.instructorsSection}>
@@ -249,7 +186,7 @@ const Instructors: React.FC = () => {
 
   return (
     <section className={styles.instructorsSection}>
-      <div className={styles.container}>
+      <div className={styles.container}><Breadcrumb />
         <h1 className={styles.title}>اساتید روم دنتال</h1>
         <p className={styles.subtitle}>
           با برترین اساتید دندانپزشکی، دانش و تجربه را به دست آورید
@@ -296,7 +233,14 @@ const Instructors: React.FC = () => {
             </div>
 
             <div className={styles.instructorsGrid}>
-              {currentInstructors.map(renderInstructorCard)}
+              {currentInstructors.map((instructor) => (
+                <InstructorCard
+                  key={instructor.id}
+                  instructor={instructor}
+                  toggleWishlist={toggleWishlist}
+                  isInWishlist={isInWishlist}
+                />
+              ))}
             </div>
 
             {filteredInstructors.length === 0 && (

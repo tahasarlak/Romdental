@@ -3,6 +3,7 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import styles from './InstructorDetails.module.css';
 import { useInstructorContext } from '../../../Context/InstructorContext';
+import Breadcrumb from '../../../components/Breadcrumb/Breadcrumb';
 
 const InstructorDetails: React.FC = () => {
   const { instructorName } = useParams<{ instructorName: string }>();
@@ -17,7 +18,7 @@ const InstructorDetails: React.FC = () => {
 
   return (
     <section className={styles.instructorDetailsSection}>
-      <div className={styles.container}>
+      <div className={styles.container}><Breadcrumb />
         <h1>{instructor.name}</h1>
         <img
           src={instructor.image}

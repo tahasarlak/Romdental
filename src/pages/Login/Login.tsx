@@ -1,32 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
-import PhoneIcon from '@mui/icons-material/Phone';
-import styles from './Login.module.css';
+import CalculateIcon from '@mui/icons-material/Calculate';
 import { useAuthContext } from '../../Context/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+import styles from './Login.module.css';
+
+interface FormData {
+  identifier: string;
+  password: string;
+  captchaAnswer: string;
+}
 
 const Login: React.FC = () => {
   const { login } = useAuthContext();
-  const [formData, setFormData] = useState({
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState<FormData>({
     identifier: '',
     password: '',
+    captchaAnswer: '',
   });
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [captchaNumbers, setCaptchaNumbers] = useState({ num1: 0, num2: 0, sum: 0 });
+
+  // تولید دو عدد تصادفی برای کپچا
+  useEffect(() => {
+    const num1 = Math.floor(Math.random() * 10) + 1; // عدد تصادفی بین 1 تا 10
+    const num2 = Math.floor(Math.random() * 10) + 1; // عدد تصادفی بین 1 تا 10
+    setCaptchaNumbers({ num1, num2, sum: num1 + num2 });
+  }, []);
+
+  const validate = (): Partial<FormData> => {
+    const newErrors: Partial<FormData> = {};
+    if (!formData.identifier) newErrors.identifier = 'ایمیل یا شماره تلفن الزامی است';
+    if (!formData.password || formData.password.length < 6) newErrors.password = 'رمز عبور باید حداقل ۶ کاراکتر باشد';
+    if (!formData.captchaAnswer || parseInt(formData.captchaAnswer) !== captchaNumbers.sum) {
+      newErrors.captchaAnswer = 'پاسخ جمع اشتباه است';
+    }
+    return newErrors;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev: FormData) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    setIsLoading(true);
     try {
       await login(formData.identifier, formData.password);
-      setFormData({ identifier: '', password: '' });
-      alert('ورود با موفقیت انجام شد!');
+      setFormData({ identifier: '', password: '', captchaAnswer: '' });
+      // تولید کپچای جدید پس از ورود موفق
+      const num1 = Math.floor(Math.random() * 10) + 1;
+      const num2 = Math.floor(Math.random() * 10) + 1;
+      setCaptchaNumbers({ num1, num2, sum: num1 + num2 });
+      navigate('/');
     } catch (error: any) {
-      setError(error.message || 'خطا در ورود!');
+      setErrors({ identifier: error.message || 'خطا در ورود!' });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -50,7 +90,10 @@ const Login: React.FC = () => {
               placeholder="ایمیل یا شماره تلفن خود را وارد کنید"
               className={styles.input}
               required
+              aria-invalid={!!errors.identifier}
+              aria-describedby={errors.identifier ? 'identifier-error' : undefined}
             />
+            {errors.identifier && <p id="identifier-error" className={styles.error}>{errors.identifier}</p>}
           </div>
 
           <div className={styles.formGroup}>
@@ -66,14 +109,38 @@ const Login: React.FC = () => {
               placeholder="رمز عبور خود را وارد کنید"
               className={styles.input}
               required
+              aria-invalid={!!errors.password}
+              aria-describedby={errors.password ? 'password-error' : undefined}
             />
+            {errors.password && <p id="password-error" className={styles.error}>{errors.password}</p>}
           </div>
 
-          {error && <p className={styles.error}>{error}</p>}
+          <div className={styles.formGroup}>
+            <label htmlFor="captchaAnswer" className={styles.label}>
+              <CalculateIcon /> تأیید ربات نبودن: {captchaNumbers.num1} + {captchaNumbers.num2} = ?
+            </label>
+            <input
+              type="number"
+              id="captchaAnswer"
+              name="captchaAnswer"
+              value={formData.captchaAnswer}
+              onChange={handleChange}
+              placeholder="حاصل جمع را وارد کنید"
+              className={styles.input}
+              required
+              aria-invalid={!!errors.captchaAnswer}
+              aria-describedby={errors.captchaAnswer ? 'captchaAnswer-error' : undefined}
+            />
+            {errors.captchaAnswer && <p id="captchaAnswer-error" className={styles.error}>{errors.captchaAnswer}</p>}
+          </div>
 
-          <button type="submit" className={styles.submitButton}>
-            ورود
+          <button type="submit" className={styles.submitButton} disabled={isLoading}>
+            {isLoading ? 'در حال ورود...' : 'ورود'}
           </button>
+
+          <p className={styles.subtitle}>
+            حساب کاربری ندارید؟ <Link to="/signup" className={styles.link}>ثبت‌نام</Link>
+          </p>
         </form>
       </div>
     </section>
