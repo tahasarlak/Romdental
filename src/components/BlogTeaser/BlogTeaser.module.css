@@ -1,61 +1,97 @@
-/* src/components/BlogTeaser.module.css */
+/* src/styles/BlogTeaser.module.css */
 .blog {
-  padding: 60px 20px;
+  padding: 4rem 0;
+  background-color: var(--secondary-color);
+  transition: var(--transition);
+  opacity: 0;
 }
+
+.visible {
+  opacity: 1;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.titleVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.posts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.noPosts {
+  font-size: 1rem;
+  color: var(--gray);
+}
+
 .viewAllContainer {
-  margin-top: 40px;
   text-align: center;
 }
 
 .viewAllButton {
   display: inline-block;
-  background-color: var(--button-bg, #3b82f6);
-  color: #ffffff;
-  padding: 12px 24px;
-  border-radius: var(--border-radius, 8px);
-  text-decoration: none;
-  font-size: 1.1rem;
-  font-weight: 500;
-  transition: background-color 0.3s ease;
-}
-
-.viewAllButton:hover {
-  background-color: var(--button-hover-bg, #2563eb);
-}
-
-.title {
-  text-align: center;
-  font-size: 32px;
-  margin-bottom: 40px;
-  color: var(--primary-color);
-}
-
-.posts {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
-}
-
-.card {
-  background-color: var(--white);
-  padding: 25px;
+  padding: 0.75rem 1.5rem;
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
+  background-color: var(--accent-color);
+  color: var(--white);
+  font-weight: 500;
+  text-decoration: none;
   transition: var(--transition);
 }
 
-.card:hover {
-  transform: translateY(-5px);
+.viewAllButton:hover {
+  background-color: var(--accent-color-hover);
 }
 
-.cardTitle {
+/* حالت تیره */
+.dark .blog {
+  background-color: var(--secondary-color);
+}
+
+.dark .title {
   color: var(--primary-color);
-  margin-bottom: 15px;
 }
 
-.readMore {
-  color: var(--accent-color);
-  font-weight: 500;
+.dark .noPosts {
+  color: var(--gray-dark);
+}
+
+.dark .viewAllButton {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.dark .viewAllButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+/* پاسخ‌گویی */
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .posts {
+    grid-template-columns: 1fr;
+  }
 }

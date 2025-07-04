@@ -22,8 +22,9 @@ import { InstructorProvider } from './Context/InstructorContext';
 import { TestimonialProvider } from './Context/TestimonialContext';
 import { ReviewProvider } from './Context/ReviewContext';
 import { WishlistProvider } from './Context/WishlistContext';
-import './styles/global.css';
 import { SubscriptionProvider } from './Context/SubscriptionContext';
+import './styles/global.css';
+import BlogPostDetails from './pages/Blog/BlogPostDetails/BlogPostDetails';
 
 const App: React.FC = () => {
   return (
@@ -47,6 +48,7 @@ const App: React.FC = () => {
                                 <Route path="/instructors" element={<Instructors />} />
                                 <Route path="/instructors/:instructorName" element={<InstructorDetails />} />
                                 <Route path="/blog" element={<Blog />} />
+                                <Route path="/blog/:id" element={<BlogPostDetails />} />
                                 <Route path="/contact" element={<Contact />} />
                                 <Route path="/login" element={<Login />} />
                                 <Route path="/signup" element={<Signup />} />

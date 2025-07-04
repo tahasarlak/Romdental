@@ -1,8 +1,9 @@
-.signupSection {
+
+.signupSection {  background-color: var(--background);
+  padding: 4rem 1rem;
+  direction: rtl;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
   background-image: url('/public/assets/background.jpg');
   background-size: cover;
   background-position: center;
@@ -10,40 +11,28 @@
   position: relative;
 }
 
-.signupSection::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1;
-}
-
 .container {
-  position: relative;
-  z-index: 2;
-  max-width: 500px;
-  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
 }
 
 .title {
   font-size: 2rem;
-  color: #006064;
-  margin-bottom: 0.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
   text-align: center;
+  margin-bottom: 1rem;
 }
 
 .subtitle {
   font-size: 1rem;
-  color: #666;
-  margin-bottom: 2rem;
+  color: var(--gray);
   text-align: center;
+  margin-bottom: 2rem;
 }
 
 .signupForm {
@@ -63,48 +52,134 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 1rem;
-  color: #333;
+  font-weight: 500;
+  color: var(--text-color);
 }
 
-.input {
+.label svg {
+  color: var(--accent-color);
+}
+
+.input, .phoneInput {
   padding: 0.75rem;
+  border: 1px solid var(--gray);
+  border-radius: var(--border-radius);
   font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  transition: border-color 0.3s ease;
+  color: var(--text-color);
+  background-color: var(--white);
+  transition: var(--transition);
 }
 
-.input:focus {
+.input:focus, .phoneInput:focus {
   outline: none;
-  border-color: #00acc1;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.phoneContainer {
+  direction: ltr;
+}
+
+.phoneButton {
+  background-color: var(--gray);
+}
+
+.phoneDropdown {
+  background-color: var(--white);
+  color: var(--text-color);
 }
 
 .error {
-  color: #d32f2f;
-  font-size: 0.9rem;
-  text-align: center;
+  color: var(--error-color);
+  font-size: 0.85rem;
 }
 
 .submitButton {
-  background: #00acc1;
-  color: #fff;
-  padding: 1rem;
-  font-size: 1.1rem;
+  padding: 0.75rem;
+  background-color: var(--accent-color);
+  color: var(--white);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: var(--transition);
 }
 
 .submitButton:hover {
-  background: #008c9e;
+  background-color: var(--accent-color-hover);
+}
+
+.submitButton:disabled {
+  background-color: var(--gray);
+  cursor: not-allowed;
 }
 
 .link {
-  color: #00acc1;
+  color: var(--accent-color);
   text-decoration: none;
+  font-weight: 500;
 }
 
 .link:hover {
   text-decoration: underline;
+}
+
+/* حالت تیره */
+.dark .signupSection {
+  background-color: var(--background-dark);
+}
+
+.dark .container {
+  background-color: var(--primary-color);
+}
+
+.dark .title {
+  color: var(--text-color-dark);
+}
+
+.dark .subtitle {
+  color: var(--gray-dark);
+}
+
+.dark .label {
+  color: var(--text-color-dark);
+}
+
+.dark .input, .dark .phoneInput {
+  background-color: var(--primary-color);
+  border-color: var(--gray-dark);
+  color: var(--text-color-dark);
+}
+
+.dark .phoneButton {
+  background-color: var(--gray-dark);
+}
+
+.dark .phoneDropdown {
+  background-color: var(--primary-color);
+  color: var(--text-color-dark);
+}
+
+/* پاسخ‌گویی */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .input, .phoneInput {
+    font-size: 0.9rem;
+  }
+
+  .submitButton {
+    font-size: 0.9rem;
+  }
 }

@@ -7,7 +7,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Tooltip from '@mui/material/Tooltip';
-import styles from '../../pages/Courses/Courses.module.css';
+import styles from './CourseCard.module.css';
 
 interface Course {
   id: number;

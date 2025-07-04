@@ -1,100 +1,145 @@
+/* src/styles/CTA.module.css */
 .cta {
-  padding: 60px 20px;
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: 4rem 0;
   text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.cta::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.1;
-  z-index: 0;
+  transition: var(--transition);
 }
 
 .title {
-  font-size: 36px;
+  font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 30px;
-  position: relative;
-  z-index: 1;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--gray);
+  margin-bottom: 2rem;
 }
 
 .form {
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 15px;
+  gap: 1rem;
   max-width: 600px;
   margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.inputContainer {
   position: relative;
-  z-index: 1;
+  flex: 1;
+  min-width: 200px;
 }
 
 .input {
-  padding: 12px 20px;
-  font-size: 16px;
+  width: 100%;
+  padding: 0.75rem;
   border: none;
   border-radius: var(--border-radius);
-  width: 100%;
-  max-width: 350px;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: var(--secondary-color);
   color: var(--text-color);
-  transition: all 0.3s ease;
+  font-family: var(--font-family);
+  transition: var(--transition);
 }
 
 .input:focus {
   outline: none;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
-  background-color: var(--white);
-}
-
-.input::placeholder {
-  color: var(--gray);
-  opacity: 0.8;
+  box-shadow: 0 0 0 2px var(--accent-color);
 }
 
 .submitButton {
-  padding: 12px 30px;
-  font-size: 16px;
-  font-weight: 600;
-  background: linear-gradient(90deg, var(--accent-color), #b8962e);
+  background-color: var(--accent-color);
   color: var(--white);
-  border: none;
+  padding: 0.75rem 1.5rem;
   border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow);
+  font-weight: 500;
+  transition: var(--transition);
 }
 
 .submitButton:hover {
-  background: linear-gradient(90deg, darken(var(--accent-color), 10%), #a38127);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(212, 175, 55, 0.4);
+  background-color: var(--accent-color-hover);
 }
 
-/* ریسپانسیو */
+.submitButton:disabled {
+  background-color: var(--gray);
+  cursor: not-allowed;
+}
+
+.loader {
+  color: var(--white);
+}
+
+.errorMessage {
+  color: #ff4d4f;
+  font-size: 0.85rem;
+  position: absolute;
+  bottom: -1.5rem;
+  right: 0;
+}
+
+.successMessage {
+  color: #4caf50;
+  font-size: 0.85rem;
+  position: absolute;
+  bottom: -1.5rem;
+  right: 0;
+}
+
+/* حالت تیره */
+.dark .cta {
+  background-color: var(--secondary-color);
+  color: var(--text-color-dark);
+}
+
+.dark .title {
+  color: var(--text-color-dark);
+}
+
+.dark .subtitle {
+  color: var(--gray-dark);
+}
+
+.dark .input {
+  background-color: var(--primary-color);
+  color: var(--text-color-dark);
+}
+
+.dark .submitButton {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.dark .submitButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.dark .submitButton:disabled {
+  background-color: var(--gray-dark);
+}
+
+/* پاسخ‌گویی */
 @media (max-width: 768px) {
   .title {
-    font-size: 28px;
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
   }
 
   .form {
     flex-direction: column;
-    gap: 20px;
+    align-items: center;
   }
 
-  .input {
-    max-width: 100%;
+  .inputContainer {
+    width: 100%;
   }
 
   .submitButton {
-    padding: 10px 25px;
-    font-size: 14px;
+    width: 100%;
   }
 }

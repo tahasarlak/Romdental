@@ -1,0 +1,373 @@
+/* src/styles/CourseCard.module.css */
+.courseCard {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.courseCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.imageWrapper {
+  position: relative;
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  height: 200px;
+}
+
+.courseImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition);
+}
+
+
+.featuredBadge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: var(--accent-color);
+  color: var(--white);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--border-radius);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.courseContent {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: var(--text-color);
+}
+
+.courseTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  line-height: 1.4;
+}
+
+.instructor {
+  font-size: 0.9rem;
+  color: var(--gray);
+}
+
+.instructorLink {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.instructorLink:hover {
+  filter: brightness(85%);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--gray);
+}
+
+.starIcon {
+  color: var(--accent-color);
+  font-size: 1.2rem;
+}
+
+.description {
+  font-size: 0.9rem;
+  color: var(--gray);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--gray);
+}
+
+.details span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.details svg {
+  font-size: 1rem;
+  color: var(--accent-color);
+}
+
+.priceContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.originalPrice {
+  text-decoration: line-through;
+  color: var(--gray);
+}
+
+.discountPrice {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.discountPercentage {
+  font-size: 0.8rem;
+  color: var(--gray);
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  background-color: var(--gray);
+  color: var(--white);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--border-radius);
+  font-size: 0.8rem;
+}
+
+.progressContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background-color: var(--gray);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: var(--accent-color);
+  transition: width 0.5s ease;
+}
+
+.progressText {
+  font-size: 0.85rem;
+  color: var(--gray);
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.enrollButton {
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  background-color: var(--accent-color);
+  color: var(--white);
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.enrollButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.enrollButton:disabled {
+  background-color: var(--gray);
+  cursor: not-allowed;
+}
+
+.addedToCart {
+  background-color: var(--gray);
+}
+
+.addedToCart:hover {
+  background-color: var(--gray-dark);
+}
+
+.removeIcon {
+  font-size: 1.2rem;
+  margin-left: 0.5rem;
+}
+
+.detailsLink {
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  font-weight: 500;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.detailsLink:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.wishlistButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray);
+  transition: var(--transition);
+}
+
+.wishlistButton svg {
+  font-size: 1.5rem;
+}
+
+.wishlistButton:hover {
+  color: var(--accent-color);
+}
+
+.wishlistIconActive {
+  color: var(--accent-color);
+}
+
+/* انیمیشن اسکلتون */
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* حالت تیره */
+.dark .courseCard {
+  background-color: var(--primary-color);
+  color: var(--text-color-dark);
+}
+
+.dark .courseTitle {
+  color: var(--text-color-dark);
+}
+
+.dark .instructor,
+.dark .rating,
+.dark .description,
+.dark .details,
+.dark .progressText {
+  color: var(--gray-dark);
+}
+
+.dark .instructorLink {
+  color: var(--accent-color);
+}
+
+.dark .instructorLink:hover {
+  filter: brightness(115%);
+}
+
+.dark .starIcon,
+.dark .details svg {
+  color: var(--accent-color);
+}
+
+.dark .tag {
+  background-color: var(--gray-dark);
+  color: var(--text-color-dark);
+}
+
+.dark .progressBar {
+  background-color: var(--gray-dark);
+}
+
+.dark .enrollButton {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.dark .enrollButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.dark .addedToCart {
+  background-color: var(--gray-dark);
+}
+
+.dark .addedToCart:hover {
+  background-color: var(--gray);
+}
+
+.dark .detailsLink {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.dark .detailsLink:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.dark .wishlistButton {
+  color: var(--gray-dark);
+}
+
+.dark .wishlistButton:hover,
+.dark .wishlistIconActive {
+  color: var(--accent-color);
+}
+
+/* پاسخ‌گویی */
+@media (max-width: 768px) {
+  .courseCard {
+    max-width: 100%;
+  }
+
+  .courseImage {
+    height: 180px;
+  }
+
+  .courseTitle {
+    font-size: 1.1rem;
+  }
+
+  .instructor,
+  .rating,
+  .description,
+  .details,
+  .progressText {
+    font-size: 0.85rem;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .enrollButton,
+  .detailsLink {
+    width: 100%;
+    text-align: center;
+  }
+}

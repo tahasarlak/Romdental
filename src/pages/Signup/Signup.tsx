@@ -8,6 +8,8 @@ import WcIcon from '@mui/icons-material/Wc';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import { useAuthContext } from '../../Context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css'; // استایل‌های پیش‌فرض کتابخانه
 import styles from './Signup.module.css';
 
 interface FormData {
@@ -23,7 +25,7 @@ interface FormData {
   captchaAnswer: string;
 }
 
-const courses = ['پادفکت', 'کورس ۱', 'کورس ۲', 'کورس ۳', 'کورس ۴', 'کورس ۵', 'بقیه موارد'];
+const courses = ['پادفک', 'کورس ۱', 'کورس ۲', 'کورس ۳', 'کورس ۴', 'کورس ۵', 'بقیه موارد'];
 const genders = ['مرد', 'زن'];
 
 const Signup: React.FC = () => {
@@ -45,10 +47,9 @@ const Signup: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [captchaNumbers, setCaptchaNumbers] = useState({ num1: 0, num2: 0, sum: 0 });
 
-  // تولید دو عدد تصادفی برای کپچا
   useEffect(() => {
-    const num1 = Math.floor(Math.random() * 10) + 1; // عدد تصادفی بین 1 تا 10
-    const num2 = Math.floor(Math.random() * 10) + 1; // عدد تصادفی بین 1 تا 10
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
     setCaptchaNumbers({ num1, num2, sum: num1 + num2 });
   }, []);
 
@@ -58,7 +59,7 @@ const Signup: React.FC = () => {
     if (!formData.lastName) newErrors.lastName = 'نام خانوادگی الزامی است';
     if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'ایمیل معتبر نیست';
     if (!formData.password || formData.password.length < 6) newErrors.password = 'رمز عبور باید حداقل ۶ کاراکتر باشد';
-    if (!formData.phone || !/^09[0-9]{9}$/.test(formData.phone)) newErrors.phone = 'شماره تلفن معتبر نیست';
+    if (!formData.phone || formData.phone.length < 10) newErrors.phone = 'شماره تلفن معتبر نیست';
     if (!formData.university) newErrors.university = 'دانشگاه الزامی است';
     if (!formData.gender) newErrors.genderError = 'جنسیت الزامی است';
     if (formData.course === 'بقیه موارد' && !formData.otherCourse) newErrors.otherCourse = 'لطفاً نام کورس را وارد کنید';
@@ -72,6 +73,11 @@ const Signup: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: '', genderError: '' }));
+  };
+
+  const handlePhoneChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, phone: value }));
+    setErrors((prev) => ({ ...prev, phone: '' }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,7 +110,6 @@ const Signup: React.FC = () => {
         otherCourse: '',
         captchaAnswer: '',
       });
-      // تولید کپچای جدید پس از ثبت‌نام موفق
       const num1 = Math.floor(Math.random() * 10) + 1;
       const num2 = Math.floor(Math.random() * 10) + 1;
       setCaptchaNumbers({ num1, num2, sum: num1 + num2 });
@@ -203,17 +208,21 @@ const Signup: React.FC = () => {
             <label htmlFor="phone" className={styles.label}>
               <PhoneIcon /> شماره تماس
             </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
+            <PhoneInput
+              country={'ir'}
+              preferredCountries={['ir', 'us', 'gb']}
               value={formData.phone}
-              onChange={handleChange}
-              placeholder="شماره تماس خود را وارد کنید"
-              className={styles.input}
-              required
-              aria-invalid={!!errors.phone}
-              aria-describedby={errors.phone ? 'phone-error' : undefined}
+              onChange={handlePhoneChange}
+              inputProps={{
+                id: 'phone',
+                name: 'phone',
+                required: true,
+                className: `${styles.input} ${styles.phoneInput}`,
+              }}
+              containerClass={styles.phoneContainer}
+              buttonClass={styles.phoneButton}
+              dropdownClass={styles.phoneDropdown}
+              placeholder="شماره تلفن خود را وارد کنید"
             />
             {errors.phone && <p id="phone-error" className={styles.error}>{errors.phone}</p>}
           </div>

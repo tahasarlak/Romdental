@@ -4,7 +4,6 @@ import WhyUs from '../components/WhyUs/WhyUs';
 import BlogTeaser from '../components/BlogTeaser/BlogTeaser';
 import CTA from '../components/CTA/CTA';
 import FeaturedCourses from '../components/FeaturedCourses/FeaturedCourses';
-import Testimonials from '../components/Testimonials/Testimonials';
 import Stats from '../components/Stats/Stats';
 import Instructors from '../components/Instructors/Instructors';
 

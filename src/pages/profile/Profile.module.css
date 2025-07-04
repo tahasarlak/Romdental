@@ -1,32 +1,20 @@
 /* src/styles/Profile.module.css */
 .profileContainer {
-  max-width: var(--max-width);
-  margin: 2rem auto;
-  padding: 0 1rem;
-  background-color: var(--secondary-color);
-  min-height: 100vh;
+  background-color: var(--background);
+  padding: 4rem 1rem;
+  direction: rtl;
 }
 
 .navBar {
-  background-color: var(--primary-color);
-  box-shadow: var(--shadow);
-}
-
-.navBar button {
-  margin-left: 1rem;
-  font-family: var(--font-family);
-  font-weight: 500;
-}
-
-.navBar button:hover {
-  background-color: var(--accent-color);
+  background-color: var(--primary-color) !important;
 }
 
 .profileCard {
+  max-width: 800px;
+  margin: 0 auto;
   background-color: var(--white);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
-  margin-top: 2rem;
   padding: 2rem;
 }
 
@@ -36,8 +24,9 @@
 }
 
 .profileTitle {
-  color: var(--primary-color);
+  font-size: 2rem;
   font-weight: 700;
+  color: var(--primary-color);
   margin-bottom: 1rem;
 }
 
@@ -47,8 +36,7 @@
 }
 
 .profileAvatar {
-  border: 3px solid var(--accent-color);
-  transition: var(--transition);
+  border: 2px solid var(--accent-color);
 }
 
 .uploadButton {
@@ -58,17 +46,13 @@
   background-color: var(--accent-color);
   color: var(--white);
   border-radius: 50%;
-  padding: 8px;
-}
-
-.uploadButton:hover {
-  background-color: darken(var(--accent-color), 10%);
 }
 
 .profileName {
+  font-size: 1.5rem;
+  font-weight: 600;
   color: var(--text-color);
   margin-top: 1rem;
-  font-weight: 600;
 }
 
 .formContainer {
@@ -78,71 +62,105 @@
 }
 
 .formRow {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+  display: flex;
+  gap: 1rem;
 }
 
 .formField {
-  font-family: var(--font-family);
-}
-
-.formField label {
-  color: var(--primary-color);
+  flex: 1;
 }
 
 .formActions {
   display: flex;
   gap: 1rem;
   justify-content: center;
-  margin-top: 2rem;
+}
+
+.saveButton, .cancelButton, .editButton {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .saveButton {
-  background-color: var(--primary-color);
+  background-color: var(--accent-color);
   color: var(--white);
 }
 
 .saveButton:hover {
-  background-color: darken(var(--primary-color), 10%);
+  background-color: var(--accent-color-hover);
 }
 
-.cancelButton {
-  background-color: var(--gray);
+.cancelButton, .editButton {
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.cancelButton:hover, .editButton:hover {
+  background-color: var(--primary-color);
   color: var(--white);
-}
-
-.cancelButton:hover {
-  background-color: darken(var(--gray), 10%);
-}
-
-.editButton {
-  background-color: var(--accent-color);
-}
-
-.editButton:hover {
-  background-color: darken(var(--accent-color), 10%);
 }
 
 .profileInfo {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  text-align: right;
+  font-size: 1rem;
+  color: var(--text-color);
 }
 
-.profileInfo strong {
-  color: var(--primary-color);
-  margin-left: 0.5rem;
+/* حالت تیره */
+.dark .profileContainer {
+  background-color: var(--background-dark);
 }
 
-/* Responsive adjustments */
+.dark .profileCard {
+  background-color: var(--primary-color);
+}
+
+.dark .profileTitle {
+  color: var(--text-color-dark);
+}
+
+.dark .profileName {
+  color: var(--text-color-dark);
+}
+
+.dark .profileInfo {
+  color: var(--text-color-dark);
+}
+
+.dark .formField input, .dark .formField select {
+  background-color: var(--primary-color);
+  color: var(--text-color-dark);
+  border-color: var(--gray-dark);
+}
+
+/* پاسخ‌گویی */
 @media (max-width: 768px) {
-  .formRow {
-    grid-template-columns: 1fr;
+  .profileCard {
+    padding: 1rem;
   }
 
-  .profileCard {
-    padding: 1.5rem;
+  .profileTitle {
+    font-size: 1.5rem;
+  }
+
+  .profileName {
+    font-size: 1.25rem;
+  }
+
+  .formRow {
+    flex-direction: column;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .saveButton, .cancelButton, .editButton {
+    width: 100%;
   }
 }

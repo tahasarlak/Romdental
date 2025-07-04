@@ -1,142 +1,92 @@
-.featured {
-  padding: 60px 20px;
-  background-color: var(--secondary-color, #f9fafb);
+/* src/styles/FeaturedCourses.module.css */
+
+
+.visible {
+  opacity: 1;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 1.5rem;
   text-align: center;
 }
 
 .title {
-  text-align: center;
-  font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 40px;
-  color: var(--primary-color, #1f2937);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.titleVisible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .courses {
-  max-width: var(--max-width, 1200px);
-  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
-}
-
-.card {
-  background-color: var(--white, #ffffff);
-  padding: 25px;
-  border-radius: var(--border-radius, 12px);
-  box-shadow: var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.1));
-  transition: var(--transition, transform 0.3s ease, box-shadow 0.3s ease);
-}
-
-.card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-.cardImage {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-radius: var(--border-radius, 12px) var(--border-radius, 12px) 0 0;
-}
-
-.cardContent {
-  padding: 15px 0;
-}
-
-.cardTitle {
-  color: var(--primary-color, #1f2937);
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 15px;
-}
-
-.cardDescription {
-  font-size: 1rem;
-  color: #4b5563;
-  margin-bottom: 15px;
-  line-height: 1.5;
-}
-
-.cardDetails {
-  font-size: 0.9rem;
-  color: #6b7280;
-  margin-bottom: 15px;
-}
-
-.cardDetails p {
-  margin: 8px 0;
-}
-
-.cardPrice {
-  font-weight: bold;
-  color: var(--price-color, #10b981);
-}
-
-.enrollButton {
-  margin-top: 20px;
-  width: 100%;
-  background-color: var(--button-bg, #3b82f6);
-  color: #ffffff;
-  padding: 12px;
-  border-radius: var(--border-radius, 8px);
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.enrollButton:hover {
-  background-color: var(--button-hover-bg, #2563eb);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
 }
 
 .noCourses {
-  font-size: 1.2rem;
-  color: #6b7280;
-  text-align: center;
-  margin-top: 2rem;
+  font-size: 1rem;
+  color: var(--gray);
 }
 
 .viewAllContainer {
-  margin-top: 40px;
   text-align: center;
 }
 
 .viewAllButton {
   display: inline-block;
-  background-color: var(--button-bg, #3b82f6);
-  color: #ffffff;
-  padding: 12px 24px;
-  border-radius: var(--border-radius, 8px);
-  text-decoration: none;
-  font-size: 1.1rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  background-color: var(--accent-color);
+  color: var(--white);
   font-weight: 500;
-  transition: background-color 0.3s ease;
+  text-decoration: none;
+  transition: var(--transition);
 }
 
 .viewAllButton:hover {
-  background-color: var(--button-hover-bg, #2563eb);
+  background-color: var(--accent-color-hover);
 }
 
-@media (max-width: 768px) {
-  .featured {
-    padding: 40px 15px;
-  }
+/* حالت تیره */
+.dark .featured {
+  background-color: var(--secondary-color);
+}
 
+.dark .title {
+  color: var(--primary-color);
+}
+
+.dark .noCourses {
+  color: var(--gray-dark);
+}
+
+.dark .viewAllButton {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.dark .viewAllButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+/* پاسخ‌گویی */
+@media (max-width: 768px) {
   .title {
-    font-size: 28px;
+    font-size: 1.8rem;
   }
 
   .courses {
     grid-template-columns: 1fr;
-  }
-
-  .cardImage {
-    height: 150px;
-  }
-
-  .viewAllButton {
-    padding: 10px 20px;
-    font-size: 1rem;
   }
 }

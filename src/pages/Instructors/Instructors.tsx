@@ -80,7 +80,6 @@ const Instructors: React.FC = () => {
         if (sortBy === 'name') return a.name.localeCompare(b.name);
         if (sortBy === 'experience') return parseInt(b.experience) - parseInt(a.experience);
         if (sortBy === 'rating') return parseFloat(b.averageRating) - parseFloat(a.averageRating);
-        if (sortBy === 'students') return b.totalStudents - a.totalStudents;
         return 0;
       });
   }, [updatedInstructors, filterSpecialty, searchQuery, sortBy]);
@@ -227,8 +226,7 @@ const Instructors: React.FC = () => {
               >
                 <option value="name">نام</option>
                 <option value="experience">تجربه</option>
-                <option value="rating">امتیاز</option>
-                <option value="students">تعداد دانشجویان</option>
+                <option value="rating">محبوب‌ترین‌ها</option>
               </select>
             </div>
 

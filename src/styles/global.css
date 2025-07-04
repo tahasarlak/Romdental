@@ -3,16 +3,16 @@
   --primary-color: #1a2b4a; /* آبی تیره عمیق - حس قدرت و اعتماد */
   --secondary-color: #f5f1e9; /* بژ روشن - حس گرما و ظرافت */
   --accent-color: #d4af37; /* طلایی ملایم - نماد لوکس و ثروت */
+  --accent-color-hover: #b8972f; /* طلایی تیره‌تر برای هاور */
   --text-color: #2c2c2c; /* مشکی مات - ساده و شیک */
   --white: #ffffff;
   --gray: #8a8a8a; /* خاکستری مات - حس تعادل و مدرنیته */
-  --shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* سایه عمیق‌تر برای جلوه بیشتر */
-  --border-radius: 12px; /* گوشه‌های نرم‌تر برای ظرافت */
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* سایه عمیق‌تر */
+  --border-radius: 12px; /* گوشه‌های نرم‌تر */
   --max-width: 1280px;
   --font-family: 'IranSans', 'Roboto', sans-serif;
-  --transition: all 0.4s ease; /* ترنزیشن کمی نرم‌تر */
+  --transition: all 0.3s ease; /* ترنزیشن کمی سریع‌تر */
 }
-
 
 * {
   margin: 0;
@@ -26,6 +26,7 @@ body {
   line-height: 1.6;
   background-color: var(--secondary-color);
   direction: rtl;
+  transition: var(--transition); /* ترنزیشن برای تغییر تم */
 }
 
 a {
@@ -35,7 +36,7 @@ a {
 }
 
 a:hover {
-  color: darken(var(--primary-color), 10%);
+  filter: brightness(85%); /* جایگزین darken */
 }
 
 button {
@@ -50,5 +51,39 @@ button {
 }
 
 button:hover {
-  background-color: darken(var(--accent-color), 10%);
+  background-color: var(--accent-color-hover); /* استفاده از متغیر جدید */
+}
+
+/* استایل‌های حالت تیره */
+.dark {
+  --primary-color: #e0e0e0; /* متن روشن برای حالت تیره */
+  --secondary-color: #1a2b4a; /* پس‌زمینه تیره */
+  --accent-color: #d4af37; /* طلایی ملایم حفظ می‌شود */
+  --accent-color-hover: #b8972f; /* طلایی تیره‌تر برای هاور */
+  --text-color: #070606; /* متن روشن برای خوانایی */
+  --gray: #000000; /* خاکستری روشن‌تر برای حالت تیره */
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+
+.dark a {
+  color: var(--primary-color);
+}
+
+.dark a:hover {
+  filter: brightness(115%); /* جایگزین lighten */
+}
+
+.dark button {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.dark button:hover {
+  background-color: var(--accent-color-hover);
+}
+
+/* برای اطمینان از ترنزیشن روان هنگام تغییر تم */
+html {
+  transition: background-color var(--transition), color var(--transition);
 }

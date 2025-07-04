@@ -1,103 +1,205 @@
+/* src/styles/InstructorDetails.module.css */
 .instructorDetailsSection {
-  padding: 4rem 2rem;
-  background: linear-gradient(180deg, var(--white) 0%, var(--secondary-color) 100%);
+  background-color: var(--background);
+  padding: 4rem 1rem;
+  direction: rtl;
 }
 
 .container {
-  max-width: var(--max-width);
+  max-width: 1200px;
   margin: 0 auto;
+}
+
+.header {
   text-align: center;
+  margin-bottom: 2rem;
 }
 
-.container h1 {
+.title {
   font-size: 2.5rem;
-  color: var(--primary-color);
-  margin-bottom: 1rem;
   font-weight: 700;
-  position: relative;
+  color: var(--primary-color);
 }
 
-.container h1::after {
-  content: '';
-  display: block;
-  width: 100px;
-  height: 4px;
-  background: var(--accent-color);
-  margin: 0.5rem auto;
-  border-radius: var(--border-radius);
+.rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: var(--gray);
+}
+
+.starIcon {
+  color: var(--accent-color);
+}
+
+.contentWrapper {
+  display: flex;
+  gap: 2rem;
+}
+
+.imageContainer {
+  flex: 0 0 300px;
 }
 
 .instructorImage {
   width: 100%;
-  max-width: 300px;
-  height: auto;
+  height: 300px;
+  object-fit: cover;
+  border-radius: var(--border-radius);
+}
+
+.detailsContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.infoCard, .bioCard, .coursesCard, .socialMedia {
+  background-color: var(--white);
+  padding: 1.5rem;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
-  margin: 1rem 0;
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.sectionIcon {
+  color: var(--accent-color);
+}
+
+.infoCard p, .bioCard p {
+  font-size: 1rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.infoIcon {
+  color: var(--accent-color);
+  margin-left: 0.5rem;
+}
+
+.courseGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.courseCard {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.courseCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.courseImage {
+  width: 100%;
+  height: 150px;
   object-fit: cover;
 }
 
-.container p {
-  font-size: 1.1rem;
-  color: var(--text-color);
-  margin: 0.5rem 0;
+.courseContent {
+  padding: 1rem;
 }
 
-.container strong {
+.courseTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
   color: var(--primary-color);
 }
 
-.container h2 {
-  font-size: 1.8rem;
-  color: var(--primary-color);
-  margin: 1.5rem 0 1rem;
+.courseDescription {
+  font-size: 0.9rem;
+  color: var(--gray);
 }
 
-.container ul {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 2rem;
-}
-
-.container li {
+.noCourses {
   font-size: 1rem;
-  color: var(--text-color);
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--gray);
+  color: var(--gray);
+}
+
+.socialLinks {
+  display: flex;
+  gap: 1rem;
+}
+
+.socialIcon {
+  color: var(--accent-color);
+  font-size: 1.5rem;
+}
+
+.socialIcon:hover {
+  color: var(--accent-color-hover);
 }
 
 .backLink {
   display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background-color: var(--accent-color);
-  color: var(--white);
-  border-radius: var(--border-radius);
-  font-size: 1rem;
-  transition: var(--transition);
+  margin-top: 2rem;
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 500;
 }
 
 .backLink:hover {
-  background-color: darken(var(--accent-color), 10%);
+  text-decoration: underline;
 }
 
-.error {
-  font-size: 1.5rem;
-  color: var(--gray);
-  text-align: center;
-  margin: 4rem 0;
+/* حالت تیره */
+.dark .instructorDetailsSection {
+  background-color: var(--background-dark);
 }
 
-/* Responsive Design */
+.dark .infoCard, .dark .bioCard, .dark .coursesCard, .dark .socialMedia {
+  background-color: var(--primary-color);
+}
+
+.dark .title, .dark .subtitle, .dark .courseTitle {
+  color: var(--text-color-dark);
+}
+
+.dark .rating, .dark .courseDescription, .dark .noCourses {
+  color: var(--gray-dark);
+}
+
+.dark .infoCard p, .dark .bioCard p {
+  color: var(--text-color-dark);
+}
+
+/* پاسخ‌گویی */
 @media (max-width: 768px) {
-  .container h1 {
-    font-size: 2rem;
+  .contentWrapper {
+    flex-direction: column;
+  }
+
+  .imageContainer {
+    flex: none;
   }
 
   .instructorImage {
-    max-width: 250px;
+    height: 200px;
   }
 
-  .container h2 {
-    font-size: 1.5rem;
+  .title {
+    font-size: 2rem;
+  }
+
+  .courseGrid {
+    grid-template-columns: 1fr;
   }
 }

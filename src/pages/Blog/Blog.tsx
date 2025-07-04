@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import styles from './Blog.module.css';
 import { useBlogContext } from '../../Context/BlogContext';
+import { useAuthContext } from '../../Context/AuthContext';
+import { useWishlistContext } from '../../Context/WishlistContext';
 import BlogCard from '../../components/BlogCard/BlogCard';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 
@@ -18,6 +20,7 @@ interface BlogPost {
 
 const Blog: React.FC = () => {
   const { blogPosts } = useBlogContext();
+  const { isAuthenticated } = useAuthContext();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filter, setFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('date');
@@ -52,7 +55,8 @@ const Blog: React.FC = () => {
 
   return (
     <section className={styles.blogSection}>
-      <div className={styles.container}><Breadcrumb />
+      <div className={styles.container}>
+        <Breadcrumb />
         <h1 className={styles.title}>وبلاگ روم دنتال</h1>
         <p className={styles.subtitle}>
           آخرین اخبار، مقالات و نکات دندانپزشکی را اینجا بخوانید
@@ -118,6 +122,15 @@ const Blog: React.FC = () => {
               </button>
             ))}
           </div>
+        )}
+
+        {/* پیام برای کاربران غیر احراز هویت شده */}
+        {!isAuthenticated && (
+          <p className={styles.authMessage}>
+            برای افزودن مقالات به لیست علاقه‌مندی‌ها، لطفاً{' '}
+            <a href="/login">وارد شوید</a> یا{' '}
+            <a href="/signup">ثبت‌نام کنید</a>.
+          </p>
         )}
       </div>
     </section>

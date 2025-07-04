@@ -14,6 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import PersonIcon from '@mui/icons-material/Person';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import Avatar from '@mui/material/Avatar';
+import ThemeToggle from '../ThemeToggle/ThemeToggle';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -150,9 +151,11 @@ const Header: React.FC = () => {
                   }}
                   aria-label="باز کردن سبد خرید"
                 >
-                  <ShoppingCartIcon />
-                </IconButton>
+<ShoppingCartIcon fontSize="medium" />                </IconButton>
               </Tooltip>
+            </li>
+            <li>
+              <ThemeToggle />
             </li>
           </ul>
 
@@ -188,15 +191,18 @@ const Header: React.FC = () => {
                   <MenuItem onClick={() => handleProfileNavigation('/wishlist')}>
                     <FavoriteIcon style={{ marginRight: '8px' }} /> علاقه‌مندی‌ها
                   </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      logout();
-                      handleProfileClose();
-                      navigate('/');
-                    }}
-                  >
-                    <CloseIcon style={{ marginRight: '8px' }} /> خروج
-                  </MenuItem>
+               <MenuItem>
+  <Button
+    className={styles.logoutButton}
+    onClick={() => {
+      logout();
+      handleProfileClose();
+      navigate('/');
+    }}
+  >
+    <CloseIcon style={{ marginRight: '8px' }} /> خروج
+  </Button>
+</MenuItem>
                 </Menu>
               </div>
             ) : (

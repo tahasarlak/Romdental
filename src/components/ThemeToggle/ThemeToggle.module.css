@@ -1,0 +1,46 @@
+/* src/components/ThemeToggle/ThemeToggle.module.css */
+.themeToggle {
+  background-color: var(--accent-color);
+  color: var(--white);
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.themeToggle:hover {
+  background-color: darken(var(--accent-color), 10%);
+}
+
+/* استایل‌های حالت تیره */
+:root {
+  --primary-color-dark: #e0e0e0; /* رنگ روشن‌تر برای متن در حالت تیره */
+  --secondary-color-dark: #1a2b4a; /* آبی تیره به عنوان پس‌زمینه */
+  --accent-color-dark: #d4af37; /* طلایی ملایم حفظ می‌شود */
+  --text-color-dark: #e0e0e0;
+  --gray-dark: #b0b0b0;
+}
+
+.dark {
+  --primary-color: var(--primary-color-dark);
+  --secondary-color: var(--secondary-color-dark);
+  --accent-color: var(--accent-color-dark);
+  --text-color: var(--text-color-dark);
+  --gray: var(--gray-dark);
+  background-color: var(--secondary-color);
+}
+
+.dark a {
+  color: var(--primary-color);
+}
+
+.dark a:hover {
+  color: lighten(var(--primary-color), 10%);
+}
+
+.dark button {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.dark button:hover {
+  background-color: lighten(var(--accent-color), 10%);
+}
