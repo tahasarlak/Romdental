@@ -2,10 +2,12 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useCourseContext } from './CourseContext';
 
 interface ScheduleItem {
+  id: number; // Added to link to CourseDetails
   day: string;
   time: string;
   course: string;
   instructor: string;
+  image: string; // Added for course image
 }
 
 interface ScheduleContextType {
@@ -27,10 +29,12 @@ export const ScheduleProvider = ({ children }: { children: ReactNode }) => {
       const randomDay = days[Math.floor(Math.random() * days.length)];
       const randomTime = times[Math.floor(Math.random() * times.length)];
       return {
+        id: course.id, // Include course ID
         day: randomDay,
         time: randomTime,
         course: course.title,
         instructor: course.instructor,
+        image: course.image, // Include course image
       };
     });
 

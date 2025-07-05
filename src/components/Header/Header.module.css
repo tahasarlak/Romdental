@@ -148,6 +148,7 @@
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
   width: 90%;
+  max-width: 1200px;
   padding: 1.5rem;
   color: var(--text-color);
   position: relative;
@@ -169,7 +170,7 @@
 }
 
 .cartModalBody {
-  max-height: 300px;
+  max-height: 600px;
   overflow-y: auto;
   margin-bottom: 1rem;
 }
@@ -224,6 +225,35 @@
 
 .logoutButton:hover {
   color: var(--accent-color) !important;
+}
+
+.scheduleLink {
+  text-decoration: none;
+  color: var(--text-color);
+  transition: var(--transition);
+}
+
+.scheduleLink:hover {
+  color: var(--accent-color);
+}
+
+.scheduleItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.scheduleImage {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius);
+  object-fit: cover;
+}
+
+.scheduleInstructor {
+  font-size: 0.9em;
+  color: var(--gray);
 }
 
 /* استایل‌های حالت تیره */
@@ -300,6 +330,18 @@
   background-color: var(--accent-color-hover);
 }
 
+.dark .scheduleLink {
+  color: var(--text-color);
+}
+
+.dark .scheduleLink:hover {
+  color: var(--accent-color);
+}
+
+.dark .scheduleInstructor {
+  color: var(--gray);
+}
+
 /* پاسخ‌گویی برای موبایل */
 @media (max-width: 768px) {
   .menuToggle {
@@ -345,7 +387,7 @@
   .cartModalContent,
   .calendarModalContent {
     width: 95%;
-    max-width: 600px;
+    max-width: 400px;
     padding: 1rem;
   }
 
@@ -357,5 +399,18 @@
   .cartModalHeader h2,
   .calendarModalHeader h2 {
     font-size: 1.1rem;
+  }
+
+  .scheduleImage {
+    width: 32px;
+    height: 32px;
+  }
+
+  .scheduleItem {
+    gap: 0.4rem;
+  }
+
+  .scheduleInstructor {
+    font-size: 0.8em;
   }
 }

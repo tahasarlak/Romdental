@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface User {
+  token: string;
   name: string;
   email: string;
   phone: string;
@@ -41,6 +42,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       profilePicture: '/assets/default-profile.jpg',
       wishlist: [],
       password: 'password123',
+      token: ''
     },
   ]);
 
@@ -94,6 +96,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             profilePicture: '/assets/default-profile.jpg',
             wishlist: [],
             password,
+            token: ''
           };
           setUsers((prev) => [...prev, newUser]);
           setUserState(newUser);

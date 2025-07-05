@@ -352,12 +352,28 @@ const Header: React.FC = () => {
                         return (
                           <TableCell key={`${day}-${time}`} align="center">
                             {schedule ? (
-                              <div>
-                                <div>{schedule.course}</div>
-                                <div style={{ fontSize: '0.9em', color: '#555' }}>
-                                  {schedule.instructor}
+                              <NavLink
+                                to={`/courses/${schedule.id}`}
+                                className={styles.scheduleLink}
+                                onClick={() => setIsCalendarOpen(false)}
+                              >
+                                <div className={styles.scheduleItem}>
+                                  <img
+                                    src={schedule.image}
+                                    alt={schedule.course}
+                                    className={styles.scheduleImage}
+                                    onError={(e) => {
+                                      e.currentTarget.src = '/assets/fallback.jpg';
+                                    }}
+                                  />
+                                  <div>
+                                    <div>{schedule.course}</div>
+                                    <div className={styles.scheduleInstructor}>
+                                      {schedule.instructor}
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
+                              </NavLink>
                             ) : (
                               '-'
                             )}

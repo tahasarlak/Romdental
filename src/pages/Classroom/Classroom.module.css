@@ -1,0 +1,113 @@
+.classroomSection {
+  padding: 2rem 0;
+  background-color: var(--background-color);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.navigation {
+  margin-bottom: 1.5rem;
+}
+
+.backButton {
+  color: var(--text-color);
+  border-color: var(--gray);
+  transition: var(--transition);
+}
+
+.backButton:hover {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.classroomContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.videoPlayer {
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  max-width: 100%;
+}
+
+.classInfo {
+  background-color: var(--secondary-color);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  color: var(--text-color);
+}
+
+.classInfo p {
+  margin: 0.5rem 0;
+}
+
+.classInfo strong {
+  color: var(--accent-color);
+}
+
+/* Dark mode */
+.dark .classroomSection {
+  background-color: var(--background-color);
+}
+
+.dark .title {
+  color: var(--text-color);
+}
+
+.dark .classInfo {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+
+.dark .classInfo strong {
+  color: var(--accent-color);
+}
+
+.dark .backButton {
+  color: var(--text-color);
+  border-color: var(--gray);
+}
+
+.dark .backButton:hover {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .classroomSection {
+    padding: 1rem 0;
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .classInfo {
+    padding: 1rem;
+  }
+
+  .navigation {
+    margin-bottom: 1rem;
+  }
+}

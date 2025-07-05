@@ -10,6 +10,7 @@ import Signup from './pages/Signup/Signup';
 import Layout from './Layout';
 import InstructorDetails from './pages/Instructors/InstructorDetails/InstructorDetails';
 import CourseDetails from './pages/Courses/[title]/[title]';
+import Classroom from './pages/Classroom/Classroom';
 import Checkout from './pages/Checkout/[id]';
 import Profile from './pages/profile/Profile';
 import Wishlist from './pages/Wishlist/Wishlist';
@@ -55,6 +56,7 @@ const App: React.FC = () => {
                                   <Route path="/login" element={<Login />} />
                                   <Route path="/signup" element={<Signup />} />
                                   <Route path="/checkout/:id" element={<Checkout />} />
+                                  <Route path="/classroom/:id" element={<Classroom />} />
                                   <Route path="/profile" element={<Profile />} />
                                   <Route path="/wishlist" element={<Wishlist />} />
                                 </Routes>

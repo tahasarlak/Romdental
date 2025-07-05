@@ -131,10 +131,14 @@ const CourseDetails: React.FC = () => {
   }, [id, isEnrolled, navigate]);
 
   const handleJoinClass = useCallback(() => {
+    if (!isEnrolled) {
+      alert('شما در این دوره ثبت‌نام نکرده‌اید.');
+      navigate(`/checkout/${id}`);
+      return;
+    }
     trackEvent('join_class_click', { courseId: id }); // Analytics
-    // Mock: Redirect to a virtual classroom (replace with actual implementation)
-    window.open('https://example.com/virtual-classroom', '_blank');
-  }, [id]);
+    navigate(`/classroom/${id}`); // Navigate to internal classroom page
+  }, [id, isEnrolled, navigate]);
 
   // Mock analytics function (replace with real implementation)
   const trackEvent = (event: string, data: any) => {
@@ -315,7 +319,7 @@ const CourseDetails: React.FC = () => {
             </p>
 
             {/* Online Class Section */}
-            {course.courseType === 'Online' && isEnrolled && (
+            {course.courseType === 'Online' && (
               <div className={styles.onlineClassSection}>
                 <h2>ورود به کلاس آنلاین</h2>
                 <p>برای شرکت در جلسات آنلاین این دوره، از دکمه زیر استفاده کنید:</p>
