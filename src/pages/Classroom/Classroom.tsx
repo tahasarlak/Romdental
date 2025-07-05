@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCourseContext } from '../../Context/CourseContext';
 import { useAuthContext } from '../../Context/AuthContext';
-import ReactPlayer from 'react-player';
 import styles from './Classroom.module.css';
 import Button from '@mui/material/Button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -21,8 +20,7 @@ const Classroom: React.FC = () => {
 
   const course = courses.find((c) => c.id === parseInt(id || ''));
 
-  // Mock enrollment check (replace with actual logic, e.g., API or context)
-  const isEnrolled = course?.id === 1; // Mock: Assume enrolled for course ID 1
+  const isEnrolled = course?.id === 1;
 
   useEffect(() => {
     if (!course || course.courseType !== 'Online') {
@@ -38,11 +36,11 @@ const Classroom: React.FC = () => {
   }, [course, isEnrolled, id, navigate]);
 
   if (!course || !isEnrolled) {
-    return null; // Redirects handled in useEffect
+    return null;
   }
 
-  // لینک پخش زنده داخلی از سرور شما
-  const liveStreamUrl = `http://your-domain.com/live/${course.id}/stream.m3u8`; // جایگزین با آدرس سرور استریمینگ
+  // لینک جلسه Zoom
+  const zoomMeetingUrl = 'https://us05web.zoom.us/j/88536628660?pwd=UPjasZiqa7q9asoe8EuHleEddsybdG.1'; // لینک Zoom خودت
 
   return (
     <section className={styles.classroomSection}>
@@ -60,28 +58,17 @@ const Classroom: React.FC = () => {
         </div>
         <h1 className={styles.title}>کلاس آنلاین: {course.title}</h1>
         <div className={styles.classroomContent}>
-          <ReactPlayer
-            url={liveStreamUrl}
+          <iframe
+            src={zoomMeetingUrl}
             width="100%"
-            height="auto"
-            controls
-            className={styles.videoPlayer}
-            playing
-            config={{
-              file: {
-                hlsOptions: {
-                  xhrSetup: (xhr: XMLHttpRequest) => {
-                    // افزودن توکن احراز هویت برای دسترسی امن
-                    xhr.setRequestHeader('Authorization', `Bearer ${user?.token || ''}`);
-                  },
-                },
-              },
-            }}
+            height="500px"
+            allow="camera; microphone; fullscreen"
+            style={{ border: 'none' }}
           />
           <div className={styles.classInfo}>
             <p>خوش آمدید، {user?.name || 'کاربر'}!</p>
             <p>این صفحه کلاس آنلاین برای دوره <strong>{course.title}</strong> است.</p>
-            <p>شما در حال مشاهده پخش زنده کلاس هستید.</p>
+            <p>شما در حال مشاهده جلسه Zoom هستید.</p>
           </div>
         </div>
       </div>
