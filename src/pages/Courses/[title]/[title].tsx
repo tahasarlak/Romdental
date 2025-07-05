@@ -15,6 +15,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import DescriptionIcon from '@mui/icons-material/Description';
+import VideoCallIcon from '@mui/icons-material/VideoCall';
 import styles from './CourseDetails.module.css';
 import { useCourseContext } from '../../../Context/CourseContext';
 import { useReviewContext } from '../../../Context/ReviewContext';
@@ -128,6 +129,12 @@ const CourseDetails: React.FC = () => {
       navigate(`/checkout/${id}`);
     }
   }, [id, isEnrolled, navigate]);
+
+  const handleJoinClass = useCallback(() => {
+    trackEvent('join_class_click', { courseId: id }); // Analytics
+    // Mock: Redirect to a virtual classroom (replace with actual implementation)
+    window.open('https://example.com/virtual-classroom', '_blank');
+  }, [id]);
 
   // Mock analytics function (replace with real implementation)
   const trackEvent = (event: string, data: any) => {
@@ -304,8 +311,23 @@ const CourseDetails: React.FC = () => {
           <div className={styles.courseContent}>
             <h2>درباره این دوره</h2>
             <p>
-              این دوره با هدف ارتقای مهارت‌های شما در زمینهExtended {course.title} برای دانشگاه {course.university} طراحی شده است. با شرکت در این دوره، شما با جدیدترین تکنیک‌ها و ابزارهای مرتبط آشنا خواهید شد.
+              این دوره با هدف ارتقای مهارت‌های شما در زمینه {course.title} برای دانشگاه {course.university} طراحی شده است. با شرکت در این دوره، شما با جدیدترین تکنیک‌ها و ابزارهای مرتبط آشنا خواهید شد.
             </p>
+
+            {/* Online Class Section */}
+            {course.courseType === 'Online' && isEnrolled && (
+              <div className={styles.onlineClassSection}>
+                <h2>ورود به کلاس آنلاین</h2>
+                <p>برای شرکت در جلسات آنلاین این دوره، از دکمه زیر استفاده کنید:</p>
+                <button
+                  className={styles.joinClassButton}
+                  onClick={handleJoinClass}
+                  aria-label="ورود به کلاس آنلاین"
+                >
+                  <VideoCallIcon /> ورود به کلاس آنلاین
+                </button>
+              </div>
+            )}
 
             <h2>سرفصل‌های دوره</h2>
             {isEnrolled && totalItems > 0 && (

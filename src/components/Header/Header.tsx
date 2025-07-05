@@ -3,6 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import styles from './Header.module.css';
 import { useAuthContext } from '../../Context/AuthContext';
 import { useCartContext } from '../../Context/CartContext';
+import { useScheduleContext } from '../../Context/ScheduleContext';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import IconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
@@ -15,19 +16,30 @@ import PersonIcon from '@mui/icons-material/Person';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import Avatar from '@mui/material/Avatar';
 import ThemeToggle from '../ThemeToggle/ThemeToggle';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { isAuthenticated, user, logout } = useAuthContext();
   const { cartItems, removeFromCart } = useCartContext();
+  const { weeklySchedule } = useScheduleContext();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     setIsMenuOpen(false);
     setIsCartOpen(false);
+    setIsCalendarOpen(false);
     setAnchorEl(null);
   }, [location.pathname]);
 
@@ -35,6 +47,7 @@ const Header: React.FC = () => {
     event.stopPropagation();
     setIsMenuOpen(false);
     setIsCartOpen(false);
+    setIsCalendarOpen(false);
     setAnchorEl(null);
   };
 
@@ -67,6 +80,9 @@ const Header: React.FC = () => {
     : user?.gender === 'زن' 
     ? '/assets/female-profile.jpg' 
     : '/assets/default-profile.jpg';
+
+  const daysOfWeek = ['دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه', 'یکشنبه'];
+  const timeSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
 
   return (
     <header className={styles.header}>
@@ -147,11 +163,29 @@ const Header: React.FC = () => {
                   onClick={() => {
                     setIsCartOpen(true);
                     setIsMenuOpen(false);
+                    setIsCalendarOpen(false);
                     setAnchorEl(null);
                   }}
                   aria-label="باز کردن سبد خرید"
                 >
-<ShoppingCartIcon fontSize="medium" />                </IconButton>
+                  <ShoppingCartIcon fontSize="medium" />
+                </IconButton>
+              </Tooltip>
+            </li>
+            <li>
+              <Tooltip title="تقویم کلاس‌ها">
+                <IconButton
+                  className={styles.calendarIcon}
+                  onClick={() => {
+                    setIsCalendarOpen(true);
+                    setIsMenuOpen(false);
+                    setIsCartOpen(false);
+                    setAnchorEl(null);
+                  }}
+                  aria-label="باز کردن تقویم"
+                >
+                  <CalendarTodayIcon fontSize="medium" />
+                </IconButton>
               </Tooltip>
             </li>
             <li>
@@ -191,18 +225,18 @@ const Header: React.FC = () => {
                   <MenuItem onClick={() => handleProfileNavigation('/wishlist')}>
                     <FavoriteIcon style={{ marginRight: '8px' }} /> علاقه‌مندی‌ها
                   </MenuItem>
-               <MenuItem>
-  <Button
-    className={styles.logoutButton}
-    onClick={() => {
-      logout();
-      handleProfileClose();
-      navigate('/');
-    }}
-  >
-    <CloseIcon style={{ marginRight: '8px' }} /> خروج
-  </Button>
-</MenuItem>
+                  <MenuItem>
+                    <Button
+                      className={styles.logoutButton}
+                      onClick={() => {
+                        logout();
+                        handleProfileClose();
+                        navigate('/');
+                      }}
+                    >
+                      <CloseIcon style={{ marginRight: '8px' }} /> خروج
+                    </Button>
+                  </MenuItem>
                 </Menu>
               </div>
             ) : (
@@ -277,6 +311,65 @@ const Header: React.FC = () => {
               </Button>
             </div>
           )}
+        </div>
+      </Modal>
+
+      <Modal
+        open={isCalendarOpen}
+        onClose={() => setIsCalendarOpen(false)}
+        aria-labelledby="calendar-modal-title"
+        className={styles.calendarModal}
+      >
+        <div className={styles.calendarModalContent}>
+          <div className={styles.calendarModalHeader}>
+            <h2 id="calendar-modal-title">تقویم کلاس‌های آنلاین</h2>
+            <IconButton
+              onClick={() => setIsCalendarOpen(false)}
+              aria-label="بستن تقویم"
+            >
+              <CloseIcon />
+            </IconButton>
+          </div>
+          <div className={styles.calendarModalBody}>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>زمان</TableCell>
+                    {daysOfWeek.map((day) => (
+                      <TableCell key={day} align="center">{day}</TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {timeSlots.map((time) => (
+                    <TableRow key={time}>
+                      <TableCell>{time}</TableCell>
+                      {daysOfWeek.map((day) => {
+                        const schedule = weeklySchedule.find(
+                          (item) => item.day === day && item.time === time
+                        );
+                        return (
+                          <TableCell key={`${day}-${time}`} align="center">
+                            {schedule ? (
+                              <div>
+                                <div>{schedule.course}</div>
+                                <div style={{ fontSize: '0.9em', color: '#555' }}>
+                                  {schedule.instructor}
+                                </div>
+                              </div>
+                            ) : (
+                              '-'
+                            )}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
         </div>
       </Modal>
     </header>

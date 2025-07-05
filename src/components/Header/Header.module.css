@@ -1,4 +1,3 @@
-/* src/styles/Header.module.css */
 .header {
   background-color: var(--secondary-color);
   box-shadow: var(--shadow);
@@ -113,12 +112,14 @@
   background-color: var(--accent-color-hover);
 }
 
-.cartIcon {
+.cartIcon,
+.calendarIcon {
   color: var(--text-color);
   transition: var(--transition);
 }
 
-.cartIcon:hover {
+.cartIcon:hover,
+.calendarIcon:hover {
   color: var(--accent-color);
 }
 
@@ -134,31 +135,34 @@
   border: 2px solid var(--accent-color);
 }
 
-.cartModal {
+.cartModal,
+.calendarModal {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.cartModalContent {
+.cartModalContent,
+.calendarModalContent {
   background-color: var(--secondary-color);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
   width: 90%;
-  max-width: 400px;
   padding: 1.5rem;
   color: var(--text-color);
   position: relative;
 }
 
-.cartModalHeader {
+.cartModalHeader,
+.calendarModalHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
 }
 
-.cartModalHeader h2 {
+.cartModalHeader h2,
+.calendarModalHeader h2 {
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-color);
@@ -166,6 +170,12 @@
 
 .cartModalBody {
   max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.calendarModalBody {
+  max-height: 500px;
   overflow-y: auto;
   margin-bottom: 1rem;
 }
@@ -237,11 +247,13 @@
   color: var(--accent-color);
 }
 
-.dark .cartIcon {
+.dark .cartIcon,
+.dark .calendarIcon {
   color: var(--text-color);
 }
 
-.dark .cartIcon:hover {
+.dark .cartIcon:hover,
+.dark .calendarIcon:hover {
   color: var(--accent-color);
 }
 
@@ -264,12 +276,14 @@
   background-color: var(--accent-color-hover);
 }
 
-.dark .cartModalContent {
+.dark .cartModalContent,
+.dark .calendarModalContent {
   background-color: var(--secondary-color);
   color: var(--text-color);
 }
 
-.dark .cartModalHeader h2 {
+.dark .cartModalHeader h2,
+.dark .calendarModalHeader h2 {
   color: var(--text-color);
 }
 
@@ -326,5 +340,22 @@
   .signupButton {
     width: 100%;
     text-align: center;
+  }
+
+  .cartModalContent,
+  .calendarModalContent {
+    width: 95%;
+    max-width: 600px;
+    padding: 1rem;
+  }
+
+  .cartModalBody,
+  .calendarModalBody {
+    max-height: 350px;
+  }
+
+  .cartModalHeader h2,
+  .calendarModalHeader h2 {
+    font-size: 1.1rem;
   }
 }
