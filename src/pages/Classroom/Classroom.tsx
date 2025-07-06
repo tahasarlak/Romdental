@@ -39,8 +39,8 @@ const Classroom: React.FC = () => {
     return null;
   }
 
-  // لینک جلسه Zoom
-  const zoomMeetingUrl = 'https://us05web.zoom.us/j/88536628660?pwd=UPjasZiqa7q9asoe8EuHleEddsybdG.1'; // لینک Zoom خودت
+  // لینک جلسه Google Meet
+  const meetUrl = 'https://meet.google.com/gwd-zkmf-qtv?pli=1'; // لینک Google Meet خودت
 
   return (
     <section className={styles.classroomSection}>
@@ -59,7 +59,7 @@ const Classroom: React.FC = () => {
         <h1 className={styles.title}>کلاس آنلاین: {course.title}</h1>
         <div className={styles.classroomContent}>
           <iframe
-            src={zoomMeetingUrl}
+            src={meetUrl}
             width="100%"
             height="500px"
             allow="camera; microphone; fullscreen"
@@ -68,7 +68,7 @@ const Classroom: React.FC = () => {
           <div className={styles.classInfo}>
             <p>خوش آمدید، {user?.name || 'کاربر'}!</p>
             <p>این صفحه کلاس آنلاین برای دوره <strong>{course.title}</strong> است.</p>
-            <p>شما در حال مشاهده جلسه Zoom هستید.</p>
+            <p>شما در حال مشاهده جلسه Google Meet هستید.</p>
           </div>
         </div>
       </div>
