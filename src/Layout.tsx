@@ -5,12 +5,12 @@ import BackToTop from './components/BackToTop/BackToTop'; // ایمپورت Back
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div>
-      <Header />
+  
+      <><Header />
       <main>{children}</main>
       <Footer />
-      <BackToTop /> {/* اضافه کردن BackToTop */}
-    </div>
+      <BackToTop /></>
+  
   );
 };
 
