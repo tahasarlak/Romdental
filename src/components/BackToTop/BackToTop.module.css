@@ -1,37 +1,63 @@
-/* src/styles/BackToTop.module.css */
 .backToTop {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  background-color: var(--accent-color);
-  color: var(--white);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
-  padding: 0.75rem;
-  transition: var(--transition);
   z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition), visibility var(--transition), transform var(--transition);
+  transform: translateY(20px);
 }
 
-.backToTop:hover {
-  background-color: var(--accent-color-hover);
-  transform: translateY(-4px);
+.backToTop.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
-/* استایل‌های حالت تیره */
-.dark .backToTop {
-  background-color: var(--accent-color);
-  color: var(--white);
+.button {
+  background-color: var(--accent-color) !important;
+  color: var(--white) !important;
+  box-shadow: var(--shadow);
+  border-radius: var(--border-radius) !important;
+  padding: 12px !important;
+  transition: var(--transition);
 }
 
-.dark .backToTop:hover {
-  background-color: var(--accent-color-hover);
+.button:hover {
+  background-color: var(--accent-color-hover) !important;
+  transform: scale(1.1);
 }
 
-/* پاسخ‌گویی برای موبایل */
+/* Dark mode styles */
+.dark .button {
+  background-color: var(--accent-color) !important;
+  color: var(--white) !important;
+}
+
+.dark .button:hover {
+  background-color: var(--accent-color-hover) !important;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .backToTop {
     bottom: 1.5rem;
     right: 1.5rem;
-    padding: 0.5rem;
+  }
+
+  .button {
+    padding: 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .backToTop {
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  .button {
+    padding: 8px !important;
   }
 }

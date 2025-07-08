@@ -1,7 +1,7 @@
 import React from 'react';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
-import BackToTop from './components/BackToTop/BackToTop'; // ایمپورت BackToTop
+import BackToTop from './components/BackToTop/BackToTop';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
@@ -9,7 +9,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <><Header />
       <main>{children}</main>
       <Footer />
-      <BackToTop /></>
+   <BackToTop />  </> 
   
   );
 };

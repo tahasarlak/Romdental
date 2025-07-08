@@ -1,16 +1,16 @@
-// src/components/BackToTop/BackToTop.tsx
 import React, { useState, useEffect } from 'react';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import styles from './BackToTop.module.css';
 
 const BackToTop: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
-  // نمایش دکمه هنگام اسکرول
+  // Handle scroll visibility
   useEffect(() => {
     const toggleVisibility = () => {
-      if (window.scrollY > 300) {
+      if (window.pageYOffset > 300) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
@@ -21,7 +21,7 @@ const BackToTop: React.FC = () => {
     return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
 
-  // اسکرول به بالای صفحه
+  // Smooth scroll to top
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -30,17 +30,18 @@ const BackToTop: React.FC = () => {
   };
 
   return (
-    <>
-      {isVisible && (
+    <div className={`${styles.backToTop} ${isVisible ? styles.visible : ''}`}>
+      <Tooltip title="بازگشت به بالا" placement="left">
         <IconButton
           onClick={scrollToTop}
-          className={styles.backToTop}
-          aria-label="بازگشت به بالا"
+          className={styles.button}
+          aria-label="بازگشت به بالای صفحه"
+          size="large"
         >
-          <ArrowUpwardIcon />
+          <KeyboardArrowUpIcon fontSize="medium" />
         </IconButton>
-      )}
-    </>
+      </Tooltip>
+    </div>
   );
 };
 
