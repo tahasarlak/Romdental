@@ -1,0 +1,52 @@
+h2 {
+  font-size: 1.6rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+h3 {
+  font-size: 1.3rem;
+  color: var(--primary-color);
+  margin: 1rem 0;
+}
+
+p {
+  color: var(--text-color);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.prerequisites {
+  list-style: none;
+  padding-right: 1.5rem;
+}
+
+.prerequisites li {
+  position: relative;
+  padding: 0.5rem 0;
+  color: var(--text-color);
+}
+
+.prerequisites li::before {
+  content: '•';
+  position: absolute;
+  right: -1rem;
+  color: var(--accent-color);
+}
+
+.dark h2,
+.dark h3,
+.dark p,
+.dark .prerequisites li {
+  color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+}

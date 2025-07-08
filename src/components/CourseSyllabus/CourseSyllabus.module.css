@@ -1,0 +1,206 @@
+h2 {
+  font-size: 1.6rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.progressContainer {
+  margin-bottom: 1.5rem;
+}
+
+.progressBar {
+  background-color: var(--gray);
+  height: 8px;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.progressFill {
+  background-color: var(--accent-color);
+  height: 100%;
+  transition: var(--transition);
+}
+
+.progressText {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.syllabus {
+  list-style: none;
+  padding-right: 1rem;
+}
+
+.syllabusItem {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.unlocked {
+  cursor: pointer;
+}
+
+.syllabusTimeline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timelineDot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.completedIcon,
+.lockIcon,
+.playIcon {
+  color: var(--accent-color);
+}
+
+.timelineLine {
+  width: 2px;
+  flex: 1;
+  background-color: var(--gray);
+}
+
+.syllabusContent {
+  flex: 1;
+}
+
+.syllabusHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.syllabusTitle {
+  display: flex;
+  gap: 0.5rem;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.newBadge {
+  background-color: var(--accent-color);
+  color: var(--white);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--border-radius);
+  font-size: 0.8rem;
+}
+
+.syllabusMeta {
+  display: flex;
+  gap: 1rem;
+  color: var(--gray);
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.expandIcon {
+  color: var(--accent-color);
+  transition: var(--transition);
+}
+
+.expandIcon.expanded {
+  transform: rotate(180deg);
+}
+
+.previewContent {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: var(--secondary-color);
+  border-radius: var(--border-radius);
+}
+
+.previewButton {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.previewButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.dark h2,
+.dark .progressText,
+.dark .syllabusTitle,
+.dark .previewContent {
+  color: var(--primary-color);
+}
+
+.dark .syllabusHeader,
+.dark .previewContent {
+  background-color: var(--secondary-color);
+}
+
+@media (max-width: 768px) {
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  .syllabusItem {
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+  }
+
+  .syllabusHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .syllabusMeta {
+    gap: 0.5rem;
+  }
+
+  .previewContent {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  .syllabusTitle {
+    font-size: 0.95rem;
+  }
+
+  .newBadge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+  }
+
+  .metaItem {
+    font-size: 0.85rem;
+  }
+
+  .previewButton {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .progressText {
+    font-size: 0.85rem;
+  }
+}

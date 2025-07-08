@@ -1,0 +1,247 @@
+.courseHeader {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.courseImage {
+  width: 40%;
+  height: auto;
+  border-radius: var(--border-radius);
+  object-fit: cover;
+  box-shadow: var(--shadow);
+}
+
+.courseInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.courseTitle {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+}
+
+.instructor {
+  font-size: 1.1rem;
+  color: var(--gray);
+}
+
+.instructorLink {
+  color: var(--accent-color);
+}
+
+.instructorLink:hover {
+  color: var(--accent-color-hover);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color);
+}
+
+.starIcon {
+  color: var(--accent-color);
+}
+
+.description {
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+.details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  color: var(--gray);
+}
+
+.priceContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.originalPrice {
+  text-decoration: line-through;
+  color: var(--gray);
+}
+
+.discountPrice {
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.discountPercentage {
+  color: var(--accent-color);
+  font-size: 0.9rem;
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  background-color: var(--secondary-color);
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--border-radius);
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.shareContainer {
+  position: relative;
+}
+
+.shareButton {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.shareButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.shareDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 0.5rem;
+  z-index: 10;
+}
+
+.shareOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: none;
+  color: var(--text-color);
+  width: 100%;
+  text-align: right;
+}
+
+.shareOption:hover {
+  background-color: var(--secondary-color);
+}
+
+.likeButton {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.likeButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.likedIcon {
+  color: var(--accent-color-hover);
+}
+
+.dark .courseTitle,
+.dark .instructor,
+.dark .description,
+.dark .details,
+.dark .tag {
+  color: var(--primary-color);
+}
+
+.dark .shareDropdown,
+.dark .tag {
+  background-color: var(--secondary-color);
+}
+
+@media (max-width: 1024px) {
+  .courseHeader {
+    gap: 1.5rem;
+  }
+
+  .courseImage {
+    width: 50%;
+  }
+
+  .courseTitle {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .courseHeader {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .courseImage {
+    width: 100%;
+  }
+
+  .courseTitle {
+    font-size: 1.5rem;
+  }
+
+  .instructor {
+    font-size: 1rem;
+  }
+
+  .description {
+    font-size: 0.95rem;
+  }
+
+  .details {
+    gap: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .tag {
+    font-size: 0.85rem;
+    padding: 0.2rem 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .courseTitle {
+    font-size: 1.3rem;
+  }
+
+  .instructor {
+    font-size: 0.95rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
+  .details {
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .actionButtons {
+    gap: 0.5rem;
+  }
+
+  .shareDropdown {
+    padding: 0.3rem;
+  }
+
+  .shareOption {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.85rem;
+  }
+}

@@ -1,29 +1,24 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
-import ReactPlayer from 'react-player';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import LockIcon from '@mui/icons-material/Lock';
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import ShareIcon from '@mui/icons-material/Share';
-import StarIcon from '@mui/icons-material/Star';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
-import DescriptionIcon from '@mui/icons-material/Description';
-import VideoCallIcon from '@mui/icons-material/VideoCall';
-import styles from './CourseDetails.module.css';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useCourseContext } from '../../../Context/CourseContext';
+import { useInstructorContext } from '../../../Context/InstructorContext';
 import { useReviewContext } from '../../../Context/ReviewContext';
 import { useAuthContext } from '../../../Context/AuthContext';
+import { useWishlistContext } from '../../../Context/WishlistContext';
+import { useCartContext } from '../../../Context/CartContext';
+import { useNotificationContext } from '../../../Context/NotificationContext';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import styles from './CourseDetails.module.css';
 import Breadcrumb from '../../../components/Breadcrumb/Breadcrumb';
+import CourseAbout from '../../../components/CourseAbout/CourseAbout';
+import CourseFaqs from '../../../components/CourseFaqs/CourseFaqs';
+import CourseHeader from '../../../components/CourseHeader/CourseHeader';
+import CourseReviews from '../../../components/CourseReviews/CourseReviews';
+import CourseSyllabus from '../../../components/CourseSyllabus/CourseSyllabus';
+import PreviewModal from '../../../components/PreviewModal/PreviewModal';
+import StickyEnrollBar from '../../../components/StickyEnrollBar/StickyEnrollBar';
 
-// Interface for syllabus items
-interface SyllabusItem {
+export interface SyllabusItem {
   id: number;
   title: string;
   isLocked: boolean;
@@ -35,25 +30,40 @@ interface SyllabusItem {
   isNew?: boolean;
 }
 
-// Interface for FAQ items
-interface FaqItem {
+export interface FaqItem {
   id: number;
   question: string;
   answer: string;
 }
 
-// Interface for review items
-interface ReviewItem {
+export interface ReplyItem {
+  id: number;
+  reviewId: number;
+  user: string;
+  comment: string;
+  date: string;
+  role: 'admin' | 'instructor' | 'student';
+}
+
+export interface ReviewItem {
   id: number;
   courseId: number;
   user: string;
   rating: number;
   comment: string;
   date: string;
+  isEnrolled: boolean;
+  replies?: ReplyItem[];
 }
 
-// Interface for course
-interface Course {
+export interface User {
+  name: string;
+  email: string;
+  enrolledCourses: number[];
+  wishlist: { id: number; type: 'course' | 'instructor' | 'blog' }[];
+}
+
+export interface Course {
   id: number;
   title: string;
   instructor: string;
@@ -80,8 +90,12 @@ const CourseDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { courses } = useCourseContext();
-  const { reviews } = useReviewContext();
-  const { users } = useAuthContext();
+  const { instructors } = useInstructorContext();
+  const { reviews, addReply } = useReviewContext();
+  const { user, isAuthenticated, setUser } = useAuthContext();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlistContext();
+  const { addToCart, cartItems } = useCartContext();
+  const { showNotification } = useNotificationContext();
   const [expandedSyllabus, setExpandedSyllabus] = useState<number | null>(null);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -89,10 +103,15 @@ const CourseDetails: React.FC = () => {
     text?: string;
     videoUrl?: string;
   }>({});
-  const [isEnrolled, setIsEnrolled] = useState(false); // Mock enrollment status
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
+  const [replyText, setReplyText] = useState<{ [key: number]: string }>({});
+  const [replyFormVisible, setReplyFormVisible] = useState<{ [key: number]: boolean }>({});
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const course = courses.find((c) => c.id === parseInt(id || ''));
-
+  const courseIds = new Set(courses.map((c) => c.id));
+  const instructorIds = new Set(instructors.map((i) => i.id));
   const courseReviews = reviews.filter((review) => review.courseId === parseInt(id || ''));
 
   const toggleSyllabus = useCallback((id: number) => {
@@ -116,73 +135,168 @@ const CourseDetails: React.FC = () => {
     setModalContent({});
   }, []);
 
-  const shareCourse = useCallback(() => {
-    const shareUrl = window.location.href;
-    navigator.clipboard.writeText(shareUrl);
-    alert('لینک دوره کپی شد!');
-    trackEvent('share_course', { courseId: id }); // Analytics
-  }, [id]);
+  const toggleShareDropdown = useCallback(() => {
+    setIsShareDropdownOpen((prev) => !prev);
+  }, []);
+
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setIsShareDropdownOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [handleClickOutside]);
+
+  const shareCourse = useCallback(
+    async (platform: 'native' | 'telegram' | 'whatsapp' | 'copy') => {
+      const shareUrl = window.location.href;
+      const shareText = `دوره "${course?.title}" را در روم دنتال بررسی کنید!`;
+      trackEvent('share_course', { courseId: id, platform });
+
+      try {
+        if (platform === 'native' && navigator.share) {
+          await navigator.share({
+            title: course?.title,
+            text: shareText,
+            url: shareUrl,
+          });
+          showNotification('دوره با موفقیت به اشتراک گذاشته شد!', 'success');
+        } else if (platform === 'telegram') {
+          window.open(
+            `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(
+              shareText
+            )}`,
+            '_blank'
+          );
+          showNotification('لینک دوره در تلگرام به اشتراک گذاشته شد!', 'success');
+        } else if (platform === 'whatsapp') {
+          window.open(
+            `https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`,
+            '_blank'
+          );
+          showNotification('لینک دوره در واتساپ به اشتراک گذاشته شد!', 'success');
+        } else if (platform === 'copy') {
+          await navigator.clipboard.writeText(shareUrl);
+          showNotification('لینک دوره با موفقیت کپی شد!', 'success');
+        }
+      } catch (error) {
+        console.error('Error sharing:', error);
+        showNotification('خطایی در اشتراک‌گذاری رخ داد. لطفاً دوباره تلاش کنید.', 'error');
+      }
+      setIsShareDropdownOpen(false);
+    },
+    [id, course?.title, showNotification]
+  );
 
   const handleEnroll = useCallback(() => {
-    if (!isEnrolled) {
-      trackEvent('enroll_click', { courseId: id }); // Analytics
-      navigate(`/checkout/${id}`);
+    if (!course || isEnrolled) return;
+
+    const isInCart = cartItems.some((item) => item.id === course.id);
+    if (isInCart) {
+      showNotification('این دوره قبلاً به سبد خرید اضافه شده است.', 'warning');
+    } else {
+      addToCart({
+        id: course.id,
+        title: course.title,
+        price: course.discountPrice || course.price,
+      });
+      showNotification(`دوره "${course.title}" با موفقیت به سبد خرید اضافه شد!`, 'success');
+      trackEvent('add_to_cart', { courseId: course.id });
     }
-  }, [id, isEnrolled, navigate]);
+  }, [course, isEnrolled, addToCart, cartItems, showNotification]);
 
   const handleJoinClass = useCallback(() => {
     if (!isEnrolled) {
-      alert('شما در این دوره ثبت‌نام نکرده‌اید.');
+      showNotification(
+        'شما در این دوره ثبت‌نام نکرده‌اید. لطفاً ابتدا ثبت‌نام کنید.',
+        'warning'
+      );
       navigate(`/checkout/${id}`);
       return;
     }
-    trackEvent('join_class_click', { courseId: id }); // Analytics
-    navigate(`/classroom/${id}`); // Navigate to internal classroom page
-  }, [id, isEnrolled, navigate]);
+    trackEvent('join_class_click', { courseId: id });
+    navigate(`/classroom/${id}`);
+  }, [id, isEnrolled, navigate, showNotification]);
 
-  // Mock analytics function (replace with real implementation)
+  const handleWishlistToggle = useCallback(() => {
+    if (!isAuthenticated) {
+      showNotification(
+        'برای افزودن به لیست علاقه‌مندی‌ها، لطفاً ابتدا وارد حساب کاربری خود شوید.',
+        'warning'
+      );
+      navigate('/login');
+      return;
+    }
+
+    const courseId = parseInt(id || '0');
+    if (isInWishlist(courseId, 'course')) {
+      removeFromWishlist(courseId, 'course');
+      trackEvent('remove_from_wishlist', { courseId });
+      showNotification(`دوره "${course?.title}" از لیست علاقه‌مندی‌ها حذف شد.`, 'success');
+    } else {
+      addToWishlist(courseId, 'course');
+      trackEvent('add_to_wishlist', { courseId });
+      showNotification(`دوره "${course?.title}" به لیست علاقه‌مندی‌ها اضافه شد.`, 'success');
+    }
+  }, [id, isInWishlist, addToWishlist, removeFromWishlist, course?.title, isAuthenticated, navigate, showNotification]);
+
+  const handleReplySubmit = useCallback(
+    (reviewId: number) => {
+      if (!replyText[reviewId]?.trim()) {
+        showNotification('لطفاً پاسخ خود را وارد کنید.', 'warning');
+        return;
+      }
+      try {
+        addReply(reviewId, replyText[reviewId]);
+        showNotification('پاسخ شما با موفقیت ثبت شد!', 'success');
+        setReplyText((prev) => ({ ...prev, [reviewId]: '' }));
+        setReplyFormVisible((prev) => ({ ...prev, [reviewId]: false }));
+      } catch (error: any) {
+        showNotification(error.message, 'error');
+      }
+    },
+    [replyText, addReply, showNotification]
+  );
+
+  const toggleReplyForm = useCallback((reviewId: number) => {
+    setReplyFormVisible((prev) => ({
+      ...prev,
+      [reviewId]: !prev[reviewId],
+    }));
+  }, []);
+
   const trackEvent = (event: string, data: any) => {
     console.log(`Analytics: ${event}`, data);
-    // Integrate with Google Analytics or similar
   };
 
-  // Simulate enrollment status (replace with auth context or API)
   useEffect(() => {
-    // Mock: Assume user is enrolled for course ID 1
-    if (course?.id === 1) {
-      setIsEnrolled(true);
+    if (user && course) {
+      const validEnrolledCourses = user.enrolledCourses.filter((id) => courseIds.has(id));
+      const validWishlist = user.wishlist.filter(
+        (item) =>
+          (item.type === 'course' && courseIds.has(item.id)) ||
+          (item.type === 'instructor' && instructorIds.has(item.id)) ||
+          (item.type === 'blog')
+      );
+      if (
+        validEnrolledCourses.length !== user.enrolledCourses.length ||
+        validWishlist.length !== user.wishlist.length
+      ) {
+        setUser({
+          ...user,
+          enrolledCourses: validEnrolledCourses,
+          wishlist: validWishlist,
+        });
+      }
+      const enrolled = validEnrolledCourses.includes(course.id);
+      setIsEnrolled(enrolled || course.id === 1);
     }
-  }, [course]);
-
-  // Calculate progress for enrolled users
-  const completedItems = (course?.syllabus || []).filter((item) => item.completed).length;
-  const totalItems = (course?.syllabus || []).length;
-  const progressPercentage = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
-
-  // Calculate average rating and total reviews
-  const totalReviews = courseReviews.length;
-  const averageRating =
-    totalReviews > 0
-      ? (
-          courseReviews.reduce((sum: number, review: ReviewItem) => sum + review.rating, 0) /
-          totalReviews
-        ).toFixed(1)
-      : '0.0';
-
-  // Convert index to Persian session number
-  const getSessionLabel = (index: number): string => {
-    const persianNumbers = ['اول', 'دوم', 'سوم', 'چهارم', 'پنجم', 'ششم', 'هفتم', 'هشتم', 'نهم', 'دهم'];
-    return index < persianNumbers.length ? `جلسه ${persianNumbers[index]}` : `جلسه ${index + 1}`;
-  };
-
-  // Determine if reviewer is enrolled
-  const getReviewerRole = (review: ReviewItem): string => {
-    const user = users.find((u) => u.name === review.user);
-    if (user && user.wishlist.includes(review.courseId)) {
-      return 'دانشجو';
-    }
-    return 'کاربر';
-  };
+  }, [user, course, courseIds, instructorIds, setUser]);
 
   if (!course) {
     return (
@@ -198,316 +312,54 @@ const CourseDetails: React.FC = () => {
   }
 
   return (
-    <>
-      <Helmet>
-        <title>{course.title} | دوره‌های آموزشی دندانپزشکی</title>
-        <meta name="description" content={course.description} />
-        <meta
-          name="keywords"
-          content={`${course.title}, ${course.university}, دندانپزشکی, آموزش, دوره ${course.courseType}`}
+    <section className={styles.courseDetailsSection}>
+      <div className={styles.container}>
+        <Breadcrumb />
+        <CourseHeader
+          course={course}
+          courseReviews={courseReviews}
+          isInWishlist={isInWishlist}
+          toggleShareDropdown={toggleShareDropdown}
+          isShareDropdownOpen={isShareDropdownOpen}
+          shareCourse={shareCourse}
+          handleWishlistToggle={handleWishlistToggle}
+          dropdownRef={dropdownRef}
         />
-      </Helmet>
-
-      <section className={styles.courseDetailsSection}>
-        <div className={styles.container}>
-          <Breadcrumb />
-         
-          {/* Course Header */}
-          <div className={styles.courseHeader}>
-            <img
-              src={course.image}
-              alt={course.title}
-              className={styles.courseImage}
-              loading="lazy"
-              onError={(e) => {
-                e.currentTarget.src = '/assets/fallback.jpg'; // Fallback image
-              }}
-            />
-            <div className={styles.courseInfo}>
-              <h1 className={styles.courseTitle}>{course.title}</h1>
-              <p className={styles.instructor}>
-                استاد:{' '}
-                <Link
-                  to={`/instructors/${course.instructor.replace(' ', '-')}`}
-                  className={styles.instructorLink}
-                >
-                  {course.instructor}
-                </Link>
-              </p>
-              <div className={styles.rating}>
-                <StarIcon className={styles.starIcon} />
-                <span>
-                  {averageRating} ({totalReviews} نظر)
-                </span>
-              </div>
-              <p className={styles.description}>{course.description}</p>
-              <div className={styles.details}>
-                <span>
-                  <AccessTimeIcon /> مدت: {course.duration}
-                </span>
-                <span>
-                  <TrendingUpIcon /> کورس: {course.courseNumber}
-                </span>
-                <span className={styles.priceContainer}>
-                  <span className={course.discountPrice ? styles.originalPrice : ''}>
-                    <AttachMoneyIcon /> {course.price}
-                  </span>
-                  {course.discountPrice && (
-                    <>
-                      <span className={styles.discountPrice}>
-                        <AttachMoneyIcon /> {course.discountPrice}
-                      </span>
-                      {course.discountPercentage && (
-                        <span className={styles.discountPercentage}>
-                          ({course.discountPercentage}% تخفیف)
-                        </span>
-                      )}
-                    </>
-                  )}
-                </span>
-                <span>
-                  <CalendarTodayIcon /> شروع: {course.startDate}
-                </span>
-                <span>دانشگاه: {course.university}</span>
-              </div>
-              {course.tags && course.tags.length > 0 && (
-                <div className={styles.tagsContainer}>
-                  {course.tags.map((tag, index) => (
-                    <span key={index} className={styles.tag}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-              <button
-                className={styles.shareButton}
-                onClick={shareCourse}
-                aria-label="اشتراک‌گذاری دوره"
-              >
-                <ShareIcon /> اشتراک‌گذاری
-              </button>
-            </div>
-          </div>
-
-          {/* Sticky Enrollment Bar */}
-          <div className={styles.stickyEnrollBar}>
-            <button
-              className={styles.enrollButton}
-              disabled={!course.isOpen || isEnrolled}
-              onClick={handleEnroll}
-              aria-label={
-                isEnrolled
-                  ? 'شما در این دوره ثبت‌نام کرده‌اید'
-                  : course.isOpen
-                  ? 'ثبت‌نام در دوره'
-                  : 'ثبت‌نام بسته است'
-              }
-            >
-              {isEnrolled
-                ? 'شما ثبت‌نام کرده‌اید'
-                : course.isOpen
-                ? `ثبت‌نام در دوره (${course.discountPrice || course.price})`
-                : 'ثبت‌نام بسته است'}
-            </button>
-          </div>
-
-          {/* Course Content */}
-          <div className={styles.courseContent}>
-            <h2>درباره این دوره</h2>
-            <p>
-              این دوره با هدف ارتقای مهارت‌های شما در زمینه {course.title} برای دانشگاه {course.university} طراحی شده است. با شرکت در این دوره، شما با جدیدترین تکنیک‌ها و ابزارهای مرتبط آشنا خواهید شد.
-            </p>
-
-            {/* Online Class Section */}
-            {course.courseType === 'Online' && (
-              <div className={styles.onlineClassSection}>
-                <h2>ورود به کلاس آنلاین</h2>
-                <p>برای شرکت در جلسات آنلاین این دوره، از دکمه زیر استفاده کنید:</p>
-                <button
-                  className={styles.joinClassButton}
-                  onClick={handleJoinClass}
-                  aria-label="ورود به کلاس آنلاین"
-                >
-                  <VideoCallIcon /> ورود به کلاس آنلاین
-                </button>
-              </div>
-            )}
-
-            <h2>سرفصل‌های دوره</h2>
-            {isEnrolled && totalItems > 0 && (
-              <div className={styles.progressContainer}>
-                <div className={styles.progressBar}>
-                  <div
-                    className={styles.progressFill}
-                    style={{ width: `${progressPercentage}%` }}
-                  />
-                </div>
-                <span className={styles.progressText}>
-                  {completedItems} از {totalItems} درس کامل شده (
-                  {Math.round(progressPercentage)}%)
-                </span>
-              </div>
-            )}
-            <ul className={styles.syllabus}>
-              {(course.syllabus || []).map((item: SyllabusItem, index) => (
-                <li
-                  key={item.id}
-                  className={`${styles.syllabusItem} ${
-                    item.isLocked && !isEnrolled ? styles.locked : styles.unlocked
-                  }`}
-                >
-                  <div className={styles.syllabusTimeline}>
-                    <div className={styles.timelineDot}>
-                      {item.completed ? (
-                        <CheckCircleIcon className={styles.completedIcon} />
-                      ) : item.isLocked && !isEnrolled ? (
-                        <LockIcon className={styles.lockIcon} />
-                      ) : (
-                        <PlayCircleOutlineIcon className={styles.playIcon} />
-                      )}
-                    </div>
-                    {index < (course.syllabus || []).length - 1 && (
-                      <div className={styles.timelineLine} />
-                    )}
-                  </div>
-                  <div className={styles.syllabusContent}>
-                    <div
-                      className={styles.syllabusHeader}
-                      onClick={() => toggleSyllabus(item.id)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => e.key === 'Enter' && toggleSyllabus(item.id)}
-                      aria-expanded={expandedSyllabus === item.id}
-                    >
-                      <div className={styles.syllabusTitle}>
-                        <span>{getSessionLabel(index)}: {item.title}</span>
-                        {item.isNew && <span className={styles.newBadge}>جدید</span>}
-                      </div>
-                      <div className={styles.syllabusMeta}>
-                        <span className={styles.metaItem}>
-                          {item.contentType === 'video' && <VideoLibraryIcon />}
-                          {item.contentType === 'text' && <DescriptionIcon />}
-                          {item.contentType === 'quiz' && <StarIcon />}
-                          {item.contentType}
-                        </span>
-                        <span className={styles.metaItem}>
-                          <AccessTimeIcon /> {item.duration}
-                        </span>
-                        <ExpandMoreIcon
-                          className={`${styles.expandIcon} ${
-                            expandedSyllabus === item.id ? styles.expanded : ''
-                          }`}
-                        />
-                      </div>
-                    </div>
-                    {expandedSyllabus === item.id && (!item.isLocked || isEnrolled) && (
-                      <div className={styles.previewContent}>
-                        {item.previewContent && <p>{item.previewContent}</p>}
-                        {(item.previewContent || item.videoUrl) && (
-                          <button
-                            className={styles.previewButton}
-                            onClick={() => openPreviewModal(item)}
-                            aria-label={`مشاهده پیش‌نمایش ${item.title}`}
-                          >
-                            مشاهده پیش‌نمایش
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-
-            {/* FAQ Section */}
-            <h2>سوالات متداول</h2>
-            <div className={styles.faq}>
-              {(course.faqs || []).map((faq: FaqItem) => (
-                <div
-                  key={faq.id}
-                  className={styles.faqItem}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => toggleFaq(faq.id)}
-                  onKeyDown={(e) => e.key === 'Enter' && toggleFaq(faq.id)}
-                  aria-expanded={expandedFaq === faq.id}
-                >
-                  <div className={styles.faqHeader}>
-                    <h3>{faq.question}</h3>
-                    <ExpandMoreIcon
-                      className={`${styles.expandIcon} ${
-                        expandedFaq === faq.id ? styles.expanded : ''
-                      }`}
-                    />
-                  </div>
-                  {expandedFaq === faq.id && (
-                    <div className={styles.faqContent}>
-                      <p>{faq.answer}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-              {(!course.faqs || course.faqs.length === 0) && (
-                <p>سوالی برای این دوره ثبت نشده است.</p>
-              )}
-            </div>
-
-            {/* Reviews Section */}
-            <h2>نظرات کاربران</h2>
-            <div className={styles.reviews}>
-              {courseReviews.length > 0 ? (
-                courseReviews.map((review) => (
-                  <div key={review.id} className={styles.reviewItem}>
-                    <div className={styles.reviewHeader}>
-                      <span className={styles.reviewUser}>
-                        {review.user}{' '}
-                        <span className={styles.reviewRole}>({getReviewerRole(review)})</span>
-                      </span>
-                      <div className={styles.reviewRating}>
-                        {Array.from({ length: review.rating }, (_, i) => (
-                          <StarIcon key={i} className={styles.starIcon} />
-                        ))}
-                      </div>
-                    </div>
-                    <p className={styles.reviewComment}>{review.comment}</p>
-                    <span className={styles.reviewDate}>{review.date}</span>
-                  </div>
-                ))
-              ) : (
-                <p>هنوز نظری برای این دوره ثبت نشده است.</p>
-              )}
-            </div>
-          </div> {/* Close courseContent div */}
-        </div> {/* Close container div */}
-      </section>
-
-      {/* Preview Modal */}
-      {isModalOpen && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
-            <button
-              className={styles.closeModalButton}
-              onClick={closeModal}
-              aria-label="بستن پیش‌نمایش"
-            >
-              ×
-            </button>
-            <div className={styles.modalContent}>
-              {modalContent.videoUrl && (
-                <ReactPlayer
-                  url={modalContent.videoUrl}
-                  width="100%"
-                  height="auto"
-                  controls
-                  className={styles.videoPlayer}
-                />
-              )}
-              {modalContent.text && <p>{modalContent.text}</p>}
-            </div>
-          </div>
+        <StickyEnrollBar
+          course={course}
+          isEnrolled={isEnrolled}
+          handleEnroll={handleEnroll}
+          handleJoinClass={handleJoinClass}
+        />
+        <div className={styles.courseContent}>
+          <CourseAbout course={course} />
+          <CourseSyllabus
+            course={course}
+            isEnrolled={isEnrolled}
+            expandedSyllabus={expandedSyllabus}
+            toggleSyllabus={toggleSyllabus}
+            openPreviewModal={openPreviewModal}
+          />
+          <CourseFaqs faqs={course.faqs} expandedFaq={expandedFaq} toggleFaq={toggleFaq} />
+          <CourseReviews
+            courseId={parseInt(id || '0')}
+            courseReviews={courseReviews}
+            user={user}
+            isAuthenticated={isAuthenticated}
+            replyText={replyText}
+            setReplyText={setReplyText}
+            replyFormVisible={replyFormVisible}
+            toggleReplyForm={toggleReplyForm}
+            handleReplySubmit={handleReplySubmit}
+          />
         </div>
-      )}
-    </>
+        <PreviewModal
+          isModalOpen={isModalOpen}
+          modalContent={modalContent}
+          closeModal={closeModal}
+        />
+      </div>
+    </section>
   );
 };
 

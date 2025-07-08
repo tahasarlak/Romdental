@@ -1,42 +1,65 @@
-/* src/components/Breadcrumb/Breadcrumb.module.css */
 .breadcrumb {
-  margin: 1rem 0;
-  padding: 0.5rem 0;
+  margin-bottom: 1.5rem;
   font-size: 0.9rem;
-  direction: rtl;
+  font-family: var(--font-family);
 }
 
 .breadcrumbList {
   list-style: none;
-  margin: 0;
-  padding: 0;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem 0;
 }
 
 .breadcrumbItem {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+  color: var(--gray);
 }
 
 .link {
-  color: #007bff;
-  text-decoration: none;
-  transition: color 0.2s ease;
+  color: var(--accent-color);
+  transition: var(--transition);
 }
 
 .link:hover {
-  color: #0056b3;
-  text-decoration: underline;
+  color: var(--accent-color-hover);
 }
 
 .active {
-  color: #333;
-  font-weight: bold;
+  color: var(--primary-color);
+  font-weight: 500;
 }
 
 .separator {
-  margin: 0 0.5rem;
-  color: #666;
+  color: var(--gray);
+}
+
+.dark .breadcrumbItem,
+.dark .separator {
+  color: var(--gray);
+}
+
+.dark .link {
+  color: var(--accent-color);
+}
+
+.dark .link:hover {
+  color: var(--accent-color-hover);
+}
+
+.dark .active {
+  color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .breadcrumb {
+    font-size: 0.8rem;
+  }
+
+  .breadcrumbList {
+    flex-wrap: wrap;
+  }
 }

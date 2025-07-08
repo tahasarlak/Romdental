@@ -1,0 +1,243 @@
+.reviews {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.reviewPrompt {
+  color: var(--gray);
+  font-size: 1rem;
+}
+
+.loginLink {
+  color: var(--accent-color);
+}
+
+.loginLink:hover {
+  color: var(--accent-color-hover);
+}
+
+.reviewItem {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.reviewUser {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.reviewStatus {
+  color: var(--gray);
+  font-size: 0.9rem;
+}
+
+.reviewRating {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.starIcon {
+  color: var(--accent-color);
+}
+
+.reviewComment {
+  color: var(--text-color);
+  margin: 0.5rem 0;
+}
+
+.reviewDate {
+  color: var(--gray);
+  font-size: 0.9rem;
+}
+
+.replyButton {
+  background: none;
+  color: var(--accent-color);
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.replyButton:hover {
+  color: var(--accent-color-hover);
+}
+
+.replyForm {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: var(--secondary-color);
+  border-radius: var(--border-radius);
+}
+
+.replyTextarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 0.5rem;
+  border: 1px solid var(--gray);
+  border-radius: var(--border-radius);
+  resize: vertical;
+  font-family: var(--font-family);
+  color: var(--text-color);
+}
+
+.replyFormButtons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.submitReplyButton {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.submitReplyButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.cancelReplyButton {
+  background-color: var(--gray);
+  color: var(--white);
+}
+
+.cancelReplyButton:hover {
+  background-color: var(--text-color);
+}
+
+.replies {
+  margin-top: 1rem;
+  padding-right: 1.5rem;
+}
+
+.replyItem {
+  padding: 1rem;
+  border-right: 2px solid var(--accent-color);
+  margin-bottom: 0.5rem;
+}
+
+.replyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.replyUser {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.replyRole {
+  color: var(--gray);
+  font-size: 0.9rem;
+}
+
+.replyDate {
+  color: var(--gray);
+  font-size: 0.9rem;
+}
+
+.replyComment {
+  color: var(--text-color);
+}
+
+.dark .reviewItem,
+.dark .replyForm {
+  background-color: var(--secondary-color);
+}
+
+.dark .reviewUser,
+.dark .replyUser,
+.dark .reviewComment,
+.dark .replyComment {
+  color: var(--primary-color);
+}
+
+.dark .reviewStatus,
+.dark .replyRole,
+.dark .reviewDate,
+.dark .replyDate {
+  color: var(--gray);
+}
+
+@media (max-width: 768px) {
+  .reviewItem {
+    padding: 1rem;
+  }
+
+  .reviewHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .reviewUser {
+    font-size: 1rem;
+  }
+
+  .reviewStatus,
+  .reviewDate,
+  .replyRole,
+  .replyDate {
+    font-size: 0.85rem;
+  }
+
+  .reviewComment,
+  .replyComment {
+    font-size: 0.95rem;
+  }
+
+  .replyForm {
+    padding: 0.75rem;
+  }
+
+  .replyTextarea {
+    min-height: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .reviewItem {
+    padding: 0.75rem;
+  }
+
+  .reviewPrompt {
+    font-size: 0.9rem;
+  }
+
+  .reviewUser {
+    font-size: 0.95rem;
+  }
+
+  .reviewComment,
+  .replyComment {
+    font-size: 0.9rem;
+  }
+
+  .replyButton {
+    font-size: 0.85rem;
+    padding: 0.3rem;
+  }
+
+  .submitReplyButton,
+  .cancelReplyButton {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .replies {
+    padding-right: 1rem;
+  }
+
+  .replyItem {
+    padding: 0.75rem;
+  }
+}

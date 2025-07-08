@@ -1,485 +1,54 @@
-/* src/styles/CourseDetails.module.css */
 .courseDetailsSection {
-  background-color: var(--background);
-  padding: 4rem 1rem;
-  direction: rtl;
+  padding: 2rem 0;
+  background-color: var(--secondary-color);
 }
 
 .container {
-  max-width: 1200px;
+  max-width: var(--max-width);
   margin: 0 auto;
+  padding: 0 1rem;
 }
 
-.courseHeader {
-  display: flex;
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-.courseImage {
-  flex: 0 0 400px;
-  height: 300px;
-  object-fit: cover;
-  border-radius: var(--border-radius);
-}
-
-.courseInfo {
-  flex: 1;
-}
-
-.courseTitle {
-  font-size: 2.5rem;
-  font-weight: 700;
+.title {
+  font-size: 2rem;
   color: var(--primary-color);
   margin-bottom: 1rem;
-}
-
-.instructor {
-  font-size: 1rem;
-  color: var(--gray);
-  margin-bottom: 0.5rem;
-}
-
-.instructorLink {
-  color: var(--accent-color);
-  text-decoration: none;
-}
-
-.instructorLink:hover {
-  text-decoration: underline;
-}
-
-.rating {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1rem;
-  color: var(--gray);
-  margin-bottom: 1rem;
-}
-
-.starIcon {
-  color: var(--accent-color);
-}
-
-.description {
-  font-size: 1rem;
-  color: var(--text-color);
-  margin-bottom: 1rem;
-}
-
-.details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--gray);
-  margin-bottom: 1rem;
-}
-
-.details span {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.details svg {
-  color: var(--accent-color);
-}
-
-.priceContainer {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.originalPrice {
-  text-decoration: line-through;
-}
-
-.discountPrice {
-  color: var(--accent-color);
-  font-weight: 600;
-}
-
-.discountPercentage {
-  font-size: 0.8rem;
-  color: var(--gray);
-}
-
-.tagsContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.tag {
-  background-color: var(--gray);
-  color: var(--white);
-  padding: 0.3rem 0.75rem;
-  border-radius: var(--border-radius);
-  font-size: 0.8rem;
-}
-
-.shareButton {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--primary-color);
-  border-radius: var(--border-radius);
-  background-color: transparent;
-  color: var(--primary-color);
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.shareButton:hover {
-  background-color: var(--primary-color);
-  color: var(--white);
-}
-
-.stickyEnrollBar {
-  position: sticky;
-  top: 0;
-  background-color: var(--white);
-  padding: 1rem;
-  border-bottom: 1px solid var(--gray);
-  z-index: 10;
   text-align: center;
 }
 
-.enrollButton {
-  padding: 0.75rem 1.5rem;
-  background-color: var(--accent-color);
-  color: var(--white);
-  border: none;
-  border-radius: var(--border-radius);
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.enrollButton:hover {
-  background-color: var(--accent-color-hover);
-}
-
-.enrollButton:disabled {
-  background-color: var(--gray);
-  cursor: not-allowed;
-}
-
-.courseContent h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--primary-color);
-  margin: 2rem 0 1rem;
-}
-
-.progressContainer {
-  margin-bottom: 1rem;
-}
-
-.progressBar {
-  width: 100%;
-  height: 8px;
-  background-color: var(--gray);
-  border-radius: var(--border-radius);
-  overflow: hidden;
-}
-
-.progressFill {
-  height: 100%;
-  background-color: var(--accent-color);
-  transition: width 0.5s ease;
-}
-
-.progressText {
-  font-size: 0.9rem;
-  color: var(--gray);
-  margin-top: 0.5rem;
-}
-
-.syllabus {
-  list-style: none;
-  padding: 0;
-}
-
-.syllabusItem {
-  display: flex;
-  gap: 1rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--gray);
-}
-
-.locked .syllabusTitle {
-  color: var(--gray);
-}
-
-.unlocked .syllabusTitle {
-  color: var(--text-color);
-}
-
-.syllabusTimeline {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.timelineDot {
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.completedIcon, .lockIcon, .playIcon {
-  color: var(--accent-color);
-}
-
-.timelineLine {
-  width: 2px;
-  flex: 1;
-  background-color: var(--gray);
-}
-
-.syllabusContent {
-  flex: 1;
-}
-
-.syllabusHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-}
-
-.syllabusTitle {
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.newBadge {
-  background-color: var(--accent-color);
-  color: var(--white);
-  padding: 0.2rem 0.5rem;
-  border-radius: var(--border-radius);
-  font-size: 0.8rem;
-}
-
-.syllabusMeta {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.9rem;
-  color: var(--gray);
-}
-
-.metaItem {
+.backLink {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-.metaItem svg {
   color: var(--accent-color);
-}
-
-.expandIcon {
-  transition: transform 0.3s ease;
-}
-
-.expandIcon.expanded {
-  transform: rotate(180deg);
-}
-
-.previewContent {
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  color: var(--text-color);
-}
-
-.previewButton {
-  padding: 0.5rem 1rem;
-  background-color: var(--accent-color);
-  color: var(--white);
-  border: none;
-  border-radius: var(--border-radius);
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.previewButton:hover {
-  background-color: var(--accent-color-hover);
-}
-
-.faqItem {
-  border-bottom: 1px solid var(--gray);
-  padding: 1rem 0;
-  cursor: pointer;
-}
-
-.faqHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.faqHeader h3 {
-  font-size: 1rem;
   font-weight: 500;
-  color: var(--text-color);
-}
-
-.faqContent {
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  color: var(--text-color);
-}
-
-.reviews {
-  margin-top: 2rem;
-}
-
-.reviewItem {
-  border-bottom: 1px solid var(--gray);
-  padding: 1rem 0;
-}
-
-.reviewHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.reviewUser {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--text-color);
-}
-
-.reviewRole {
-  font-size: 0.8rem;
-  color: var(--gray);
-}
-
-.reviewRating {
-  display: flex;
-  gap: 0.2rem;
-}
-
-.reviewComment {
-  font-size: 0.9rem;
-  color: var(--text-color);
-}
-
-.reviewDate {
-  font-size: 0.8rem;
-  color: var(--gray);
-}
-
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal {
-  background-color: var(--white);
-  padding: 2rem;
-  border-radius: var(--border-radius);
-  max-width: 600px;
-  width: 100%;
-  position: relative;
-}
-
-.closeModalButton {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--text-color);
-}
-
-.videoPlayer {
   margin-bottom: 1rem;
 }
 
-.backLink {
-  display: inline-block;
-  margin-top: 2rem;
-  color: var(--accent-color);
-  text-decoration: none;
-  font-weight: 500;
-}
-
 .backLink:hover {
-  text-decoration: underline;
+  color: var(--accent-color-hover);
 }
 
-/* حالت تیره */
+.courseContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
 .dark .courseDetailsSection {
-  background-color: var(--background-dark);
+  background-color: var(--secondary-color);
 }
 
-.dark .courseInfo, .dark .courseContent {
-  color: var(--text-color-dark);
+.dark .title {
+  color: var(--primary-color);
 }
 
-.dark .courseTitle, .dark .courseContent h2 {
-  color: var(--text-color-dark);
-}
-
-.dark .instructor, .dark .rating, .dark .description, .dark .details, .dark .progressText, .dark .reviewComment, .dark .reviewDate, .dark .faqHeader h3, .dark .faqContent, .dark .syllabusTitle.unlocked {
-  color: var(--gray-dark);
-}
-
-.dark .stickyEnrollBar {
-  background-color: var(--primary-color);
-  border-color: var(--gray-dark);
-}
-
-.dark .modal {
-  background-color: var(--primary-color);
-}
-
-.dark .closeModalButton {
-  color: var(--text-color-dark);
-}
-
-/* پاسخ‌گویی */
 @media (max-width: 768px) {
-  .courseHeader {
-    flex-direction: column;
-  }
-
-  .courseImage {
-    flex: none;
-    width: 100%;
-    height: 200px;
-  }
-
-  .courseTitle {
-    font-size: 2rem;
-  }
-
-  .details {
-    font-size: 0.85rem;
-  }
-
-  .modal {
+  .courseDetailsSection {
     padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
   }
 }

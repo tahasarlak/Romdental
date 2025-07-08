@@ -1,71 +1,88 @@
-// src/Context/WishlistContext.tsx
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useAuthContext } from './AuthContext';
+import { useCourseContext } from './CourseContext';
+import { useInstructorContext } from './InstructorContext';
+import { useBlogContext } from './BlogContext';
 
 interface WishlistItem {
   id: number;
-  type: 'course' | 'instructor';
+  type: 'course' | 'instructor' | 'blog';
 }
 
 interface WishlistContextType {
   wishlist: WishlistItem[];
-  addToWishlist: (id: number, type: 'course' | 'instructor') => void;
-  removeFromWishlist: (id: number, type: 'course' | 'instructor') => void;
-  isInWishlist: (id: number, type: 'course' | 'instructor') => boolean;
+  addToWishlist: (id: number, type: 'course' | 'instructor' | 'blog') => void;
+  removeFromWishlist: (id: number, type: 'course' | 'instructor' | 'blog') => void;
+  isInWishlist: (id: number, type: 'course' | 'instructor' | 'blog') => boolean;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
 export const WishlistProvider = ({ children }: { children: ReactNode }) => {
-  const { user, setUser, isAuthenticated } = useAuthContext();
+  const { user, addToWishlist, removeFromWishlist, isAuthenticated } = useAuthContext();
+  const { courses } = useCourseContext();
+  const { instructors } = useInstructorContext();
+  const { blogPosts } = useBlogContext();
 
-  // Initialize wishlist from user data or empty array if not authenticated
-  const wishlist: WishlistItem[] = user?.wishlist?.map((id) => ({
-    id,
-    type: 'course', // Default to 'course' for backward compatibility; adjust as needed
-  })) || [];
+  const courseIds = new Set(courses.map((course) => course.id));
+  const instructorIds = new Set(instructors.map((instructor) => instructor.id));
+  const blogPostIds = new Set(blogPosts.map((post) => post.id));
 
-  const addToWishlist = (id: number, type: 'course' | 'instructor') => {
+  const wishlist: WishlistItem[] = user?.wishlist
+    ?.filter((item) => 
+      (item.type === 'course' && courseIds.has(item.id)) || 
+      (item.type === 'instructor' && instructorIds.has(item.id)) ||
+      (item.type === 'blog' && blogPostIds.has(item.id))
+    )
+    .map((item) => ({
+      id: item.id,
+      type: item.type,
+    })) || [];
+
+  const handleAddToWishlist = (id: number, type: 'course' | 'instructor' | 'blog') => {
     if (!isAuthenticated || !user) {
-      return; // Prevent adding to wishlist if not authenticated
+      console.warn('برای افزودن به لیست علاقه‌مندی‌ها باید وارد حساب کاربری شوید.');
+      return;
     }
 
-    const updatedWishlist = [...user.wishlist, id];
-    const updatedUser = {
-      ...user,
-      wishlist: Array.from(new Set(updatedWishlist)), // Ensure no duplicates
-    };
-
-    setUser(updatedUser);
-  };
-
-  const removeFromWishlist = (id: number, type: 'course' | 'instructor') => {
-    if (!isAuthenticated || !user) {
-      return; // Prevent removing from wishlist if not authenticated
+    if (type === 'course' && !courseIds.has(id)) {
+      console.warn(`دوره با شناسه ${id} وجود ندارد.`);
+      return;
+    }
+    if (type === 'instructor' && !instructorIds.has(id)) {
+      console.warn(`استاد با شناسه ${id} وجود ندارد.`);
+      return;
+    }
+    if (type === 'blog' && !blogPostIds.has(id)) {
+      console.warn(`پست وبلاگ با شناسه ${id} وجود ندارد.`);
+      return;
     }
 
-    const updatedWishlist = user.wishlist.filter((itemId) => itemId !== id);
-    const updatedUser = {
-      ...user,
-      wishlist: updatedWishlist,
-    };
-
-    setUser(updatedUser);
+    addToWishlist(user.email, id, type);
   };
 
-  const isInWishlist = (id: number, type: 'course' | 'instructor') => {
+  const handleRemoveFromWishlist = (id: number, type: 'course' | 'instructor' | 'blog') => {
+    if (!isAuthenticated || !user) {
+      console.warn('برای حذف از لیست علاقه‌مندی‌ها باید وارد حساب کاربری شوید.');
+      return;
+    }
+
+    removeFromWishlist(user.email, id, type);
+  };
+
+  const isInWishlist = (id: number, type: 'course' | 'instructor' | 'blog') => {
     if (!isAuthenticated || !user) {
       return false;
     }
-    return user.wishlist.includes(id);
+    return user.wishlist.some((item) => item.id === id && item.type === type);
   };
 
   return (
     <WishlistContext.Provider
       value={{
         wishlist,
-        addToWishlist,
-        removeFromWishlist,
+        addToWishlist: handleAddToWishlist,
+        removeFromWishlist: handleRemoveFromWishlist,
         isInWishlist,
       }}
     >
@@ -80,4 +97,4 @@ export const useWishlistContext = () => {
     throw new Error('useWishlistContext must be used within a WishlistProvider');
   }
   return context;
-};  
+};

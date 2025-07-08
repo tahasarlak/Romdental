@@ -20,11 +20,11 @@ import { BlogProvider } from './Context/BlogContext';
 import { ContactProvider } from './Context/ContactContext';
 import { CourseProvider } from './Context/CourseContext';
 import { InstructorProvider } from './Context/InstructorContext';
-import { TestimonialProvider } from './Context/TestimonialContext';
 import { ReviewProvider } from './Context/ReviewContext';
 import { WishlistProvider } from './Context/WishlistContext';
 import { SubscriptionProvider } from './Context/SubscriptionContext';
 import { ScheduleProvider } from './Context/ScheduleContext';
+import { NotificationProvider } from './Context/NotificationContext';
 import BlogPostDetails from './pages/Blog/BlogPostDetails/BlogPostDetails';
 import './styles/global.css';
 
@@ -32,15 +32,15 @@ const App: React.FC = () => {
   return (
     <div className="app">
       <Router>
-        <AuthProvider>
+        <NotificationProvider>
           <CartProvider>
             <InstructorProvider>
-              <CourseProvider>
-                <ScheduleProvider>
-                  <ReviewProvider>
-                    <BlogProvider>
-                      <ContactProvider>
-                        <TestimonialProvider>
+              <CourseProvider><BlogProvider>
+                <AuthProvider>  
+                  <ScheduleProvider>                    
+
+                    <ReviewProvider>
+                        <ContactProvider>
                           <WishlistProvider>
                             <SubscriptionProvider>
                               <Layout>
@@ -63,15 +63,15 @@ const App: React.FC = () => {
                               </Layout>
                             </SubscriptionProvider>
                           </WishlistProvider>
-                        </TestimonialProvider>
-                      </ContactProvider>
-                    </BlogProvider>
-                  </ReviewProvider>
-                </ScheduleProvider>
+                        </ContactProvider>
+                    </ReviewProvider>                   
+
+                  </ScheduleProvider>   
+                </AuthProvider></BlogProvider>
               </CourseProvider>
             </InstructorProvider>
           </CartProvider>
-        </AuthProvider>
+        </NotificationProvider>
       </Router>
     </div>
   );

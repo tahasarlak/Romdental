@@ -1,0 +1,75 @@
+.stickyEnrollBar {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--white);
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  z-index: 10;
+}
+
+.enrollButton {
+  background-color: var(--accent-color);
+  color: var(--white);
+  padding: 0.8rem 1.5rem;
+}
+
+.enrollButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.enrollButton:disabled {
+  background-color: var(--gray);
+  cursor: not-allowed;
+}
+
+.joinClassButton {
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.joinClassButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.dark .stickyEnrollBar {
+  background-color: var(--secondary-color);
+}
+
+.dark .enrollButton,
+.dark .joinClassButton {
+  color: var(--white);
+}
+
+@media (max-width: 768px) {
+  .stickyEnrollBar {
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem;
+  }
+
+  .enrollButton,
+  .joinClassButton {
+    width: 100%;
+    text-align: center;
+    padding: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stickyEnrollBar {
+    padding: 0.5rem;
+  }
+
+  .enrollButton,
+  .joinClassButton {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+}

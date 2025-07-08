@@ -24,6 +24,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Badge from '@mui/material/Badge';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -53,7 +54,7 @@ const Header: React.FC = () => {
 
   const handleProceedToCheckout = () => {
     setIsCartOpen(false);
-    navigate('/checkout/mulitple');
+    navigate('/checkout/multiple');
   };
 
   const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -168,7 +169,9 @@ const Header: React.FC = () => {
                   }}
                   aria-label="باز کردن سبد خرید"
                 >
-                  <ShoppingCartIcon fontSize="medium" />
+                  <Badge badgeContent={cartItems.length} color="primary">
+                    <ShoppingCartIcon fontSize="medium" />
+                  </Badge>
                 </IconButton>
               </Tooltip>
             </li>

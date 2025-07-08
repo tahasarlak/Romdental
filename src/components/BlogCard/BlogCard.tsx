@@ -21,21 +21,20 @@ interface BlogPost {
 
 interface BlogCardProps {
   post: BlogPost;
+  toggleWishlist?: (postId: number) => void;
+  isInWishlist?: (id: number, type: 'course' | 'instructor' | 'blog') => boolean;
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
-  const { isAuthenticated, user } = useAuthContext();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlistContext();
+const BlogCard: React.FC<BlogCardProps> = ({ post, toggleWishlist, isInWishlist }) => {
+  const { isAuthenticated } = useAuthContext();
 
   const handleWishlistToggle = () => {
     if (!isAuthenticated) {
       alert('لطفاً برای افزودن به لیست علاقه‌مندی‌ها وارد شوید.');
       return;
     }
-    if (isInWishlist(post.id, 'course')) {
-      removeFromWishlist(post.id, 'course');
-    } else {
-      addToWishlist(post.id, 'course');
+    if (toggleWishlist) {
+      toggleWishlist(post.id);
     }
   };
 
@@ -61,13 +60,15 @@ const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
           >
             ادامه مطلب
           </Link>
-          <button
-            onClick={handleWishlistToggle}
-            className={styles.wishlistButton}
-            title={isInWishlist(post.id, 'course') ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}
-          >
-            {isInWishlist(post.id, 'course') ? <BookmarkIcon /> : <BookmarkBorderIcon />}
-          </button>
+          {toggleWishlist && isInWishlist && (
+            <button
+              onClick={handleWishlistToggle}
+              className={styles.wishlistButton}
+              title={isInWishlist(post.id, 'blog') ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}
+            >
+              {isInWishlist(post.id, 'blog') ? <BookmarkIcon /> : <BookmarkBorderIcon />}
+            </button>
+          )}
         </div>
       </div>
     </div>

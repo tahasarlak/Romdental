@@ -1,0 +1,88 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  position: relative;
+}
+
+.closeModalButton {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: none;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  padding: 0.5rem;
+}
+
+.closeModalButton:hover {
+  color: var(--accent-color);
+}
+
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.videoPlayer {
+  width: 100%;
+  border-radius: var(--border-radius);
+}
+
+p {
+  color: var(--text-color);
+}
+
+.dark .modal {
+  background-color: var(--secondary-color);
+}
+
+.dark .closeModalButton,
+.dark p {
+  color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .modal {
+    padding: 1.5rem;
+    max-width: 90%;
+  }
+
+  .closeModalButton {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal {
+    padding: 1rem;
+    width: 95%;
+  }
+
+  .closeModalButton {
+    top: 0.5rem;
+    left: 0.5rem;
+    font-size: 1rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+  }
+}

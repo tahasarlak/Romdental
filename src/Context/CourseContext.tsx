@@ -291,7 +291,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           id: 2,
           title: 'معاینه بیمار',
           isLocked: false,
-          previewrehensive: 'روش‌های معاینه بیمار در کلینیک.',
+          previewContent: 'روش‌های معاینه بیمار در کلینیک.',
           completed: false,
           duration: '30 دقیقه',
           contentType: 'text' as const,
@@ -521,7 +521,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         },
         {
           id: 2,
- suicide: 'آیا این دوره عملی است؟',
+          question: 'آیا این دوره عملی است؟',
           answer: 'بله، شامل تمرین‌های عملی مدیریت است.',
         },
       ],
@@ -751,7 +751,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           ['آناتومی', 'پروتز', 'ترمیمی', 'عمومی'].includes(course.category) &&
           ['Online', 'Offline', 'In-Person', 'Hybrid'].includes(course.courseType) &&
           ['Course 1', 'Course 2', 'Course 3', 'Course 4', 'Course 5'].includes(course.courseNumber) &&
-          ['Smashko', 'Piragova', 'RUDN', 'Sechenon'].includes(course.university);
+          ['Smashko', 'Piragova', 'RUDN', 'Sechenov'].includes(course.university);
         if (!isValid) {
           console.warn(`دوره ${course.title} به دلیل استاد، دسته‌بندی، نوع دوره، کورس یا دانشگاه نامعتبر حذف شد.`);
         }

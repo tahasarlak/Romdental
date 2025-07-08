@@ -11,7 +11,7 @@ interface BreadcrumbItem {
 
 const Breadcrumb: React.FC = () => {
   const location = useLocation();
-  const { slug, instructorName } = useParams<{ slug?: string; instructorName?: string }>();
+  const { id } = useParams<{ id?: string }>();
   const { courses } = useCourseContext();
   const { instructors } = useInstructorContext();
 
@@ -21,20 +21,18 @@ const Breadcrumb: React.FC = () => {
       courses: 'دوره‌ها',
       instructors: 'اساتید',
       blog: 'وبلاگ',
-      'course-details': 'جزئیات دوره',
       'instructor-details': 'جزئیات استاد',
     };
 
-    // مدیریت مسیر course-details
-    if (pathSegment === 'course-details' && pathnames[index + 1]) {
-      const courseSlug = pathnames[index + 1];
-      const course = courses.find((c) => c.slug === courseSlug);
-
+    // مدیریت مسیر courses با id
+    if (pathSegment === 'courses' && pathnames[index + 1]) {
+      const courseId = pathnames[index + 1];
+      const course = courses.find((c) => c.id === parseInt(courseId));
       if (course) {
         return course.title;
       } else {
-        console.warn(`دوره‌ای با slug ${courseSlug} یافت نشد.`);
-        return decodeURIComponent(courseSlug).replace(/-/g, ' ');
+        console.warn(`دوره‌ای با id ${courseId} یافت نشد.`);
+        return decodeURIComponent(courseId).replace(/-/g, ' ');
       }
     }
 
@@ -58,11 +56,36 @@ const Breadcrumb: React.FC = () => {
 
     let currentPath = '';
 
-    pathnames.forEach((segment, index) => {
+    for (let index = 0; index < pathnames.length; index++) {
+      const segment = pathnames[index];
       currentPath += `/${segment}`;
+
+      // اگر مسیر courses است
+      if (segment === 'courses') {
+        // اضافه کردن بخش "دوره‌ها"
+        breadcrumbs.push({ label: 'دوره‌ها', path: '/courses' });
+
+        // اگر id بعدی وجود دارد، عنوان دوره را اضافه کن
+        if (pathnames[index + 1]) {
+          const courseId = pathnames[index + 1];
+          const course = courses.find((c) => c.id === parseInt(courseId));
+          if (course) {
+            breadcrumbs.push({ label: course.title, path: currentPath });
+          } else {
+            console.warn(`دوره‌ای با id ${courseId} یافت نشد.`);
+            breadcrumbs.push({ label: decodeURIComponent(courseId).replace(/-/g, ' '), path: currentPath });
+          }
+          index++; // رد کردن id
+        }
+        continue;
+      }
+
+      // برای سایر مسیرها
       const label = getLabelFromPath(segment, index, pathnames);
-      breadcrumbs.push({ label, path: currentPath });
-    });
+      if (label) {
+        breadcrumbs.push({ label, path: currentPath });
+      }
+    }
 
     return breadcrumbs;
   };
