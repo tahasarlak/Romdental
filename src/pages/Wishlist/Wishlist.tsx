@@ -1,5 +1,4 @@
 import React from 'react';
-
 import styles from './Wishlist.module.css';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -12,13 +11,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Box from '@mui/material/Box';
 import Rating from '@mui/material/Rating';
 import { Link } from 'react-router-dom';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import { Button } from '@mui/material';
 import { useCourseContext } from '../../Context/CourseContext';
 import { useReviewContext } from '../../Context/ReviewContext';
 import { useWishlistContext } from '../../Context/WishlistContext';
-
+import { Button } from '@mui/material';
 
 const Wishlist: React.FC = () => {
   const { wishlist, removeFromWishlist } = useWishlistContext();
@@ -35,15 +31,6 @@ const Wishlist: React.FC = () => {
 
   return (
     <div className={styles.wishlistContainer}>
-      <AppBar position="static" className={styles.navBar}>
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            داشبورد کاربر
-          </Typography>
-          <Button color="inherit" component={Link} to="/profile">پروفایل</Button>
-          <Button color="inherit" component={Link} to="/wishlist">لیست علاقه‌مندی‌ها</Button>
-        </Toolbar>
-      </AppBar>
       <Card className={styles.wishlistCard} role="region" aria-labelledby="wishlist-title">
         <CardContent>
           <Typography id="wishlist-title" variant="h5" className={styles.wishlistTitle}>

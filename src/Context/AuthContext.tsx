@@ -54,6 +54,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const courseIds = new Set(courses.map((course) => course.id));
   const instructorIds = new Set(instructors.map((instructor) => instructor.id));
   const blogPostIds = new Set(blogPosts.map((post) => post.id));
+
+  // Predefined profile pictures
+  const maleProfilePictures = [
+  '/assets/Profile/male-profile-1.jpg',
+    '/assets/Profile/male-profile-2.jpg',
+    '/assets/Profile/male-profile-3.jpg',
+  ];
+  const femaleProfilePictures = [
+    '/assets/Profile/female-profile-1.jpg',
+    '/assets/Profile/female-profile-2.jpg',
+    '/assets/Profile/female-profile-3.jpg',
+  ];
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUserState] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([
@@ -63,11 +76,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456789',
       university: 'دانشگاه تهران',
       gender: 'مرد',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: maleProfilePictures[Math.floor(Math.random() * maleProfilePictures.length)],
       wishlist: [{ id: 1, type: 'course' }],
       enrolledCourses: [1],
       password: 'password123',
       token: '',
+      course:'یک'
     },
     {
       name: 'دکتر سارا احمدی',
@@ -75,7 +89,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456790',
       university: 'دانشگاه تهران',
       gender: 'زن',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: femaleProfilePictures[Math.floor(Math.random() * femaleProfilePictures.length)],
       wishlist: [{ id: 1, type: 'course' }],
       enrolledCourses: [1],
       password: 'password123',
@@ -83,11 +97,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     },
     {
       name: 'محمد حسینی',
-      email: 'mohammad.hosseini@example.com',
+      email: '  ',
       phone: '09123456791',
       university: 'دانشگاه شیراز',
       gender: 'مرد',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: maleProfilePictures[Math.floor(Math.random() * maleProfilePictures.length)],
       wishlist: [{ id: 1, type: 'course' }],
       enrolledCourses: [1],
       password: 'password123',
@@ -99,7 +113,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456792',
       university: 'دانشگاه اصفهان',
       gender: 'زن',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: femaleProfilePictures[Math.floor(Math.random() * femaleProfilePictures.length)],
       wishlist: [{ id: 1, type: 'course' }],
       enrolledCourses: [1],
       password: 'password123',
@@ -111,7 +125,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456793',
       university: 'دانشگاه مشهد',
       gender: 'مرد',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: maleProfilePictures[Math.floor(Math.random() * maleProfilePictures.length)],
       wishlist: [{ id: 2, type: 'course' }],
       enrolledCourses: [2],
       password: 'password123',
@@ -123,7 +137,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456794',
       university: 'دانشگاه تبریز',
       gender: 'زن',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: femaleProfilePictures[Math.floor(Math.random() * femaleProfilePictures.length)],
       wishlist: [{ id: 2, type: 'course' }],
       enrolledCourses: [2],
       password: 'password123',
@@ -135,7 +149,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456795',
       university: 'دانشگاه تهران',
       gender: 'مرد',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: maleProfilePictures[Math.floor(Math.random() * maleProfilePictures.length)],
       wishlist: [{ id: 3, type: 'course' }],
       enrolledCourses: [3],
       password: 'password123',
@@ -147,7 +161,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456796',
       university: 'دانشگاه شیراز',
       gender: 'زن',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: femaleProfilePictures[Math.floor(Math.random() * femaleProfilePictures.length)],
       wishlist: [{ id: 3, type: 'course' }],
       enrolledCourses: [3],
       password: 'password123',
@@ -159,7 +173,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456797',
       university: 'دانشگاه اصفهان',
       gender: 'مرد',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: maleProfilePictures[Math.floor(Math.random() * maleProfilePictures.length)],
       wishlist: [{ id: 3, type: 'course' }],
       enrolledCourses: [3],
       password: 'password123',
@@ -171,7 +185,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456798',
       university: 'دانشگاه مشهد',
       gender: 'مرد',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: maleProfilePictures[Math.floor(Math.random() * maleProfilePictures.length)],
       wishlist: [{ id: 4, type: 'course' }],
       enrolledCourses: [4],
       password: 'password123',
@@ -183,7 +197,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456799',
       university: 'دانشگاه تبریز',
       gender: 'زن',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: femaleProfilePictures[Math.floor(Math.random() * femaleProfilePictures.length)],
       wishlist: [{ id: 4, type: 'course' }],
       enrolledCourses: [4],
       password: 'password123',
@@ -195,7 +209,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456800',
       university: 'دانشگاه تهران',
       gender: 'مرد',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: maleProfilePictures[Math.floor(Math.random() * maleProfilePictures.length)],
       wishlist: [{ id: 5, type: 'course' }],
       enrolledCourses: [5],
       password: 'password123',
@@ -207,7 +221,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456801',
       university: 'دانشگاه شیراز',
       gender: 'زن',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: femaleProfilePictures[Math.floor(Math.random() * femaleProfilePictures.length)],
       wishlist: [{ id: 6, type: 'course' }],
       enrolledCourses: [6],
       password: 'password123',
@@ -219,7 +233,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456802',
       university: 'دانشگاه اصفهان',
       gender: 'مرد',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: maleProfilePictures[Math.floor(Math.random() * maleProfilePictures.length)],
       wishlist: [{ id: 6, type: 'course' }],
       enrolledCourses: [6],
       password: 'password123',
@@ -231,7 +245,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456803',
       university: 'دانشگاه مشهد',
       gender: 'زن',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: femaleProfilePictures[Math.floor(Math.random() * femaleProfilePictures.length)],
       wishlist: [{ id: 7, type: 'course' }],
       enrolledCourses: [7],
       password: 'password123',
@@ -243,7 +257,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456804',
       university: 'دانشگاه تبریز',
       gender: 'زن',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: femaleProfilePictures[Math.floor(Math.random() * femaleProfilePictures.length)],
       wishlist: [{ id: 8, type: 'course' }],
       enrolledCourses: [8],
       password: 'password123',
@@ -255,7 +269,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456805',
       university: 'دانشگاه تهران',
       gender: 'مرد',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: maleProfilePictures[Math.floor(Math.random() * maleProfilePictures.length)],
       wishlist: [{ id: 8, type: 'course' }],
       enrolledCourses: [8],
       password: 'password123',
@@ -267,7 +281,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456806',
       university: 'دانشگاه شیراز',
       gender: 'مرد',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: maleProfilePictures[Math.floor(Math.random() * maleProfilePictures.length)],
       wishlist: [{ id: 9, type: 'course' }],
       enrolledCourses: [9],
       password: 'password123',
@@ -279,7 +293,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456807',
       university: 'دانشگاه اصفهان',
       gender: 'زن',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: femaleProfilePictures[Math.floor(Math.random() * femaleProfilePictures.length)],
       wishlist: [{ id: 10, type: 'course' }],
       enrolledCourses: [10],
       password: 'password123',
@@ -291,7 +305,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '09123456808',
       university: 'دانشگاه مشهد',
       gender: 'مرد',
-      profilePicture: '/assets/default-profile.jpg',
+      profilePicture: maleProfilePictures[Math.floor(Math.random() * maleProfilePictures.length)],
       wishlist: [{ id: 10, type: 'course' }],
       enrolledCourses: [10],
       password: 'password123',
@@ -350,6 +364,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             reject(new Error('ایمیل یا شماره تلفن قبلاً ثبت شده است'));
             return;
           }
+          const pictures = gender === 'مرد' ? maleProfilePictures : femaleProfilePictures;
+          const randomPicture = pictures[Math.floor(Math.random() * pictures.length)];
           const newUser: User = {
             name,
             email,
@@ -357,7 +373,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             university,
             gender,
             course,
-            profilePicture: '/assets/default-profile.jpg',
+            profilePicture: randomPicture,
             wishlist: [],
             enrolledCourses: [],
             password,
@@ -418,7 +434,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return;
     }
 
-     setUsers((prev) =>
+    setUsers((prev) =>
       prev.map((u) =>
         u.email === userId || u.phone === userId
           ? {

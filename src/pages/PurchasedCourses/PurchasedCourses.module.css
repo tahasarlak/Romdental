@@ -1,0 +1,57 @@
+.purchasedCoursesContainer {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.purchasedCoursesCard {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: var(--background-color);
+}
+
+.purchasedCoursesTitle {
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.sectionTitle {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.purchasedCourseItem {
+  padding: 1rem;
+  border-bottom: 1px solid var(--divider-color);
+  transition: background-color 0.2s;
+}
+
+.purchasedCourseItem:hover {
+  background-color: var(--hover-background);
+}
+
+.courseLink {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.courseLink:hover {
+  text-decoration: underline;
+}
+
+.viewButton {
+  margin-left: 1rem;
+  text-transform: none;
+}
+
+.backButton {
+  text-transform: none;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.backButton:hover {
+  background-color: var(--hover-background);
+}
