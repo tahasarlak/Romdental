@@ -1,8 +1,19 @@
-import React from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import React, { useMemo } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import { useCourseContext } from '../../Context/CourseContext';
 import { useInstructorContext } from '../../Context/InstructorContext';
 import styles from './Breadcrumb.module.css';
+
+// Define interfaces for type safety
+interface Course {
+  id: number;
+  title: string;
+}
+
+interface Instructor {
+  name: string;
+}
 
 interface BreadcrumbItem {
   label: string;
@@ -11,12 +22,18 @@ interface BreadcrumbItem {
 
 const Breadcrumb: React.FC = () => {
   const location = useLocation();
-  const { id } = useParams<{ id?: string }>();
   const { courses } = useCourseContext();
   const { instructors } = useInstructorContext();
 
-  // تابع برای تبدیل مسیر به نام‌های خوانا
-  const getLabelFromPath = (pathSegment: string, index: number, pathnames: string[]): string => {
+  // Sanitize input to prevent XSS
+  const sanitizePathSegment = (segment: string): string => {
+    return DOMPurify.sanitize(segment, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] })
+      .replace(/[<>{}]/g, '')
+      .trim();
+  };
+
+  // Map path segments to readable labels
+  const getLabelFromPath = (segment: string, index: number, pathnames: string[]): string => {
     const pathMap: { [key: string]: string } = {
       courses: 'دوره‌ها',
       instructors: 'اساتید',
@@ -24,90 +41,116 @@ const Breadcrumb: React.FC = () => {
       'instructor-details': 'جزئیات استاد',
     };
 
-    // مدیریت مسیر courses با id
-    if (pathSegment === 'courses' && pathnames[index + 1]) {
-      const courseId = pathnames[index + 1];
-      const course = courses.find((c) => c.id === parseInt(courseId));
-      if (course) {
-        return course.title;
-      } else {
-        console.warn(`دوره‌ای با id ${courseId} یافت نشد.`);
-        return decodeURIComponent(courseId).replace(/-/g, ' ');
+    const sanitizedSegment = sanitizePathSegment(segment).toLowerCase();
+
+    // Handle courses with ID
+    if (sanitizedSegment === 'courses' && pathnames[index + 1]) {
+      const courseId = sanitizePathSegment(pathnames[index + 1]);
+      const parsedId = parseInt(courseId, 10);
+      if (isNaN(parsedId) || parsedId <= 0) {
+        return 'دوره نامعتبر';
       }
+      const course = Array.isArray(courses) ? courses.find((c: Course) => c.id === parsedId) : null;
+      return course?.title ?? 'دوره یافت نشد';
     }
 
-    // مدیریت مسیر instructor-details
-    if (pathSegment === 'instructor-details' && pathnames[index + 1]) {
-      const formattedName = decodeURIComponent(pathnames[index + 1]).replace(/-/g, ' ');
-      const instructor = instructors.find(
-        (inst) => inst.name.toLowerCase() === formattedName.toLowerCase()
-      );
-      return instructor ? instructor.name : formattedName;
+    // Handle instructor-details
+    if (sanitizedSegment === 'instructor-details' && pathnames[index + 1]) {
+      const formattedName = decodeURIComponent(sanitizePathSegment(pathnames[index + 1])).replace(/-/g, ' ');
+      const instructor = Array.isArray(instructors)
+        ? instructors.find((inst: Instructor) => inst.name.toLowerCase() === formattedName.toLowerCase())
+        : null;
+      return (instructor?.name ?? formattedName) || 'استاد یافت نشد';
     }
 
-    // مدیریت مسیرهای عمومی
-    return pathMap[pathSegment.toLowerCase()] || decodeURIComponent(pathSegment).replace(/-/g, ' ');
+    // General path handling
+    return (pathMap[sanitizedSegment] ?? decodeURIComponent(sanitizedSegment).replace(/-/g, ' ')) || 'صفحه';
   };
 
-  // ایجاد مسیرهای breadcrumb داینامیک
-  const generateBreadcrumbs = (): BreadcrumbItem[] => {
-    const pathnames = location.pathname.split('/').filter((x) => x);
-    const breadcrumbs: BreadcrumbItem[] = [{ label: 'خانه', path: '/' }];
-
+  // Generate breadcrumbs with useMemo for performance
+  const breadcrumbs = useMemo((): BreadcrumbItem[] => {
+    const pathnames = location.pathname.split('/').filter((x) => x && x.length > 0);
+    const breadcrumbItems: BreadcrumbItem[] = [{ label: 'خانه', path: '/' }];
     let currentPath = '';
 
     for (let index = 0; index < pathnames.length; index++) {
       const segment = pathnames[index];
-      currentPath += `/${segment}`;
+      currentPath += `/${sanitizePathSegment(segment)}`;
 
-      // اگر مسیر courses است
-      if (segment === 'courses') {
-        // اضافه کردن بخش "دوره‌ها"
-        breadcrumbs.push({ label: 'دوره‌ها', path: '/courses' });
-
-        // اگر id بعدی وجود دارد، عنوان دوره را اضافه کن
+      // Handle courses path
+      if (segment.toLowerCase() === 'courses') {
+        breadcrumbItems.push({ label: 'دوره‌ها', path: '/courses' });
         if (pathnames[index + 1]) {
-          const courseId = pathnames[index + 1];
-          const course = courses.find((c) => c.id === parseInt(courseId));
-          if (course) {
-            breadcrumbs.push({ label: course.title, path: currentPath });
-          } else {
-            console.warn(`دوره‌ای با id ${courseId} یافت نشد.`);
-            breadcrumbs.push({ label: decodeURIComponent(courseId).replace(/-/g, ' '), path: currentPath });
+          const courseId = sanitizePathSegment(pathnames[index + 1]);
+          const parsedId = parseInt(courseId, 10);
+          if (!isNaN(parsedId) && parsedId > 0) {
+            const course = Array.isArray(courses)
+              ? courses.find((c: Course) => c.id === parsedId)
+              : null;
+            breadcrumbItems.push({
+              label: course?.title ?? 'دوره یافت نشد',
+              path: currentPath,
+            });
           }
-          index++; // رد کردن id
+          index++; // Skip the ID segment
         }
         continue;
       }
 
-      // برای سایر مسیرها
+      // Handle other paths
       const label = getLabelFromPath(segment, index, pathnames);
       if (label) {
-        breadcrumbs.push({ label, path: currentPath });
+        breadcrumbItems.push({ label, path: currentPath });
       }
     }
 
-    return breadcrumbs;
-  };
-
-  const breadcrumbs = generateBreadcrumbs();
+    return breadcrumbItems;
+  }, [location.pathname, courses, instructors]);
 
   return (
-    <nav aria-label="breadcrumb" className={styles.breadcrumb}>
-      <ul className={styles.breadcrumbList}>
+    <nav role="navigation" aria-label="breadcrumb" className={styles.breadcrumb}>
+      <ol
+        className={styles.breadcrumbList}
+        itemScope
+        itemType="https://schema.org/BreadcrumbList"
+      >
         {breadcrumbs.map((item, index) => (
-          <li key={item.path} className={styles.breadcrumbItem}>
+          <li
+            key={item.path}
+            className={styles.breadcrumbItem}
+            itemProp="itemListElement"
+            itemScope
+            itemType="https://schema.org/ListItem"
+          >
             {index === breadcrumbs.length - 1 ? (
-              <span className={styles.active}>{item.label}</span>
-            ) : (
-              <Link to={item.path} className={styles.link}>
+              <span
+                className={styles.active}
+                itemProp="name"
+                aria-current="page"
+              >
                 {item.label}
+              </span>
+            ) : (
+              <Link
+                to={item.path}
+                className={styles.link}
+                itemProp="item"
+                title={`رفتن به ${item.label}`}
+                itemScope
+                itemType="https://schema.org/WebPage"
+              >
+                <span itemProp="name">{item.label}</span>
               </Link>
             )}
-            {index < breadcrumbs.length - 1 && <span className={styles.separator}> / </span>}
+            {index < breadcrumbs.length - 1 && (
+              <span className={styles.separator} aria-hidden="true">
+                {' / '}
+              </span>
+            )}
+            <meta itemProp="position" content={`${index + 1}`} />
           </li>
         ))}
-      </ul>
+      </ol>
     </nav>
   );
 };

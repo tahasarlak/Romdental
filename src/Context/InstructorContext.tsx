@@ -1,187 +1,225 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, ReactNode } from 'react';
+import DOMPurify from 'dompurify';
+import { useAuthContext } from './AuthContext';
+import { useNotificationContext } from './NotificationContext';
+import { useReviewContext } from './ReviewContext';
+import { useCourseContext } from './CourseContext';
+import { ReviewItem, Instructor } from '../types/types';
 
-// Interface for defining the structure of an instructor
-export interface Instructor {
-  id: number;
-  name: string;
-  specialty: string;
-  bio: string;
-  image: string;
-  experience: string;
-  coursesTaught: string[];
-  averageRating: string;
-  totalStudents: number;
-  whatsappLink?: string; // Added WhatsApp link
-  telegramLink?: string; // Added Telegram link
-  instagramLink?: string; // Added Instagram link
-}
-
-// Interface for defining the context type
 interface InstructorContextType {
   instructors: Instructor[];
+  loading: boolean;
   setInstructors: React.Dispatch<React.SetStateAction<Instructor[]>>;
+  fetchInstructors: () => Promise<void>;
+  addInstructor: (instructor: Omit<Instructor, 'id'>) => Promise<void>;
+  deleteInstructor: (instructorId: number) => Promise<void>;
 }
 
-// Create context
 const InstructorContext = createContext<InstructorContextType | undefined>(undefined);
 
-// Context provider for managing the list of instructors
-export const InstructorProvider = ({ children }: { children: ReactNode }) => {
-  const [instructors, setInstructors] = useState<Instructor[]>([
-    {
-      id: 1,
-      name: 'احمد رضایی',
-      specialty: 'آناتومی دندان',
-      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه سماشکو، متخصص آموزش آناتومی دندان',
-      image: '/assets/instructors/ahmad-rezaei.jpg',
-      experience: '۱۵ سال',
-      coursesTaught: ['دوره جامع آناتومی دندان'],
-      averageRating: '4.5',
-      totalStudents: 120,
-      whatsappLink: 'https://wa.me/+989123456789',
-      telegramLink: 'https://t.me/ahmad_rezaei',
-      instagramLink: 'https://instagram.com/ahmad_rezaei_dent',
-    },
-    {
-      id: 2,
-      name: 'مریم حسینی',
-      specialty: 'پروتزهای دندانی',
-      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه پیراگوا، متخصص پروتزهای دندانی',
-      image: '/assets/instructors/maryam-hosseini.jpg',
-      experience: '۱۲ سال',
-      coursesTaught: ['پروتزهای دندانی پیشرفته'],
-      averageRating: '4.7',
-      totalStudents: 95,
-      whatsappLink: 'https://wa.me/+989123456790',
-      telegramLink: 'https://t.me/maryam_hosseini',
-      instagramLink: 'https://instagram.com/maryam_hosseini_dent',
-    },
-    {
-      id: 3,
-      name: 'علی محمدی',
-      specialty: 'ترمیم دندان',
-      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه رودن، متخصص ترمیم دندان',
-      image: '/assets/instructors/ali-mohammadi.jpg',
-      experience: '۱۰ سال',
-      coursesTaught: ['دوره عملی ترمیمی'],
-      averageRating: '4.3',
-      totalStudents: 80,
-      whatsappLink: 'https://wa.me/+989123456791',
-      telegramLink: 'https://t.me/ali_mohammadi',
-      instagramLink: 'https://instagram.com/ali_mohammadi_dent',
-    },
-    {
-      id: 4,
-      name: 'سارا احمدی',
-      specialty: 'دندانپزشکی عمومی',
-      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه سچینوا، با تمرکز بر آموزش دندانپزشکی پایه',
-      image: '/assets/instructors/sara-ahmadi.jpg',
-      experience: '۸ سال',
-      coursesTaught: ['دوره مقدماتی دندانپزشکی عمومی'],
-      averageRating: '4.6',
-      totalStudents: 150,
-      whatsappLink: 'https://wa.me/+989123456792',
-      telegramLink: 'https://t.me/sara_ahmadi',
-      instagramLink: 'https://instagram.com/sara_ahmadi_dent',
-    },
-    {
-      id: 5,
-      name: 'رضا کاظمی',
-      specialty: 'ایمپلنتولوژی',
-      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه سماشکو، متخصص ایمپلنت دندانی',
-      image: '/assets/instructors/reza-kazemi.jpg',
-      experience: '۱۴ سال',
-      coursesTaught: ['دوره پیشرفته ایمپلنت دندانی'],
-      averageRating: '4.8',
-      totalStudents: 110,
-      whatsappLink: 'https://wa.me/+989123456793',
-      telegramLink: 'https://t.me/reza_kazemi',
-      instagramLink: 'https://instagram.com/reza_kazemi_dent',
-    },
-    {
-      id: 6,
-      name: 'نازنین موسوی',
-      specialty: 'ترمیم پیشرفته',
-      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه پیراگوا، متخصص مواد نوین ترمیمی',
-      image: '/assets/instructors/nazanin-mousavi.jpg',
-      experience: '۱۱ سال',
-      coursesTaught: ['دوره ترمیمی پیشرفته'],
-      averageRating: '4.4',
-      totalStudents: 90,
-      whatsappLink: 'https://wa.me/+989123456794',
-      telegramLink: 'https://t.me/nazanin_mousavi',
-      instagramLink: 'https://instagram.com/nazanin_mousavi_dent',
-    },
-    {
-      id: 7,
-      name: 'مهدی شریفی',
-      specialty: 'مدیریت کلینیک',
-      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه سچینوا، متخصص مدیریت کلینیک‌های دندانپزشکی',
-      image: '/assets/instructors/mehdi-sharifi.jpg',
-      experience: '۱۳ سال',
-      coursesTaught: ['دوره مدیریت کلینیک دندانپزشکی'],
-      averageRating: '4.9',
-      totalStudents: 70,
-      whatsappLink: 'https://wa.me/+989123456795',
-      telegramLink: 'https://t.me/mehdi_sharifi',
-      instagramLink: 'https://instagram.com/mehdi_sharifi_dent',
-    },
-    {
-      id: 8,
-      name: 'حسین کاظمی',
-      specialty: 'ارتودنسی',
-      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه رودن، متخصص ارتودنسی مقدماتی',
-      image: '/assets/instructors/hossein-kazemi.jpg',
-      experience: '۹ سال',
-      coursesTaught: ['دوره ارتودنسی مقدماتی'],
-      averageRating: '4.2',
-      totalStudents: 100,
-      whatsappLink: 'https://wa.me/+989123456796',
-      telegramLink: 'https://t.me/hossein_kazemi',
-      instagramLink: 'https://instagram.com/hossein_kazemi_dent',
-    },
-    {
-      id: 9,
-      name: 'بهرام رحیمی',
-      specialty: 'جراحی دهammans',
-      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه سماشکو، متخصص جراحی دهان و دندان',
-      image: '/assets/instructors/bahram-rahimi.jpg',
-      experience: '۱۶ سال',
-      coursesTaught: ['دوره جراحی دهان و دندان'],
-      averageRating: '4.6',
-      totalStudents: 130,
-      whatsappLink: 'https://wa.me/+989123456797',
-      telegramLink: 'https://t.me/bahram_rahimi',
-      instagramLink: 'https://instagram.com/bahram_rahimi_dent',
-    },
-    {
-      id: 10,
-      name: 'فاطمه رحیمی',
-      specialty: 'لیزر در دندانپزشکی',
-      bio: 'فارغ‌التحصیل دکتری دندانپزشکی از دانشگاه سچینوا، متخصص لیزر درمانی در دندانپزشکی',
-      image: '/assets/instructors/fatemeh-rahimi.jpg',
-      experience: '۱۰ سال',
-      coursesTaught: ['دوره تکنیک‌های لیزر در دندانپزشکی'],
-      averageRating: '4.5',
-      totalStudents: 85,
-      whatsappLink: 'https://wa.me/+989123456798',
-      telegramLink: 'https://t.me/fatemeh_rahimi',
-      instagramLink: 'https://instagram.com/fatemeh_rahimi_dent',
-    },
-  ]);
+// Memoize initial instructors to prevent re-creation
+const initialInstructors: Instructor[] = [
+  {
+    id: 1,
+    name: 'سارا احمدی',
+    specialty: 'آناتومی دندان',
+    bio: 'دکتر سارا احمدی متخصص آناتومی دندان با بیش از 10 سال تجربه تدریس.',
+    image: '/assets/instructors/ahmad-rasteh.jpg',
+    experience: '10 سال',
+    coursesTaught: ['دوره جامع آناتومی دندان', 'دوره پیشرفته پروتز دندانی', 'دوره ترمیمی دندانپزشکی'],
+    averageRating: '4.5',
+    totalStudents: 200,
+    reviewCount: 50,
+    whatsappLink: 'https://wa.me/+989123456789',
+    telegramLink: 'https://t.me/sara_ahmadi',
+    instagramLink: 'https://instagram.com/sara_ahmadi_dentist',
+  },
+  {
+    id: 2,
+    name: 'علی محمدی',
+    specialty: 'پروتز دندانی',
+    bio: 'متخصص پروتز دندانی با تجربه در آموزش تکنیک‌های پیشرفته.',
+    image: '/assets/instructors/ahmad-rasteh.jpg',
+    experience: '15 سال',
+    coursesTaught: ['دوره پیشرفته پروتز دندانی'],
+    averageRating: '4.8',
+    totalStudents: 150,
+    reviewCount: 30,
+    telegramLink: 'https://t.me/ali_mohammadi',
+    whatsappLink: 'https://wa.me/+989123456789',
+  },
+  {
+    id: 3,
+    name: 'مریم حسینی',
+    specialty: 'ترمیمی',
+    bio: 'استاد ترمیمی دندانپزشکی با تمرکز بر روش‌های مدرن ترمیمی.',
+    image: '/assets/instructors/ahmad-rasteh.jpg',
+    experience: '8 سال',
+    coursesTaught: ['دوره ترمیمی دندانپزشکی'],
+    averageRating: '4.2',
+    totalStudents: 100,
+    reviewCount: 20,
+    whatsappLink: 'https://wa.me/+989123456788',
+    instagramLink: 'https://instagram.com/maryam_hosseini_dentist',
+  },
+];
 
-  return (
-    <InstructorContext.Provider value={{ instructors, setInstructors }}>
-      {children}
-    </InstructorContext.Provider>
+export const InstructorProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { user } = useAuthContext();
+  const { showNotification } = useNotificationContext();
+  const [instructors, setInstructors] = useState<Instructor[]>(initialInstructors);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const fetchInstructors = useCallback(async () => {
+    try {
+      setLoading(true);
+      // Simulate fetching instructors (no actual state change needed if data is static)
+      const data = initialInstructors.map((instructor) => ({
+        ...instructor,
+        reviewCount: instructor.reviewCount ?? 0,
+      }));
+      setInstructors((prev) => {
+        // Only update if data has changed to prevent unnecessary renders
+        if (JSON.stringify(prev) !== JSON.stringify(data)) {
+          return data;
+        }
+        return prev;
+      });
+      if (!data.length) {
+        showNotification('هیچ استادی یافت نشد.', 'info');
+      }
+    } catch (error: any) {
+      console.error('Failed to fetch instructors:', error);
+      showNotification(error.message || 'خطا در بارگذاری اساتید', 'error');
+      setInstructors([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [showNotification]);
+
+  const addInstructor = useCallback(
+    async (instructor: Omit<Instructor, 'id'>) => {
+      try {
+        if (!user || !['SuperAdmin', 'Admin'].includes(user.role)) {
+          throw new Error('فقط سوپرادمین و ادمین می‌توانند استاد اضافه کنند');
+        }
+        const sanitizedInstructor: Omit<Instructor, 'id'> = {
+          ...instructor,
+          name: DOMPurify.sanitize(instructor.name),
+          specialty: DOMPurify.sanitize(instructor.specialty),
+          bio: DOMPurify.sanitize(instructor.bio),
+          experience: DOMPurify.sanitize(instructor.experience),
+          coursesTaught: instructor.coursesTaught.map((course) => DOMPurify.sanitize(course)),
+          averageRating: DOMPurify.sanitize(instructor.averageRating || '0.0'),
+          reviewCount: instructor.reviewCount ?? 0,
+          totalStudents: instructor.totalStudents ?? 0,
+          whatsappLink: instructor.whatsappLink ? DOMPurify.sanitize(instructor.whatsappLink) : undefined,
+          telegramLink: instructor.telegramLink ? DOMPurify.sanitize(instructor.telegramLink) : undefined,
+          instagramLink: instructor.instagramLink ? DOMPurify.sanitize(instructor.instagramLink) : undefined,
+        };
+        if (instructors.some((inst) => inst.name === sanitizedInstructor.name)) {
+          throw new Error(`استاد با نام ${sanitizedInstructor.name} قبلاً وجود دارد`);
+        }
+        const newInstructor: Instructor = {
+          ...sanitizedInstructor,
+          id: Math.max(...instructors.map((inst) => inst.id), 0) + 1,
+        };
+        setInstructors((prev) => [...prev, newInstructor]);
+        showNotification(`استاد "${newInstructor.name}" با موفقیت اضافه شد`, 'success');
+      } catch (error: any) {
+        console.error('Error adding instructor:', error);
+        showNotification(error.message || 'خطا در افزودن استاد', 'error');
+        throw error;
+      }
+    },
+    [user, instructors, showNotification]
   );
+
+  const deleteInstructor = useCallback(
+    async (instructorId: number) => {
+      try {
+        if (!user || !['SuperAdmin', 'Admin'].includes(user.role)) {
+          throw new Error('فقط سوپرادمین و ادمین می‌توانند استاد را حذف کنند');
+        }
+        const instructor = instructors.find((inst) => inst.id === instructorId);
+        if (!instructor) {
+          throw new Error('استاد مورد نظر یافت نشد');
+        }
+        const confirmDelete = window.confirm(
+          `آیا مطمئن هستید که می‌خواهید استاد "${DOMPurify.sanitize(instructor.name)}" را حذف کنید؟`
+        );
+        if (!confirmDelete) return;
+        setInstructors((prev) => prev.filter((inst) => inst.id !== instructorId));
+        showNotification(`استاد "${DOMPurify.sanitize(instructor.name)}" با موفقیت حذف شد`, 'success');
+      } catch (error: any) {
+        console.error('Error deleting instructor:', error);
+        showNotification(error.message || 'خطا در حذف استاد', 'error');
+        throw error;
+      }
+    },
+    [user, instructors, showNotification]
+  );
+
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(
+    () => ({
+      instructors,
+      loading,
+      setInstructors,
+      fetchInstructors,
+      addInstructor,
+      deleteInstructor,
+    }),
+    [instructors, loading, fetchInstructors, addInstructor, deleteInstructor]
+  );
+
+  return <InstructorContext.Provider value={contextValue}>{children}</InstructorContext.Provider>;
 };
 
-// Hook for using the context
 export const useInstructorContext = () => {
   const context = useContext(InstructorContext);
-  if (!context) {
-    throw new Error('useInstructorContext must be used within an InstructorProvider');
-  }
+  if (!context) throw new Error('useInstructorContext must be used within an InstructorProvider');
   return context;
+};
+
+export const useInstructorMetrics = (instructor: Instructor | null): Instructor => {
+  const { reviews } = useReviewContext();
+  const { courses } = useCourseContext();
+
+  if (!instructor) {
+    return {
+      id: 0,
+      name: '',
+      specialty: '',
+      bio: '',
+      image: '',
+      experience: '',
+      coursesTaught: [],
+      averageRating: '0.0',
+      totalStudents: 0,
+      reviewCount: 0,
+      whatsappLink: undefined,
+      telegramLink: undefined,
+      instagramLink: undefined,
+    };
+  }
+
+  const instructorCourses = courses.filter((course) => course.instructor === instructor.name);
+  const courseIds = instructorCourses.map((course) => course.id);
+  const courseReviews = reviews.filter((review: ReviewItem) => courseIds.includes(review.courseId));
+  const reviewCount = courseReviews.length;
+  const averageRating =
+    reviewCount > 0
+      ? (courseReviews.reduce((sum: number, review: ReviewItem) => sum + review.rating, 0) / reviewCount).toFixed(1)
+      : '0.0';
+  const totalStudents = instructorCourses.reduce((sum, course) => sum + (course.enrollmentCount || 0), 0);
+  const coursesTaught: string[] = instructorCourses.map((course) => course.title);
+
+  return {
+    ...instructor,
+    reviewCount,
+    averageRating,
+    totalStudents,
+    coursesTaught,
+  };
 };

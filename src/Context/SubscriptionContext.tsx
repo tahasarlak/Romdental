@@ -16,22 +16,19 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [message, setMessage] = useState<string>('');
 
   const subscribe = async (email: string) => {
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setStatus('error');
       setMessage('لطفاً یک ایمیل معتبر وارد کنید');
       return;
     }
-
     setStatus('loading');
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
       setStatus('success');
       setMessage('با موفقیت ثبت‌نام شدید!');
       setEmail('');
-    } catch (error) {
+    } catch {
       setStatus('error');
       setMessage('خطایی رخ داد. لطفاً دوباره امتحان کنید.');
     }
@@ -46,8 +43,6 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
 export const useSubscriptionContext = () => {
   const context = useContext(SubscriptionContext);
-  if (!context) {
-    throw new Error('useSubscriptionContext must be used within a SubscriptionProvider');
-  }
+  if (!context) throw new Error('useSubscriptionContext must be used within a SubscriptionProvider');
   return context;
 };

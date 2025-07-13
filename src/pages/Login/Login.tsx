@@ -5,6 +5,7 @@ import CalculateIcon from '@mui/icons-material/Calculate';
 import { useAuthContext } from '../../Context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './Login.module.css';
+import { useNotificationContext } from '../../Context/NotificationContext';
 
 interface FormData {
   identifier: string;
@@ -13,7 +14,8 @@ interface FormData {
 }
 
 const Login: React.FC = () => {
-  const { login } = useAuthContext();
+  const { login, isAuthenticated } = useAuthContext();
+  const { showNotification } = useNotificationContext();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     identifier: '',
@@ -26,10 +28,24 @@ const Login: React.FC = () => {
 
   // تولید دو عدد تصادفی برای کپچا
   useEffect(() => {
-    const num1 = Math.floor(Math.random() * 10) + 1; // عدد تصادفی بین 1 تا 10
-    const num2 = Math.floor(Math.random() * 10) + 1; // عدد تصادفی بین 1 تا 10
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
     setCaptchaNumbers({ num1, num2, sum: num1 + num2 });
   }, []);
+
+  // بررسی وضعیت لاگین و هدایت به داشبورد مناسب
+  useEffect(() => {
+    if (isAuthenticated) {
+      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+      if (storedUser.email === 'superadmin@example.com') {
+        navigate('/admin');
+      } else if (storedUser.email.includes('dr')) {
+        navigate('/instructor');
+      } else {
+        navigate('/');
+      }
+    }
+  }, [isAuthenticated, navigate]);
 
   const validate = (): Partial<FormData> => {
     const newErrors: Partial<FormData> = {};
@@ -57,14 +73,16 @@ const Login: React.FC = () => {
     setIsLoading(true);
     try {
       await login(formData.identifier, formData.password);
-      setFormData({ identifier: '', password: '', captchaAnswer: '' });
+      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+      showNotification('ورود با موفقیت انجام شد!', 'success');
       // تولید کپچای جدید پس از ورود موفق
       const num1 = Math.floor(Math.random() * 10) + 1;
       const num2 = Math.floor(Math.random() * 10) + 1;
       setCaptchaNumbers({ num1, num2, sum: num1 + num2 });
-      navigate('/');
+      setFormData({ identifier: '', password: '', captchaAnswer: '' });
     } catch (error: any) {
       setErrors({ identifier: error.message || 'خطا در ورود!' });
+      showNotification(error.message || 'خطا در ورود!', 'error');
     } finally {
       setIsLoading(false);
     }

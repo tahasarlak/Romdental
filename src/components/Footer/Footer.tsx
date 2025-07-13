@@ -8,7 +8,6 @@ const Footer: React.FC = () => {
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const email = (e.target as any).email.value;
-    console.log('اشتراک در خبرنامه با ایمیل:', email);
     // اینجا می‌توانید درخواست به سرور بفرستید
   };
 

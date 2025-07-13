@@ -1,0 +1,252 @@
+/* src/styles/Cart.module.css */
+.cartItems {
+  max-width: var(--max-width);
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: var(--transition);
+}
+
+.cartItem {
+  display: flex;
+  align-items: center;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+  gap: 1rem;
+  transition: var(--transition);
+}
+
+.courseImage {
+  width: clamp(80px, 15vw, 120px);
+  height: auto;
+  border-radius: var(--border-radius);
+  object-fit: cover;
+}
+
+.courseDetails {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.courseTitle {
+  font-family: var(--font-family);
+  color: var(--text-color);
+  font-size: clamp(1.1rem, 4vw, 1.25rem);
+  font-weight: 500;
+  margin: 0;
+}
+
+.instructor {
+  font-family: var(--font-family);
+  color: var(--gray);
+  font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+}
+
+.price {
+  font-family: var(--font-family);
+  color: var(--text-color);
+  font-size: clamp(0.9rem, 3.5vw, 1rem);
+}
+
+.quantityControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quantity {
+  font-family: var(--font-family);
+  color: var(--text-color);
+  font-size: clamp(0.9rem, 3.5vw, 1rem);
+  min-width: 2rem;
+  text-align: center;
+}
+
+.removeButton {
+  color: #d32f2f; /* قرمز برای دکمه حذف */
+  transition: var(--transition);
+}
+
+.removeButton:hover {
+  color: #b71c1c; /* قرمز تیره‌تر برای هاور */
+}
+
+.cartSummary {
+  max-width: var(--max-width);
+  width: 100%;
+  margin: 1.5rem auto;
+  padding: 1rem;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition);
+}
+
+.cartSummary h3 {
+  font-family: var(--font-family);
+  color: var(--text-color);
+  font-size: clamp(1.1rem, 4vw, 1.25rem);
+  margin: 0;
+}
+
+.checkoutButton {
+  background-color: var(--accent-color);
+  color: var(--white);
+  font-family: var(--font-family);
+  font-size: clamp(0.9rem, 3.5vw, 1rem);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.checkoutButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.emptyCart {
+  max-width: var(--max-width);
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.emptyCart h2 {
+  font-family: var(--font-family);
+  color: var(--text-color);
+  font-size: clamp(1.25rem, 5vw, 1.5rem);
+  margin-bottom: 1rem;
+}
+
+.emptyCart p {
+  font-family: var(--font-family);
+  color: var(--gray);
+  font-size: clamp(0.9rem, 4vw, 1rem);
+}
+
+/* استایل‌های حالت تیره */
+.dark .cartItem,
+.dark .cartSummary,
+.dark .emptyCart {
+  background-color: var(--secondary-color);
+}
+
+.dark .courseTitle,
+.dark .price,
+.dark .quantity,
+.dark .cartSummary h3,
+.dark .emptyCart h2 {
+  color: var(--primary-color);
+}
+
+.dark .instructor,
+.dark .emptyCart p {
+  color: var(--gray);
+}
+
+.dark .checkoutButton {
+  background-color: var(--accent-color);
+}
+
+.dark .checkoutButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.dark .removeButton {
+  color: #ef5350; /* قرمز روشن‌تر برای حالت تیره */
+}
+
+.dark .removeButton:hover {
+  color: #ff867c; /* قرمز روشن برای هاور در حالت تیره */
+}
+
+/* Media Queries برای ریسپانسیو بودن */
+@media (max-width: 768px) {
+  .cartItems {
+    padding: 1rem;
+  }
+
+  .cartItem {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.75rem;
+  }
+
+  .courseImage {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .courseDetails {
+    width: 100%;
+  }
+
+  .quantityControls {
+    justify-content: center;
+  }
+
+  .cartSummary {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.75rem;
+  }
+
+  .checkoutButton {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cartItems {
+    padding: 0.5rem;
+  }
+
+  .cartItem {
+    padding: 0.5rem;
+  }
+
+  .courseTitle {
+    font-size: clamp(1rem, 3.5vw, 1.1rem);
+  }
+
+  .instructor,
+  .price,
+  .quantity {
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+  }
+
+  .courseImage {
+    max-width: 150px;
+  }
+
+  .cartSummary h3 {
+    font-size: clamp(1rem, 3.5vw, 1.1rem);
+  }
+
+  .emptyCart {
+    padding: 1rem;
+  }
+
+  .emptyCart h2 {
+    font-size: clamp(1.1rem, 4.5vw, 1.3rem);
+  }
+
+  .emptyCart p {
+    font-size: clamp(0.8rem, 3.5vw, 0.9rem);
+  }
+}

@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import styles from './Header.module.css';
 import { useAuthContext } from '../../Context/AuthContext';
 import { useCartContext } from '../../Context/CartContext';
+import { useCourseContext } from '../../Context/CourseContext';
 import { useScheduleContext } from '../../Context/ScheduleContext';
+import { useNotificationContext } from '../../Context/NotificationContext';
+import { useCheckoutContext } from '../../Context/CheckoutContext';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import IconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
-import Button from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import Tooltip from '@mui/material/Tooltip';
 import Menu from '@mui/material/Menu';
@@ -15,6 +17,7 @@ import MenuItem from '@mui/material/MenuItem';
 import PersonIcon from '@mui/icons-material/Person';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button'; // وارد کردن Button
 import ThemeToggle from '../ThemeToggle/ThemeToggle';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import Table from '@mui/material/Table';
@@ -25,6 +28,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Badge from '@mui/material/Badge';
+import DOMPurify from 'dompurify';
+import Cart from '../Cart/Cart';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,8 +37,11 @@ const Header: React.FC = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { isAuthenticated, user, logout } = useAuthContext();
-  const { cartItems, removeFromCart } = useCartContext();
+  const { cartItems } = useCartContext();
+  const { courses } = useCourseContext();
   const { weeklySchedule } = useScheduleContext();
+  const { showNotification } = useNotificationContext();
+  const { proceedToCheckout } = useCheckoutContext();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -44,42 +52,38 @@ const Header: React.FC = () => {
     setAnchorEl(null);
   }, [location.pathname]);
 
-  const handleNavLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleNavLinkClick = useCallback((event: React.MouseEvent<HTMLAnchorElement>) => {
     event.stopPropagation();
     setIsMenuOpen(false);
     setIsCartOpen(false);
     setIsCalendarOpen(false);
     setAnchorEl(null);
-  };
+  }, []);
 
-  const handleProceedToCheckout = () => {
-    setIsCartOpen(false);
-    navigate('/checkout/multiple');
-  };
-
-  const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleProfileClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
-  };
+  }, []);
 
-  const handleProfileClose = () => {
+  const handleProfileClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
 
-  const handleProfileNavigation = (path: string) => {
-    navigate(path);
-    handleProfileClose();
-  };
+  const handleProfileNavigation = useCallback(
+    (path: string) => {
+      navigate(path);
+      handleProfileClose();
+    },
+    [navigate, handleProfileClose]
+  );
 
-  // Get first name for tooltip
-  const getShortName = (name: string) => {
+  const getShortName = useCallback((name: string) => {
     return name.split(' ')[0];
-  };
+  }, []);
 
-  // Select default profile picture based on gender
-  const defaultProfilePicture = user?.gender === 'مرد' 
-    ? '/assets/male-profile.jpg' 
-    : user?.gender === 'زن' 
-    ? '/assets/female-profile.jpg' 
+  const defaultProfilePicture = user?.gender === 'مرد'
+    ? '/assets/male-profile.jpg'
+    : user?.gender === 'زن'
+    ? '/assets/female-profile.jpg'
     : '/assets/default-profile.jpg';
 
   const daysOfWeek = ['دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه', 'یکشنبه'];
@@ -157,11 +161,27 @@ const Header: React.FC = () => {
                 تماس
               </NavLink>
             </li>
+            {isAuthenticated && user && (user.role === 'Admin' || user.role === 'SuperAdmin') && (
+              <li>
+                <NavLink
+                  to="/admin"
+                  className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}
+                  onClick={handleNavLinkClick}
+                >
+                  داشبورد ادمین
+                </NavLink>
+              </li>
+            )}
             <li>
               <Tooltip title="سبد خرید">
                 <IconButton
                   className={styles.cartIcon}
                   onClick={() => {
+                    if (!isAuthenticated) {
+                      showNotification('برای مشاهده سبد خرید، لطفاً وارد شوید.', 'error');
+                      navigate('/login');
+                      return;
+                    }
                     setIsCartOpen(true);
                     setIsMenuOpen(false);
                     setIsCalendarOpen(false);
@@ -225,6 +245,11 @@ const Header: React.FC = () => {
                   <MenuItem onClick={() => handleProfileNavigation('/profile')}>
                     <PersonIcon style={{ marginRight: '8px' }} /> پروفایل
                   </MenuItem>
+                  {user && (user.role === 'SuperAdmin' || user.role === 'Instructor') && (
+                    <MenuItem onClick={() => handleProfileNavigation('/instructor')}>
+                      <PersonIcon style={{ marginRight: '8px' }} /> پروفایل استاد
+                    </MenuItem>
+                  )}
                   <MenuItem onClick={() => handleProfileNavigation('/wishlist')}>
                     <FavoriteIcon style={{ marginRight: '8px' }} /> علاقه‌مندی‌ها
                   </MenuItem>
@@ -281,39 +306,8 @@ const Header: React.FC = () => {
             </IconButton>
           </div>
           <div className={styles.cartModalBody}>
-            {cartItems.length === 0 ? (
-              <p>سبد خرید خالی است.</p>
-            ) : (
-              <ul className={styles.cartItemList}>
-                {cartItems.map((item) => (
-                  <li key={item.id} className={styles.cartItem}>
-                    <span>{item.title}</span>
-                    <span>{item.price}</span>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      onClick={() => removeFromCart(item.id)}
-                    >
-                      حذف
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <Cart />
           </div>
-          {cartItems.length > 0 && (
-            <div className={styles.cartModalFooter}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleProceedToCheckout}
-                disabled={cartItems.length === 0}
-              >
-                ادامه به پرداخت
-              </Button>
-            </div>
-          )}
         </div>
       </Modal>
 
@@ -363,16 +357,16 @@ const Header: React.FC = () => {
                                 <div className={styles.scheduleItem}>
                                   <img
                                     src={schedule.image}
-                                    alt={schedule.course}
+                                    alt={DOMPurify.sanitize(schedule.course)}
                                     className={styles.scheduleImage}
                                     onError={(e) => {
                                       e.currentTarget.src = '/assets/fallback.jpg';
                                     }}
                                   />
                                   <div>
-                                    <div>{schedule.course}</div>
+                                    <div>{DOMPurify.sanitize(schedule.course)}</div>
                                     <div className={styles.scheduleInstructor}>
-                                      {schedule.instructor}
+                                      {DOMPurify.sanitize(schedule.instructor)}
                                     </div>
                                   </div>
                                 </div>

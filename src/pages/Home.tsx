@@ -5,14 +5,14 @@ import BlogTeaser from '../components/BlogTeaser/BlogTeaser';
 import CTA from '../components/CTA/CTA';
 import FeaturedCourses from '../components/FeaturedCourses/FeaturedCourses';
 import Stats from '../components/Stats/Stats';
-import Instructors from '../components/Instructors/Instructors';
+import FeaturedInstructors from '../components/Instructors/FeaturedInstructors';
 
 const Home: React.FC = () => {
   return (
     <div>
       <Hero />
       <WhyUs />
-      <Instructors />
+      <FeaturedInstructors />
       <FeaturedCourses />
       <BlogTeaser />
       <Stats />

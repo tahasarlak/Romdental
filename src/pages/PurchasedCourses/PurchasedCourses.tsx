@@ -15,43 +15,7 @@ import Chip from '@mui/material/Chip';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../Context/AuthContext';
 import { useCourseContext } from '../../Context/CourseContext';
-
-interface SyllabusItem {
-  id: number;
-  title: string;
-  isLocked: boolean;
-  previewContent?: string;
-  videoUrl?: string;
-  completed?: boolean;
-  duration: string;
-  contentType: 'video' | 'text' | 'quiz';
-  isNew?: boolean;
-}
-
-interface Course {
-  slug: string;
-  id: number;
-  title: string;
-  instructor: string;
-  description: string;
-  duration: string;
-  courseNumber: string;
-  category: 'آناتومی' | 'پروتز' | 'ترمیمی' | 'عمومی';
-  image: string;
-  price: string;
-  discountPrice?: string;
-  discountPercentage?: number;
-  startDate: string;
-  isOpen: boolean;
-  isFeatured: boolean;
-  enrollmentCount: number;
-  syllabus: SyllabusItem[];
-  faqs: { id: number; question: string; answer: string }[];
-  tags?: string[];
-  prerequisites?: string[];
-  courseType: 'Online' | 'Offline' | 'In-Person' | 'Hybrid';
-  university: string;
-}
+import { Course, SyllabusItem } from '../../types/types';
 
 const PurchasedCourses: React.FC = () => {
   const { user } = useAuthContext();

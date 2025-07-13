@@ -14,7 +14,10 @@
     "axe/aria": [
       "default",
       {
-        "aria-valid-attr-value": "off"
+        "aria-valid-attr-value": "off",
+        "aria-progressbar-name": "off",
+        "aria-required-children": "off",
+        "aria-required-parent": "off"
       }
     ],
     "compat-api/html": [
@@ -29,7 +32,8 @@
     "axe/forms": [
       "default",
       {
-        "label": "off"
+        "label": "off",
+        "select-name": "off"
       }
     ]
   }

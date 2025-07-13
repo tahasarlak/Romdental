@@ -16,13 +16,7 @@ const Stats: React.FC = () => {
   const { courses } = useCourseContext();
   const { reviews } = useReviewContext();
 
-  // Debug context data
-  useEffect(() => {
-    console.log('Users:', users, 'Users Length:', users?.length ?? 0);
-    console.log('Courses:', courses, 'Courses Length:', courses?.length ?? 0);
-    console.log('Reviews:', reviews, 'Reviews Length:', reviews?.length ?? 0);
-  }, [users, courses, reviews]);
-
+ 
   const [isVisible, setIsVisible] = useState(false);
   const [animatedValues, setAnimatedValues] = useState<number[]>([0, 0, 0]);
 
@@ -60,7 +54,6 @@ const Stats: React.FC = () => {
       if (section) {
         const { top } = section.getBoundingClientRect();
         if (top < window.innerHeight * 0.8 && !isVisible) {
-          console.log('Section is visible, triggering animation');
           setIsVisible(true);
         }
       }
@@ -74,7 +67,6 @@ const Stats: React.FC = () => {
   // Number animation
   useEffect(() => {
     if (isVisible) {
-      console.log('Starting animation with stats:', stats);
       const timers: NodeJS.Timeout[] = [];
       stats.forEach((stat, index) => {
         const end = stat.value;
@@ -94,7 +86,6 @@ const Stats: React.FC = () => {
           setAnimatedValues((prev) => {
             const newValues = [...prev];
             newValues[index] = start;
-            console.log(`Animating ${stat.label}: ${start} (increment: ${increment}, stepTime: ${stepTime})`);
             return newValues;
           });
         }, stepTime);

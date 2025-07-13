@@ -1,49 +1,214 @@
+/* src/styles/ReviewForm.module.css */
 .reviewForm {
-  margin-bottom: 2rem;
-  padding: 1rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  background-color: var(--white);
+  padding: 1.5rem; /* معادل 24px در دسکتاپ، کاهش در موبایل */
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  width: 100%; /* عرض کامل در دستگاه‌های کوچک */
+  margin: 0 auto 1.25rem; /* معادل 20px */
+  transition: var(--transition);
+}
+
+.reviewForm h3 {
+  font-family: var(--font-family);
+  color: var(--text-color);
+  font-size: clamp(1.25rem, 5vw, 1.5rem); /* اندازه فونت انعطاف‌پذیر */
+  margin-bottom: 1rem;
+  text-align: right;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: clamp(0.8rem, 4vw, 0.9rem);
+  margin-bottom: 1rem;
+  text-align: right;
+}
+
+.success {
+  color: #2e7d32;
+  font-size: clamp(0.8rem, 4vw, 0.9rem);
+  margin-bottom: 1rem;
+  text-align: right;
 }
 
 .rating {
   display: flex;
-  gap: 0.5rem;
+  justify-content: flex-end;
+  gap: 0.5rem; /* معادل 8px */
   margin-bottom: 1rem;
 }
 
 .star {
+  background: none;
+  border: none;
+  padding: 0;
   cursor: pointer;
-  color: #ccc;
+  color: var(--gray);
+  transition: var(--transition);
+}
+
+.star svg {
+  width: clamp(1.5rem, 6vw, 1.75rem); /* اندازه آیکون ستاره انعطاف‌پذیر */
+  height: auto;
 }
 
 .star.filled {
-  color: #f5c518;
+  color: var(--accent-color);
+}
+
+.star:hover {
+  color: var(--accent-color-hover);
 }
 
 .textarea {
   width: 100%;
-  min-height: 100px;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  padding: 0.75rem; /* معادل 12px */
+  border: 1px solid var(--gray);
+  border-radius: var(--border-radius);
+  font-family: var(--font-family);
+  font-size: clamp(0.9rem, 4vw, 1rem);
   resize: vertical;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  transition: var(--transition);
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
 }
 
 .submitButton {
-  background-color: #007bff;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  background-color: var(--accent-color);
+  color: var(--white);
+  padding: 0.75rem 1.5rem; /* معادل 12px 24px */
+  border-radius: var(--border-radius);
+  font-family: var(--font-family);
+  font-size: clamp(0.9rem, 4vw, 1rem);
+  font-weight: 500;
+  transition: var(--transition);
+  width: 100%; /* دکمه تمام‌عرض در موبایل */
+  max-width: 200px; /* محدود کردن عرض در دسکتاپ */
 }
 
 .submitButton:hover {
-  background-color: #0056b3;
+  background-color: var(--accent-color-hover);
 }
 
-.error {
-  color: red;
-  margin-bottom: 1rem;
+.submitButton:disabled {
+  background-color: var(--gray);
+  cursor: not-allowed;
+}
+
+.reviewPromptContainer {
+  text-align: center;
+  padding: 1.5rem;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  max-width: 600px;
+  width: 100%; /* عرض کامل در دستگاه‌های کوچک */
+  margin: 0 auto;
+  transition: var(--transition);
+}
+
+.reviewPrompt {
+  font-family: var(--font-family);
+  color: var(--text-color);
+  font-size: clamp(0.9rem, 4vw, 1rem);
+}
+
+.loginLink {
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.loginLink:hover {
+  color: var(--accent-color-hover);
+}
+
+/* استایل‌های حالت تیره */
+.dark .reviewForm,
+.dark .reviewPromptContainer {
+  background-color: var(--secondary-color);
+}
+
+.dark .error,
+.dark .success,
+.dark .reviewPrompt {
+  color: var(--primary-color);
+}
+
+.dark .textarea {
+  background-color: var(--white);
+  border-color: var(--gray);
+  color: var(--primary-color);
+}
+
+.dark .textarea:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+}
+
+.dark .star.filled {
+  color: var(--accent-color);
+}
+
+.dark .star:hover {
+  color: var(--accent-color-hover);
+}
+
+/* Media Queries برای ریسپانسیو بودن */
+@media (max-width: 768px) {
+  .reviewForm {
+    padding: 1rem; /* کاهش پدینگ در تبلت و موبایل */
+  }
+
+  .reviewForm h3 {
+    font-size: clamp(1.1rem, 4.5vw, 1.3rem);
+  }
+
+  .rating {
+    gap: 0.4rem; /* کاهش فاصله بین ستاره‌ها */
+  }
+
+  .star svg {
+    width: clamp(1.2rem, 5.5vw, 1.5rem);
+  }
+
+  .textarea {
+    padding: 0.5rem;
+  }
+
+  .submitButton {
+    padding: 0.6rem 1rem;
+  }
+
+  .reviewPromptContainer {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .reviewForm {
+    padding: 0.75rem; /* پدینگ کمتر برای موبایل‌های کوچک */
+  }
+
+  .reviewForm h3 {
+    font-size: clamp(1rem, 4vw, 1.2rem);
+  }
+
+  .rating {
+    gap: 0.3rem;
+    justify-content: center; /* وسط‌چین کردن ستاره‌ها در موبایل */
+  }
+
+  .star svg {
+    width: clamp(1rem, 5vw, 1.3rem);
+  }
+
+  .submitButton {
+    max-width: 100%; /* دکمه تمام‌عرض در موبایل */
+  }
 }

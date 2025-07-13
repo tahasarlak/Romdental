@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthContext } from '../../Context/AuthContext';
+import { useNotificationContext } from '../../Context/NotificationContext';
 import styles from './Profile.module.css';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -23,19 +25,22 @@ import DialogActions from '@mui/material/DialogActions';
 import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { Link } from 'react-router-dom';
+import DOMPurify from 'dompurify';
+import { User } from '../../types/types';
 
 const Profile: React.FC = () => {
   const { user, setUser, updatePassword } = useAuthContext();
+  const { showNotification } = useNotificationContext();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    university: user?.university || '',
-    gender: user?.gender || '' as 'مرد' | 'زن' | '',
-    course: user?.course || '',
+  const [formData, setFormData] = useState<Partial<User>>({
+    name: '',
+    email: '',
+    phone: '',
+    university: '',
+    gender: 'مرد', // Default to 'مرد'
+    course: '',
   });
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -43,7 +48,7 @@ const Profile: React.FC = () => {
     confirmPassword: '',
   });
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [selectedPicture, setSelectedPicture] = useState<string>(user?.profilePicture || '');
+  const [selectedPicture, setSelectedPicture] = useState<string>('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -71,42 +76,62 @@ const Profile: React.FC = () => {
     { path: '/assets/Profile/female-profile-3.jpg', label: 'تصویر زن ۳' },
   ];
 
-  const profilePicturesByGender = user?.gender
-    ? user.gender === 'مرد'
+  const profilePicturesByGender = formData.gender
+    ? formData.gender === 'مرد'
       ? allProfilePictures.filter((pic) => pic.path.includes('male-profile'))
       : allProfilePictures.filter((pic) => pic.path.includes('female-profile'))
     : allProfilePictures;
 
-  const defaultProfilePicture = user?.gender
-    ? user.gender === 'مرد'
+  const defaultProfilePicture = formData.gender
+    ? formData.gender === 'مرد'
       ? maleProfilePictures[Math.floor(Math.random() * maleProfilePictures.length)]
       : femaleProfilePictures[Math.floor(Math.random() * femaleProfilePictures.length)]
     : '/assets/default-profile.jpg';
 
   useEffect(() => {
-    if (isEditing && !selectedPicture.includes('blob:') && user?.gender) {
-      const pictures = user.gender === 'مرد' ? maleProfilePictures : femaleProfilePictures;
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    setFormData({
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      university: user.university,
+      gender: user.gender,
+      course: user.course || '',
+    });
+    setSelectedPicture(user.profilePicture || defaultProfilePicture);
+  }, [user, navigate]);
+
+  useEffect(() => {
+    if (isEditing && !selectedPicture.includes('blob:') && formData.gender) {
+      const pictures = formData.gender === 'مرد' ? maleProfilePictures : femaleProfilePictures;
       const randomPicture = pictures[Math.floor(Math.random() * pictures.length)];
       setSelectedPicture(randomPicture);
     }
-  }, [isEditing, user?.gender, selectedPicture]);
+  }, [isEditing, formData.gender, selectedPicture]);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
     if (!formData.name) newErrors.name = 'نام الزامی است';
-    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'ایمیل معتبر وارد کنید';
-    if (!formData.phone || !/^\d{10,11}$/.test(formData.phone)) newErrors.phone = 'شماره تلفن معتبر وارد کنیدÐ';
+    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+      newErrors.email = 'ایمیل معتبر وارد کنید';
+    if (!formData.phone || !/^\d{10,11}$/.test(formData.phone))
+      newErrors.phone = 'شماره تلفن معتبر وارد کنید';
     if (!formData.university) newErrors.university = 'دانشگاه الزامی است';
-    if (!formData.gender) newErrors.gender = 'جنسیت را انتخاب کنید';
-    if (!formData.course) newErrors.course = 'دوره الزامی است'; // اعتبارسنجی دوره
+    if (!['مرد', 'زن'].includes(formData.gender || '')) newErrors.gender = 'جنسیت را انتخاب کنید';
+    if (!formData.course) newErrors.course = 'دوره الزامی است';
     return newErrors;
   };
 
   const validatePassword = () => {
     const newErrors: { [key: string]: string } = {};
     if (!passwordData.currentPassword) newErrors.currentPassword = 'رمز عبور فعلی الزامی است';
-    if (!passwordData.newPassword || passwordData.newPassword.length < 8) newErrors.newPassword = 'رمز جدید باید حداقل ۸ کاراکتر باشد';
-    if (passwordData.newPassword !== passwordData.confirmPassword) newErrors.confirmPassword = 'رمزهای عبور مطابقت ندارند';
+    if (!passwordData.newPassword || passwordData.newPassword.length < 8)
+      newErrors.newPassword = 'رمز جدید باید حداقل ۸ کاراکتر باشد';
+    if (passwordData.newPassword !== passwordData.confirmPassword)
+      newErrors.confirmPassword = 'رمزهای عبور مطابقت ندارند';
     return newErrors;
   };
 
@@ -167,17 +192,29 @@ const Profile: React.FC = () => {
     if (user) {
       setLoading(true);
       try {
-        const updatedUser = {
+        const updatedUser: User = {
           ...user,
-          ...formData,
-          gender: formData.gender,
+          name: DOMPurify.sanitize(formData.name || ''),
+          email: DOMPurify.sanitize(formData.email || ''),
+          phone: DOMPurify.sanitize(formData.phone || ''),
+          university: DOMPurify.sanitize(formData.university || ''),
+          gender: formData.gender || user.gender,
+          course: DOMPurify.sanitize(formData.course || ''),
           profilePicture: selectedPicture,
+          wishlist: user.wishlist,
+          enrolledCourses: user.enrolledCourses,
+          cart: user.cart, // Preserve cart
+          password: user.password,
+          token: user.token,
+          role: user.role,
         };
         await setUser(updatedUser);
+        showNotification('پروفایل با موفقیت به‌روزرسانی شد', 'success');
         setSuccessMessage('پروفایل با موفقیت به‌روزرسانی شد');
         setIsEditing(false);
         setProfilePicture(null);
       } catch (error) {
+        showNotification('خطا در به‌روزرسانی پروفایل', 'error');
         setErrors({ general: 'خطا در به‌روزرسانی پروفایل' });
       } finally {
         setLoading(false);
@@ -195,10 +232,12 @@ const Profile: React.FC = () => {
     setLoading(true);
     try {
       await updatePassword(user!.email, passwordData.currentPassword, passwordData.newPassword);
+      showNotification('رمز عبور با موفقیت تغییر کرد', 'success');
       setSuccessMessage('رمز عبور با موفقیت تغییر کرد');
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       setIsChangingPassword(false);
     } catch (error) {
+      showNotification((error as Error).message || 'خطا در تغییر رمز عبور', 'error');
       setErrors({ general: (error as Error).message || 'خطا در تغییر رمز عبور' });
     } finally {
       setLoading(false);
@@ -228,7 +267,7 @@ const Profile: React.FC = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <Avatar
                     src={user?.profilePicture || selectedPicture || defaultProfilePicture}
-                    alt={user?.name}
+                    alt={user?.name || 'پروفایل'}
                     className={styles.profileAvatar}
                     sx={{ width: 150, height: 150 }}
                   />
@@ -253,10 +292,10 @@ const Profile: React.FC = () => {
                   )}
                 </Box>
               </Box>
+              <Typography variant="h6" className={styles.profileName}>
+                {user?.name.split(' ')[0] || 'کاربر'}
+              </Typography>
             </div>
-            <Typography variant="h6" className={styles.profileName}>
-              {user?.name.split(' ')[0]}
-            </Typography>
           </div>
 
           <Dialog open={openModal} onClose={() => setOpenModal(false)}>
@@ -357,7 +396,7 @@ const Profile: React.FC = () => {
                   <InputLabel>جنسیت</InputLabel>
                   <Select
                     name="gender"
-                    value={formData.gender}
+                    value={formData.gender || ''}
                     onChange={handleGenderChange}
                     error={!!errors.gender}
                     required

@@ -1,63 +1,50 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './FeaturedCourses.module.css';
 import { useCourseContext } from '../../Context/CourseContext';
 import { useInstructorContext } from '../../Context/InstructorContext';
-import CourseCard from '../CourseCard/CourseCard'; 
+import { useReviewContext } from '../../Context/ReviewContext';
+import { useWishlistContext } from '../../Context/WishlistContext';
+import { useCartContext } from '../../Context/CartContext';
+import { useAuthContext } from '../../Context/AuthContext';
+import { useNotificationContext } from '../../Context/NotificationContext';
+import CourseCard from '../CourseCard/CourseCard';
+import { Course, ReviewItem } from '../../types/types';
+import DOMPurify from 'dompurify';
 
-interface Course {
-  id: number;
-  title: string;
-  instructor: string;
-  description: string;
-  duration: string;
-  courseNumber: string;
-  category: string;
-  image: string;
-  price: string;
-  discountPrice?: string;
-  discountPercentage?: number;
-  startDate: string;
-  isOpen: boolean;
-  isFeatured: boolean;
-  enrollmentCount: number;
-  syllabus: { completed?: boolean }[];
-  tags?: string[];
-  prerequisites?: string[];
-  courseType: 'Online' | 'Offline' | 'In-Person' | 'Hybrid';
-  university: string;
-}
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
 
 const getRandomCourses = (courses: Course[], count: number): Course[] => {
-  const featuredCourses = courses.filter((course) => course.isFeatured && course.isOpen);
-  const otherCourses = courses.filter((course) => !course.isFeatured && course.isOpen);
-
-  const shuffledFeatured = [...featuredCourses].sort(() => Math.random() - 0.5);
-  const shuffledOthers = [...otherCourses].sort(() => Math.random() - 0.5);
-
-  const selectedCourses = [
-    ...shuffledFeatured.slice(0, Math.min(count, featuredCourses.length)),
-    ...shuffledOthers.slice(0, count - Math.min(count, featuredCourses.length)),
-  ].slice(0, count);
-
-  return selectedCourses;
+  const openCourses = courses.filter((course) => course.isOpen && course.isFeatured);
+  if (openCourses.length === 0) return [];
+  const shuffled = shuffleArray(openCourses);
+  return shuffled.slice(0, Math.min(count, openCourses.length));
 };
 
 const FeaturedCourses: React.FC = () => {
-  const { courses } = useCourseContext();
+  const { courses, loading } = useCourseContext();
   const { instructors } = useInstructorContext();
+  const { reviews } = useReviewContext();
+  const { isInWishlist, toggleWishlist, isWishlistLoading } = useWishlistContext();
+  const { cartItems, addToCart, removeFromCart } = useCartContext();
+  const { user, isAuthenticated } = useAuthContext();
+  const { showNotification } = useNotificationContext();
+  const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
-  const [cartItems, setCartItems] = useState<number[]>([]);
-  const [wishlist, setWishlist] = useState<number[]>([]);
 
   useEffect(() => {
     const handleScroll = () => {
       const section = document.querySelector(`.${styles.featured}`);
       if (section) {
         const { top } = section.getBoundingClientRect();
-        if (top < window.innerHeight - 100) {
-          setIsVisible(true);
-        }
+        setIsVisible(top < window.innerHeight - 100);
       }
     };
 
@@ -66,37 +53,61 @@ const FeaturedCourses: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const instructorNames = useMemo(() => {
-    return new Set(instructors.map((instructor) => instructor.name));
-  }, [instructors]);
+  const instructorNames = useMemo(() => new Set(instructors.map((instructor) => instructor.name)), [instructors]);
 
   const featuredCourses = useMemo(() => {
+    if (loading) return [];
     return getRandomCourses(courses, 3);
-  }, [courses]);
+  }, [courses, loading]);
 
-  const handleAddToCart = (course: Course) => {
-    setCartItems((prev) =>
-      prev.includes(course.id)
-        ? prev.filter((id) => id !== course.id)
-        : [...prev, course.id]
-    );
+  const isCartItem = (courseId: number) => cartItems.some((item) => item.courseId === courseId);
+
+  const isEnrolled = (courseId: number) => user?.enrolledCourses?.includes(courseId) || false;
+
+  const getAverageRating = (courseId: number) => {
+    const courseReviews = reviews.filter((review: ReviewItem) => review.courseId === courseId);
+    return courseReviews.length > 0
+      ? (courseReviews.reduce((sum: number, r: ReviewItem) => sum + r.rating, 0) / courseReviews.length).toFixed(1)
+      : '0.0';
   };
 
-  const handleWishlistToggle = (courseId: number) => {
-    setWishlist((prev) =>
-      prev.includes(courseId)
-        ? prev.filter((id) => id !== courseId)
-        : [...prev, courseId]
-    );
-  };
-
-  const isCartItem = (courseId: number) => cartItems.includes(courseId);
-
-  const isInWishlist = (id: number, type: 'course' | 'instructor') => {
-    if (type === 'course') {
-      return wishlist.includes(id);
+  const handleAddToCart = async (course: Course) => {
+    if (!isAuthenticated) {
+      showNotification('برای افزودن به سبد خرید، لطفاً وارد شوید.', 'warning');
+      navigate('/login');
+      return;
     }
-    return false;
+    try {
+      if (isCartItem(course.id)) {
+        const cartItem = cartItems.find((item) => item.courseId === course.id);
+        if (!cartItem) return;
+        const confirmRemove = window.confirm(
+          `آیا مطمئن هستید که می‌خواهید دوره "${DOMPurify.sanitize(course.title)}" را از سبد خرید حذف کنید؟`
+        );
+        if (!confirmRemove) return;
+        await removeFromCart(cartItem.id);
+        showNotification(`دوره "${DOMPurify.sanitize(course.title)}" از سبد خرید حذف شد.`, 'success');
+      } else {
+        await addToCart(course.id);
+        showNotification(`دوره "${DOMPurify.sanitize(course.title)}" به سبد خرید اضافه شد.`, 'success');
+      }
+    } catch (error) {
+      console.error('Error handling cart action:', error);
+      showNotification('خطایی در به‌روزرسانی سبد خرید رخ داد.', 'error');
+    }
+  };
+
+  const handleWishlistToggle = async (courseId: number, title: string) => {
+    if (!isAuthenticated) {
+      showNotification('برای افزودن به علاقه‌مندی‌ها، لطفاً وارد شوید.', 'warning');
+      navigate('/login');
+      return;
+    }
+    try {
+      await toggleWishlist(courseId, 'course', DOMPurify.sanitize(title));
+    } catch (error: any) {
+      showNotification(error.message || 'خطایی در به‌روزرسانی علاقه‌مندی‌ها رخ داد.', 'error');
+    }
   };
 
   return (
@@ -105,31 +116,38 @@ const FeaturedCourses: React.FC = () => {
         <h2 className={`${styles.title} ${isVisible ? styles.titleVisible : ''}`}>
           دوره‌های برجسته روم دنتال
         </h2>
-        <div className={styles.courses}>
-          {featuredCourses.length > 0 ? (
-            featuredCourses.map((course, index) => (
-              <CourseCard
-                key={course.id}
-                course={course}
-                isEnrolled={false} // فرض می‌کنیم کاربر در این دوره‌ها ثبت‌نام نکرده است
-                isCartItem={isCartItem}
-                handleAddToCart={handleAddToCart}
-                handleWishlistToggle={handleWishlistToggle}
-                isInWishlist={isInWishlist}
-                instructorNames={instructorNames}
-                averageRating="4.5" // مقدار پیش‌فرض برای نمونه
-                courseReviewsLength={10} // مقدار پیش‌فرض برای نمونه
-              />
-            ))
-          ) : (
-            <p className={styles.noCourses}>دوره‌ای برای نمایش وجود ندارد.</p>
-          )}
-        </div>
-        <div className={styles.viewAllContainer}>
-          <Link to="/courses" className={styles.viewAllButton}>
-            مشاهده همه دوره‌ها
-          </Link>
-        </div>
+        {loading ? (
+          <p className={styles.noCourses}>در حال بارگذاری...</p>
+        ) : featuredCourses.length > 0 ? (
+          <div className={styles.courses}>
+            {featuredCourses.map((course) => {
+              const courseReviews = reviews.filter((review: ReviewItem) => review.courseId === course.id);
+              const averageRating = getAverageRating(course.id);
+              const courseReviewsLength = courseReviews.length;
+
+              return (
+                <CourseCard
+                  key={course.id}
+                  course={{ ...course, image: `${course.image}?format=webp` }}
+                  isEnrolled={isEnrolled(course.id)}
+                  handleWishlistToggle={handleWishlistToggle}
+                  isInWishlist={isInWishlist}
+                  instructorNames={instructorNames}
+                  averageRating={averageRating}
+                  courseReviewsLength={courseReviewsLength}
+                  handleAddToCart={() => handleAddToCart(course)}
+                  isInCart={isCartItem(course.id)}
+                  isWishlistLoading={isWishlistLoading}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <p className={styles.noCourses}>هیچ دوره برجسته‌ای در دسترس نیست.</p>
+        )}
+        <Link to="/courses" className={styles.viewAllLink} aria-label="مشاهده همه دوره‌ها">
+          مشاهده همه دوره‌ها
+        </Link>
       </div>
     </section>
   );
