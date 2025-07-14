@@ -1,0 +1,135 @@
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 24px;
+  background-color: var(--secondary-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.title {
+  color: var(--primary-color);
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.createButton {
+  background-color: var(--accent-color) !important;
+  margin-bottom: 24px;
+}
+
+.createButton:hover {
+  background-color: var(--accent-color-hover) !important;
+}
+
+.emptyMessage {
+  text-align: center;
+  color: var(--gray);
+  font-size: 1.2rem;
+  margin-top: 24px;
+}
+
+.table {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.tableHeader {
+  background-color: var(--primary-color);
+}
+
+.tableHeader .tableCell {
+  color: var(--white);
+  font-weight: 600;
+  padding: 16px;
+}
+
+.tableRow {
+  transition: var(--transition);
+}
+
+.tableRow:hover {
+  background-color: #f5f5f5;
+}
+
+.tableCell {
+  padding: 12px;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--gray);
+}
+
+.editButton {
+  color: var(--accent-color) !important;
+}
+
+.editButton:hover {
+  color: var(--accent-color-hover) !important;
+}
+
+.deleteButton {
+  color: #d32f2f !important;
+}
+
+.deleteButton:hover {
+  color: #b71c1c !important;
+}
+
+/* Dark mode styles */
+.dark .container {
+  background-color: var(--primary-color);
+}
+
+.dark .title {
+  color: var(--primary-color);
+}
+
+.dark .createButton {
+  background-color: var(--accent-color) !important;
+}
+
+.dark .createButton:hover {
+  background-color: var(--accent-color-hover) !important;
+}
+
+.dark .emptyMessage {
+  color: var(--primary-color);
+}
+
+.dark .table {
+  background-color: var(--gray);
+}
+
+.dark .tableHeader {
+  background-color: var(--secondary-color);
+}
+
+.dark .tableHeader .tableCell {
+  color: var(--primary-color);
+}
+
+.dark .tableRow:hover {
+  background-color: #333333;
+}
+
+.dark .tableCell {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.dark .editButton {
+  color: var(--accent-color) !important;
+}
+
+.dark .editButton:hover {
+  color: var(--accent-color-hover) !important;
+}
+
+.dark .deleteButton {
+  color: #d32f2f !important;
+}
+
+.dark .deleteButton:hover {
+  color: #b71c1c !important;
+}

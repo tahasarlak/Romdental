@@ -37,7 +37,7 @@ interface Course {
   discountPrice?: string;
   discountPercentage?: number;
   startDate: string;
-  university: string;
+  university?: string;
   tags?: string[];
 }
 

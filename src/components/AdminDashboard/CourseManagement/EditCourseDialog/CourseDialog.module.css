@@ -1,0 +1,119 @@
+.dialog {
+  font-family: var(--font-family);
+}
+
+.dialogTitle {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: var(--text-color);
+  background-color: var(--secondary-color);
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--gray);
+  text-align: right;
+}
+
+.dialogContent {
+  padding: 1.5rem;
+  background-color: var(--white);
+}
+
+.dialogActions {
+  padding: 0.75rem 1rem;
+  background-color: var(--secondary-color);
+  border-top: 1px solid var(--gray);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.textField {
+  margin-bottom: 1rem;
+}
+
+.textField input,
+.textField textarea {
+  color: var(--text-color);
+  background-color: var(--secondary-color);
+  border: 1px solid var(--gray);
+  border-radius: var(--border-radius);
+  font-family: var(--font-family);
+  transition: var(--transition);
+}
+
+.textField input:focus,
+.textField textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(26, 43, 74, 0.2);
+}
+
+.select {
+  color: var(--text-color);
+  background-color: var(--secondary-color);
+  border: 1px solid var(--gray);
+  border-radius: var(--border-radius);
+  font-family: var(--font-family);
+  transition: var(--transition);
+}
+
+.select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(26, 43, 74, 0.2);
+}
+
+.createButton {
+  background-color: var(--accent-color);
+  color: var(--white);
+  transition: var(--transition);
+  font-family: var(--font-family);
+}
+
+.createButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.cancelButton {
+  color: var(--gray);
+  transition: var(--transition);
+  font-family: var(--font-family);
+}
+
+.cancelButton:hover {
+  color: var(--text-color);
+}
+
+.errorText {
+  color: #d32f2f;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  font-family: var(--font-family);
+}
+
+.dark .dialogTitle {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+.dark .dialogContent {
+  background-color: var(--secondary-color);
+}
+
+.dark .dialogActions {
+  background-color: var(--primary-color);
+}
+
+.dark .textField input,
+.dark .textField textarea {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border-color: var(--gray);
+}
+
+.dark .select {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border-color: var(--gray);
+}
+
+.dark .errorText {
+  color: #ef5350;
+}

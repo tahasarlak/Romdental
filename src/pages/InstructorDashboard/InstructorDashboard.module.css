@@ -1,0 +1,50 @@
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 24px;
+  background-color: var(--secondary-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.title {
+  color: var(--primary-color);
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.tabs {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  margin-bottom: 24px;
+}
+
+.tab {
+  color: var(--text-color) !important;
+  font-weight: 500;
+}
+
+.tab.Mui-selected {
+  color: var(--accent-color) !important;
+}
+
+/* Dark mode styles */
+.dark .container {
+  background-color: var(--primary-color);
+}
+
+.dark .title {
+  color: var(--primary-color);
+}
+
+.dark .tabs {
+  background-color: var(--gray);
+}
+
+.dark .tab {
+  color: var(--primary-color) !important;
+}
+
+.dark .tab.Mui-selected {
+  color: var(--accent-color) !important;
+}

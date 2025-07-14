@@ -1,26 +1,13 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { useAuthContext,  } from './AuthContext';
-import { User } from '../types/types'; // Updated import
-
-export interface BlogPost {
-  id: number;
-  title: string;
-  content: string;
-  slug?: string;
-  image?: string;
-  author?: string;
-  date?: string;
-  tags?: string[];
-  category?: string;
-  excerpt?: string;
-  images?: string[];
-  videos?: string[];
-}
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { useAuthContext } from './AuthContext';
+import { User, BlogPost } from '../types/types';
 
 interface BlogContextType {
   blogPosts: BlogPost[];
   addBlogPost: (post: Omit<BlogPost, 'id' | 'date' | 'author'>) => void;
   setBlogPosts: React.Dispatch<React.SetStateAction<BlogPost[]>>;
+  deleteBlogPost: (id: number) => Promise<void>;
+  loading: boolean;
 }
 
 export const BlogContext = createContext<BlogContextType | undefined>(undefined);
@@ -30,42 +17,52 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([
     {
       id: 1,
-      title: 'نکات مهم در مراقبت از دندان‌ها',
-      author: 'دکتر احمد رضایی',
-      category: 'بهداشت دهان',
-      excerpt: 'روش‌های ساده و مؤثر برای حفظ سلامت دندان‌ها.',
-      content: '<p>آموزش روش‌های روزمره برای سلامت دندان‌ها...</p>',
-      images: ['/assets/blog/dental-care.jpg'],
-      videos: ['https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
-      date: '2025-05-01',
-      tags: ['دندانپزشکی', 'بهداشت'],
+      title: 'مقدمه‌ای بر آناتومی دندان',
+      content: 'این پست به بررسی اصول اولیه آناتومی دندان می‌پردازد.',
+      excerpt: 'آشنایی با ساختار دندان و کاربردهای آن در دندانپزشکی.',
+      author: 'سارا احمدی',
+      date: '1404-02-15',
+      category: 'آموزش',
+      tags: ['آناتومی', 'دندانپزشکی'],
+      images: ['/assets/images/anatomy-post.jpg'],
+      videos: [],
     },
   ]);
+  const [loading, setLoading] = useState(false);
 
   const addBlogPost = (post: Omit<BlogPost, 'id' | 'date' | 'author'>) => {
-    if (!user || user.role !== 'Blogger') {
-      throw new Error('فقط وبلاگ‌نویس‌ها می‌تونن پست بذارن.');
+    if (!user || !['Blogger', 'SuperAdmin', 'Instructor'].includes(user.role)) {
+      throw new Error('فقط وبلاگ‌نویس‌ها، مدیران کل یا مربیان می‌تونن پست بذارن.');
     }
     setBlogPosts((prev) => [
       ...prev,
       {
         ...post,
-        id: prev.length + 1,
+        id: Math.max(...prev.map((p) => p.id || 0), 0) + 1,
         date: new Date().toISOString().split('T')[0],
         author: user.name,
       },
     ]);
   };
 
+  const deleteBlogPost = async (id: number) => {
+    if (!user || !['Blogger', 'SuperAdmin', 'Instructor'].includes(user.role)) {
+      throw new Error('فقط وبلاگ‌نویس‌ها، مدیران کل یا مربیان می‌تونن پست حذف کنن.');
+    }
+    setBlogPosts((prev) => prev.filter((post) => post.id !== id));
+  };
+
   const restrictedSetBlogPosts: React.Dispatch<React.SetStateAction<BlogPost[]>> = (action) => {
-    if (!user || user.role !== 'Blogger') {
-      throw new Error('فقط وبلاگ‌نویس‌ها می‌تونن پست‌ها رو تغییر بدن.');
+    if (!user || !['Blogger', 'SuperAdmin', 'Instructor'].includes(user.role)) {
+      throw new Error('فقط وبلاگ‌نویس‌ها، مدیران کل یا مربیان می‌تونن پست‌ها رو تغییر بدن.');
     }
     setBlogPosts(action);
   };
 
   return (
-    <BlogContext.Provider value={{ blogPosts, addBlogPost, setBlogPosts: restrictedSetBlogPosts }}>
+    <BlogContext.Provider
+      value={{ blogPosts, addBlogPost, setBlogPosts: restrictedSetBlogPosts, deleteBlogPost, loading }}
+    >
       {children}
     </BlogContext.Provider>
   );
@@ -76,3 +73,5 @@ export const useBlogContext = () => {
   if (!context) throw new Error('useBlogContext باید توی BlogProvider استفاده بشه');
   return context;
 };
+
+export type { BlogPost };

@@ -1,12 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import DOMPurify from 'dompurify';
-import { User, CategorizedUsers } from '../types/types';
+import { User, CategorizedUsers, WishlistItem } from '../types/types';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
   users: User[];
   categorizedUsers: CategorizedUsers;
+  universities: string[];
+  loading: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   login: (
     identifier: string,
@@ -23,7 +25,8 @@ interface AuthContextType {
     university: string,
     gender: 'مرد' | 'زن',
     course?: string,
-    role?: 'Student' | 'Instructor' | 'Blogger' | 'Admin'
+    role?: 'Student' | 'Instructor' | 'Blogger' | 'Admin' | 'SuperAdmin',
+    profilePicture?: string
   ) => Promise<void>;
   logout: () => void;
   setUser: (user: User | null) => Promise<void>;
@@ -31,6 +34,8 @@ interface AuthContextType {
   updatePassword: (userId: string, currentPasswordInput: string, newPassword: string) => Promise<void>;
   enrollInCourse: (userId: string, courseId: number) => Promise<void>;
   manageUser: (userId: string, updates: Partial<User>) => Promise<void>;
+  addUniversity: (university: string) => void;
+  deleteUser: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -81,12 +86,6 @@ const validatePassword = (password: string): boolean => {
   return password.length >= 8;
 };
 
-const logError = (message: string, data: unknown) => {
-  if (process.env.NODE_ENV !== 'production') {
-    console.warn(message, data);
-  }
-};
-
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const MALE_PROFILE_PICTURES = [
     '/assets/Profile/male-profile-1.jpg',
@@ -110,7 +109,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       university: 'دانشگاه تهران',
       gender: 'مرد',
       profilePicture: MALE_PROFILE_PICTURES[0],
-      wishlist: [],
+      wishlist: [{
+        id: 1, type: 'course', name: '',
+        likeDate: '',
+        userId: 0
+      }],
       enrolledCourses: [],
       cart: [],
       password: hashPassword('password123'),
@@ -142,7 +145,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       university: 'Sechenov',
       gender: 'مرد',
       profilePicture: MALE_PROFILE_PICTURES[1],
-      wishlist: [{ id: 1, type: 'course' }, { id: 2, type: 'instructor' }],
+      wishlist: [
+        {
+          id: 1, type: 'course', name: '',
+          likeDate: '',
+          userId: 0
+        },
+        {
+          id: 2, type: 'instructor', name: '',
+          likeDate: '',
+          userId: 0
+        },
+      ],
       enrolledCourses: [],
       cart: [],
       password: hashPassword('11111111111'),
@@ -151,6 +165,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       role: 'Student',
     },
   ]);
+  const [universities, setUniversities] = useState<string[]>(['دانشگاه تهران', 'Smashko', 'Sechenov']);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const categorizedUsers = useMemo(() => categorizeUsers(users), [users]);
 
@@ -171,29 +187,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     gender?: 'مرد' | 'زن',
     role?: 'Student' | 'Instructor' | 'Blogger'
   ) => {
-    if (!validateEmail(identifier) && !validatePhone(identifier)) {
-      throw new Error('ایمیل یا شماره تلفن نامعتبر است.');
-    }
-    if (!validatePassword(passwordInput)) {
-      throw new Error('رمز عبور باید حداقل ۸ کاراکتر باشد.');
-    }
+    setLoading(true);
+    try {
+      if (!validateEmail(identifier) && !validatePhone(identifier)) {
+        throw new Error('ایمیل یا شماره تلفن نامعتبر است.');
+      }
+      if (!validatePassword(passwordInput)) {
+        throw new Error('رمز عبور باید حداقل ۸ کاراکتر باشد.');
+      }
 
-    const existingUser = users.find(
-      (u) => (u.email === identifier || u.phone === identifier) && u.password === hashPassword(passwordInput)
-    );
-    if (!existingUser) throw new Error('ایمیل، شماره تلفن یا رمز عبور اشتباه است');
+      const existingUser = users.find(
+        (u) => (u.email === identifier || u.phone === identifier) && u.password === hashPassword(passwordInput)
+      );
+      if (!existingUser) throw new Error('ایمیل، شماره تلفن یا رمز عبور اشتباه است');
 
-    const updatedUser = {
-      ...existingUser,
-      course: course || existingUser.course,
-      gender: gender || existingUser.gender,
-      role: role && ['Student', 'Instructor', 'Blogger'].includes(role) ? role : existingUser.role,
-      token: `${existingUser.role.toLowerCase()}-token-${Date.now()}`,
-    };
-    setUserState(updatedUser);
-    setIsAuthenticated(true);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    localStorage.setItem('isAuthenticated', 'true');
+      const updatedUser = {
+        ...existingUser,
+        course: course || existingUser.course,
+        gender: gender || existingUser.gender,
+        role: role && ['Student', 'Instructor', 'Blogger'].includes(role) ? role : existingUser.role,
+        token: `${existingUser.role.toLowerCase()}-token-${Date.now()}`,
+      };
+      setUserState(updatedUser);
+      setIsAuthenticated(true);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      localStorage.setItem('isAuthenticated', 'true');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signup = async (
@@ -204,45 +225,51 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     university: string,
     gender: 'مرد' | 'زن',
     course?: string,
-    role: 'Student' | 'Instructor' | 'Blogger' | 'Admin' = 'Student'
+    role: 'Student' | 'Instructor' | 'Blogger' | 'Admin' | 'SuperAdmin' = 'Student',
+    profilePicture?: string
   ) => {
-    if (!name.trim()) throw new Error('نام نمی‌تواند خالی باشد.');
-    if (!validateEmail(email)) throw new Error('ایمیل نامعتبر است.');
-    if (!validatePhone(phone)) throw new Error('شماره تلفن باید با فرمت ۰۹xxxxxxxxx باشد.');
-    if (!validatePassword(passwordInput)) throw new Error('رمز عبور باید حداقل ۸ کاراکتر باشد.');
-    if (!university.trim()) throw new Error('دانشگاه نمی‌تواند خالی باشد.');
-    if (!['مرد', 'زن'].includes(gender)) throw new Error('جنسیت باید "مرد" یا "زن" باشد.');
+    setLoading(true);
+    try {
+      if (!name.trim()) throw new Error('نام نمی‌تواند خالی باشد.');
+      if (!validateEmail(email)) throw new Error('ایمیل نامعتبر است.');
+      if (!validatePhone(phone)) throw new Error('شماره تلفن باید با فرمت ۰۹xxxxxxxxx باشد.');
+      if (!validatePassword(passwordInput)) throw new Error('رمز عبور باید حداقل ۸ کاراکتر باشد.');
+      if (!university.trim()) throw new Error('دانشگاه نمی‌تواند خالی باشد.');
+      if (!['مرد', 'زن'].includes(gender)) throw new Error('جنسیت باید "مرد" یا "زن" باشد.');
 
-    if (users.some((u) => u.email === email || u.phone === phone)) {
-      throw new Error('ایمیل یا شماره تلفن قبلاً ثبت شده است');
+      if (users.some((u) => u.email === email || u.phone === phone)) {
+        throw new Error('ایمیل یا شماره تلفن قبلاً ثبت شده است');
+      }
+      if (role === 'Admin' && (!user || user.role !== 'SuperAdmin')) {
+        throw new Error('فقط سوپرادمین می‌تواند نقش ادمین را تخصیص دهد');
+      }
+
+      const pictures = gender === 'مرد' ? MALE_PROFILE_PICTURES : FEMALE_PROFILE_PICTURES;
+      const newUser: User = {
+        id: Math.max(...users.map((u) => u.id || 0), 0) + 1,
+        name: DOMPurify.sanitize(name),
+        email: DOMPurify.sanitize(email),
+        phone: DOMPurify.sanitize(phone),
+        university: DOMPurify.sanitize(university),
+        gender,
+        course: course ? DOMPurify.sanitize(course) : undefined,
+        profilePicture: profilePicture || pictures[Math.floor(Math.random() * pictures.length)],
+        wishlist: [],
+        enrolledCourses: role === 'Student' ? [] : [],
+        cart: [],
+        password: hashPassword(passwordInput),
+        token: `${role.toLowerCase()}-token-${Date.now()}`,
+        role,
+      };
+
+      setUsers((prev) => [...prev, newUser]);
+      setUserState(newUser);
+      setIsAuthenticated(true);
+      localStorage.setItem('user', JSON.stringify(newUser));
+      localStorage.setItem('isAuthenticated', 'true');
+    } finally {
+      setLoading(false);
     }
-    if (role === 'Admin' && (!user || user.role !== 'SuperAdmin')) {
-      throw new Error('فقط سوپرادمین می‌تواند نقش ادمین را تخصیص دهد');
-    }
-
-    const pictures = gender === 'مرد' ? MALE_PROFILE_PICTURES : FEMALE_PROFILE_PICTURES;
-    const newUser: User = {
-      id: Math.max(...users.map((u) => u.id || 0), 0) + 1,
-      name: DOMPurify.sanitize(name),
-      email: DOMPurify.sanitize(email),
-      phone: DOMPurify.sanitize(phone),
-      university: DOMPurify.sanitize(university),
-      gender,
-      course: course ? DOMPurify.sanitize(course) : undefined,
-      profilePicture: pictures[Math.floor(Math.random() * pictures.length)],
-      wishlist: [],
-      enrolledCourses: role === 'Student' ? [] : [],
-      cart: [],
-      password: hashPassword(passwordInput),
-      token: `${role.toLowerCase()}-token-${Date.now()}`,
-      role,
-    };
-
-    setUsers((prev) => [...prev, newUser]);
-    setUserState(newUser);
-    setIsAuthenticated(true);
-    localStorage.setItem('user', JSON.stringify(newUser));
-    localStorage.setItem('isAuthenticated', 'true');
   };
 
   const logout = () => {
@@ -253,89 +280,137 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const setUser = async (updatedUser: User | null) => {
-    if (updatedUser) {
-      if (!['مرد', 'زن'].includes(updatedUser.gender)) {
-        throw new Error('جنسیت باید "مرد" یا "زن" باشد.');
+    setLoading(true);
+    try {
+      if (updatedUser) {
+        if (!['مرد', 'زن'].includes(updatedUser.gender)) {
+          throw new Error('جنسیت باید "مرد" یا "زن" باشد.');
+        }
+        setUsers((prev) => prev.map((u) => (u.email === updatedUser.email ? updatedUser : u)));
+        setUserState(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        localStorage.setItem('isAuthenticated', 'true');
+      } else {
+        setUserState(null);
+        localStorage.removeItem('user');
+        localStorage.removeItem('isAuthenticated');
       }
-      setUsers((prev) => prev.map((u) => (u.email === updatedUser.email ? updatedUser : u)));
-      setUserState(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      localStorage.setItem('isAuthenticated', 'true');
-    } else {
-      setUserState(null);
-      localStorage.removeItem('user');
-      localStorage.removeItem('isAuthenticated');
+    } finally {
+      setLoading(false);
     }
   };
 
   const updatePassword = async (userId: string, currentPasswordInput: string, newPassword: string) => {
-    if (!validatePassword(newPassword)) throw new Error('رمز عبور جدید باید حداقل ۸ کاراکتر باشد.');
-    const targetUser = users.find(
-      (u) => (u.email === userId || u.phone === userId) && u.password === hashPassword(currentPasswordInput)
-    );
-    if (!targetUser) throw new Error('رمز عبور فعلی اشتباه است');
-    if (user?.role !== 'SuperAdmin' && user?.email !== targetUser.email && user?.phone !== targetUser.phone) {
-      throw new Error('فقط سوپرادمین می‌تواند رمز عبور کاربران دیگر را تغییر دهد');
-    }
-    const updatedUser = { ...targetUser, password: hashPassword(newPassword) };
-    setUsers((prev) => prev.map((u) => (u.email === userId || u.phone === userId ? updatedUser : u)));
-    if (user && (user.email === userId || user.phone === userId)) {
-      setUserState(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+    setLoading(true);
+    try {
+      if (!validatePassword(newPassword)) throw new Error('رمز عبور جدید باید حداقل ۸ کاراکتر باشد.');
+      const targetUser = users.find(
+        (u) => (u.email === userId || u.phone === userId) && u.password === hashPassword(currentPasswordInput)
+      );
+      if (!targetUser) throw new Error('رمز عبور فعلی اشتباه است');
+      if (user?.role !== 'SuperAdmin' && user?.email !== targetUser.email && user?.phone !== targetUser.phone) {
+        throw new Error('فقط سوپرادمین می‌تواند رمز عبور کاربران دیگر را تغییر دهد');
+      }
+      const updatedUser = { ...targetUser, password: hashPassword(newPassword) };
+      setUsers((prev) => prev.map((u) => (u.email === userId || u.phone === userId ? updatedUser : u)));
+      if (user && (user.email === userId || user.phone === userId)) {
+        setUserState(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   const enrollInCourse = async (userId: string, courseId: number) => {
-    if (!user) {
-      throw new Error('برای ثبت‌نام در دوره باید وارد حساب شوید.');
-    }
-    if (user.role !== 'Student') throw new Error('فقط دانشجویان می‌توانند در دوره‌ها ثبت‌نام کنند');
-    if (typeof courseId !== 'number' || courseId <= 0) throw new Error('شناسه دوره نامعتبر است.');
-    const updatedUser = {
-      ...user,
-      enrolledCourses: [...new Set([...user.enrolledCourses, courseId])],
-    };
-    setUsers((prev) => prev.map((u) => (u.email === userId || u.phone === userId ? updatedUser : u)));
-    if (user.email === userId || user.phone === userId) {
-      setUserState(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+    setLoading(true);
+    try {
+      if (!user) {
+        throw new Error('برای ثبت‌نام در دوره باید وارد حساب شوید.');
+      }
+      if (user.role !== 'Student') throw new Error('فقط دانشجویان می‌توانند در دوره‌ها ثبت‌نام کنند');
+      if (typeof courseId !== 'number' || courseId <= 0) throw new Error('شناسه دوره نامعتبر است.');
+      const updatedUser = {
+        ...user,
+        enrolledCourses: [...new Set([...user.enrolledCourses, courseId])],
+      };
+      setUsers((prev) => prev.map((u) => (u.email === userId || u.phone === userId ? updatedUser : u)));
+      if (user.email === userId || user.phone === userId) {
+        setUserState(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   const manageUser = async (userId: string, updates: Partial<User>) => {
-    if (!user || !['SuperAdmin', 'Admin'].includes(user.role)) {
-      throw new Error('فقط سوپرادمین و ادمین می‌توانند کاربران را مدیریت کنند');
+    setLoading(true);
+    try {
+      if (!user || !['SuperAdmin', 'Admin'].includes(user.role)) {
+        throw new Error('فقط سوپرادمین و ادمین می‌توانند کاربران را مدیریت کنند');
+      }
+      if (updates.role === 'SuperAdmin' && user.role !== 'SuperAdmin') {
+        throw new Error('فقط سوپرادمین می‌تواند نقش سوپرادمین را تخصیص دهد');
+      }
+      if (updates.gender && !['مرد', 'زن'].includes(updates.gender)) {
+        throw new Error('جنسیت باید "مرد" یا "زن" باشد.');
+      }
+      const targetUser = users.find((u) => u.email === userId || u.phone === userId);
+      if (!targetUser) throw new Error('کاربر یافت نشد');
+      const updatedUser: User = {
+        ...targetUser,
+        ...updates,
+        name: updates.name ? DOMPurify.sanitize(updates.name) : targetUser.name,
+        email: updates.email ? DOMPurify.sanitize(updates.email) : targetUser.email,
+        phone: updates.phone ? DOMPurify.sanitize(updates.phone) : targetUser.phone,
+        university: updates.university ? DOMPurify.sanitize(updates.university) : targetUser.university,
+        course: updates.course ? DOMPurify.sanitize(updates.course) : targetUser.course,
+        profilePicture: updates.profilePicture || targetUser.profilePicture,
+        gender: updates.gender || targetUser.gender,
+        role: updates.role || targetUser.role,
+        wishlist: updates.wishlist || targetUser.wishlist,
+        enrolledCourses: updates.enrolledCourses || targetUser.enrolledCourses,
+        cart: updates.cart || targetUser.cart,
+        password: updates.password || targetUser.password,
+        token: targetUser.token,
+        id: targetUser.id,
+      };
+      setUsers((prev) => prev.map((u) => (u.email === userId || u.phone === userId ? updatedUser : u)));
+      if (user && (user.email === userId || user.phone === userId)) {
+        setUserState(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+    } finally {
+      setLoading(false);
     }
-    if (updates.role === 'SuperAdmin' && user.role !== 'SuperAdmin') {
-      throw new Error('فقط سوپرادمین می‌تواند نقش سوپرادمین را تخصیص دهد');
+  };
+
+  const addUniversity = (university: string) => {
+    if (university && !universities.includes(university)) {
+      setUniversities((prev) => [...prev, university]);
     }
-    if (updates.gender && !['مرد', 'زن'].includes(updates.gender)) {
-      throw new Error('جنسیت باید "مرد" یا "زن" باشد.');
-    }
-    const targetUser = users.find((u) => u.email === userId || u.phone === userId);
-    if (!targetUser) throw new Error('کاربر یافت نشد');
-    const updatedUser: User = {
-      ...targetUser,
-      ...updates,
-      name: updates.name ? DOMPurify.sanitize(updates.name) : targetUser.name,
-      email: updates.email ? DOMPurify.sanitize(updates.email) : targetUser.email,
-      phone: updates.phone ? DOMPurify.sanitize(updates.phone) : targetUser.phone,
-      university: updates.university ? DOMPurify.sanitize(updates.university) : targetUser.university,
-      course: updates.course ? DOMPurify.sanitize(updates.course) : targetUser.course,
-      profilePicture: updates.profilePicture || targetUser.profilePicture,
-      gender: updates.gender || targetUser.gender,
-      role: updates.role || targetUser.role,
-      wishlist: updates.wishlist || targetUser.wishlist,
-      enrolledCourses: updates.enrolledCourses || targetUser.enrolledCourses,
-      cart: updates.cart || targetUser.cart,
-      password: updates.password || targetUser.password,
-      token: targetUser.token,
-      id: targetUser.id,
-    };
-    setUsers((prev) => prev.map((u) => (u.email === userId || u.phone === userId ? updatedUser : u)));
-    if (user && (user.email === userId || user.phone === userId)) {
-      setUserState(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
+  const deleteUser = async (email: string) => {
+    setLoading(true);
+    try {
+      if (!user || user.role !== 'SuperAdmin') {
+        throw new Error('فقط سوپرادمین می‌تواند کاربران را حذف کند');
+      }
+      const targetUser = users.find((u) => u.email === email);
+      if (!targetUser) throw new Error('کاربر یافت نشد');
+      if (targetUser.role === 'SuperAdmin') {
+        throw new Error('نمی‌توان کاربر سوپرادمین را حذف کرد');
+      }
+      setUsers((prev) => prev.filter((u) => u.email !== email));
+      if (user.email === email) {
+        setUserState(null);
+        localStorage.removeItem('user');
+        localStorage.removeItem('isAuthenticated');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -346,6 +421,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         user,
         users,
         categorizedUsers,
+        universities,
+        loading,
         setIsAuthenticated,
         login,
         signup,
@@ -355,6 +432,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         updatePassword,
         enrollInCourse,
         manageUser,
+        addUniversity,
+        deleteUser,
       }}
     >
       {children}
@@ -367,3 +446,5 @@ export const useAuthContext = () => {
   if (!context) throw new Error('useAuthContext must be used within an AuthProvider');
   return context;
 };
+
+export default AuthProvider;

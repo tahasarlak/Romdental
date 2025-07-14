@@ -1,0 +1,86 @@
+  .dialog {
+  font-family: var(--font-family);
+}
+
+.dialogTitle {
+  background-color: var(--primary-color);
+  color: var(--white);
+  font-weight: 600;
+  padding: 16px 24px;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.dialogContent {
+  padding: 24px;
+  background-color: var(--secondary-color);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.textField {
+  margin-bottom: 16px !important;
+}
+
+.textField input,
+.textField .MuiInputBase-root {
+  border-radius: var(--border-radius);
+  background-color: var(--white);
+  transition: var(--transition);
+}
+
+.textField .MuiInputBase-root.Mui-error {
+  border-color: #d32f2f;
+}
+
+.dialogActions {
+  padding: 16px 24px;
+  background-color: var(--secondary-color);
+  border-top: 1px solid var(--gray);
+}
+
+.cancelButton {
+  background-color: var(--gray) !important;
+  color: var(--white) !important;
+}
+
+.cancelButton:hover {
+  background-color: #6b6b6b !important;
+}
+
+.submitButton {
+  background-color: var(--accent-color) !important;
+}
+
+.submitButton:hover {
+  background-color: var(--accent-color-hover) !important;
+}
+
+/* Dark mode styles */
+.dark .dialogTitle {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+.dark .dialogContent {
+  background-color: var(--primary-color);
+}
+
+.dark .textField .MuiInputBase-root {
+  background-color: var(--gray);
+  color: var(--primary-color);
+}
+
+.dark .dialogActions {
+  background-color: var(--primary-color);
+  border-top-color: var(--gray);
+}
+
+.dark .cancelButton {
+  background-color: var(--gray) !important;
+  color: var(--primary-color) !important;
+}
+
+.dark .cancelButton:hover {
+  background-color: #4a4a4a !important;
+}

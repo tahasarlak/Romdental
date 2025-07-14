@@ -223,7 +223,7 @@ const BlogPostDetails: React.FC = React.memo(() => {
           </div>
         </div>
         <Typography variant="body1" className={styles.excerpt}>
-          {post.excerpt}
+          {post.excerpt || ''}
         </Typography>
         <div
           className={styles.content}

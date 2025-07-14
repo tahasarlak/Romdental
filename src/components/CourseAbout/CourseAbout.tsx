@@ -40,6 +40,7 @@ const validateCourse = (course: Course | null): { isValid: boolean; data: Course
     enrollmentCount: 0,
     syllabus: [],
     faqs: [],
+    currency: "",
   };
 
   if (

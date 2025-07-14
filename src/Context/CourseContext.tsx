@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useInstructorContext } from './InstructorContext';
 import { useNotificationContext } from './NotificationContext';
@@ -7,6 +8,10 @@ import { Course, SyllabusItem, ContentItem } from '../types/types';
 interface CourseContextType {
   courses: Course[];
   setCourses: React.Dispatch<React.SetStateAction<Course[]>>;
+  universities: string[];
+  addUniversity: (university: string) => void;
+  categories: string[];
+  addCategory: (category: string) => void;
   loading: boolean;
   addCourse: (course: Omit<Course, 'id'>) => Promise<void>;
   deleteCourse: (courseId: number) => Promise<void>;
@@ -20,6 +25,8 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const { showNotification } = useNotificationContext();
   const { user } = useAuthContext();
   const [loading, setLoading] = useState(true);
+  const [universities, setUniversities] = useState<string[]>(['Smashko', 'Piragova', 'RUDN', 'Sechenov']);
+  const [categories, setCategories] = useState<string[]>(['آناتومی', 'پروتز', 'ترمیمی', 'عمومی']);
   const [courses, setCourses] = useState<Course[]>([
     {
       id: 1,
@@ -29,12 +36,12 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       duration: "8 هفته",
       courseNumber: "Course 1",
       category: "آناتومی",
-      image: "/assets/courses/ahmmad.jpg",
+      image: "/assets/courses/anatomy.jpg",
       price: "۴,۵۰۰,۰۰۰ تومان",
       discountPrice: "۳,۸۰۰,۰۰۰ تومان",
       discountPercentage: 15,
       startDate: "اردیبهشت ۱۴۰۴",
-      isOpen: true,
+      isOpen: true, 
       isFeatured: true,
       enrollmentCount: 120,
       syllabus: [
@@ -73,6 +80,7 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       courseType: "Online",
       university: "Smashko",
       slug: "anatomy-course",
+      currency: ''
     },
     {
       id: 2,
@@ -82,7 +90,7 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       duration: "6 هفته",
       courseNumber: "Course 2",
       category: "پروتز",
-      image: "/assets/courses/ahmmad.jpg",
+      image: "/assets/courses/prosthodontics.jpg",
       price: "۵,۲۰۰,۰۰۰ تومان",
       discountPrice: "۴,۵۰۰,۰۰۰ تومان",
       discountPercentage: 13,
@@ -121,6 +129,7 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       courseType: "Hybrid",
       university: "Sechenov",
       slug: "prosthodontics-course",
+      currency: ''
     },
     {
       id: 3,
@@ -130,7 +139,7 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       duration: "10 هفته",
       courseNumber: "Course 3",
       category: "ترمیمی",
-      image: "/assets/courses/ahmmad.jpg",
+      image: "/assets/courses/restorative.jpg",
       price: "۶,۰۰۰,۰۰۰ تومان",
       discountPrice: undefined,
       discountPercentage: undefined,
@@ -169,6 +178,7 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       courseType: "In-Person",
       university: "RUDN",
       slug: "restorative-dentistry-course",
+      currency: ''
     },
   ]);
 
@@ -204,30 +214,63 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   const validateCourse = (course: Course): boolean => {
     const instructorNames = new Set(instructors.map((i) => i.name));
-    const validCategories = ['آناتومی', 'پروتز', 'ترمیمی', 'عمومی'];
     const validCourseTypes = ['Online', 'Offline', 'In-Person', 'Hybrid'];
-    const validUniversities = ['Smashko', 'Piragova', 'RUDN', 'Sechenov'];
 
     if (!instructorNames.has(course.instructor)) {
       console.warn(`استاد ${course.instructor} برای دوره ${course.title} یافت نشد.`);
       return false;
     }
-    if (!validCategories.includes(course.category)) console.warn(`دسته‌بندی ${course.category} نامعتبر است.`);
-    if (!validCourseTypes.includes(course.courseType)) console.warn(`نوع دوره ${course.courseType} نامعتبر است.`);
-    if (!validUniversities.includes(course.university)) console.warn(`دانشگاه ${course.university} نامعتبر است.`);
+    if (typeof course.category !== 'string' || course.category.trim() === '') {
+      console.warn(`دسته‌بندی ${course.category} نامعتبر است.`);
+      return false;
+    }
+    if (!validCourseTypes.includes(course.courseType)) {
+      console.warn(`نوع دوره ${course.courseType} نامعتبر است.`);
+      return false;
+    }
+    if (typeof course.university !== 'string' || course.university.trim() === '') {
+      console.warn(`دانشگاه ${course.university} نامعتبر است.`);
+      return false;
+    }
     if (!Array.isArray(course.syllabus) || !course.syllabus.every(validateSyllabusItem)) {
       console.warn(`سرفصل‌های دوره ${course.title} نامعتبر است.`);
       return false;
     }
 
-    return instructorNames.has(course.instructor);
+    return true;
   };
-
+console.log('Initial courses in CourseProvider:', courses);
   const validateAndSetCourses = (newCourses: Course[] | ((prev: Course[]) => Course[])) => {
     setCourses((prev) => {
       const updatedCourses = typeof newCourses === 'function' ? newCourses(prev) : newCourses;
       return updatedCourses.filter(validateCourse);
     });
+  };
+
+  const addUniversity = (university: string) => {
+    if (university.trim() === '') {
+      showNotification('نام دانشگاه نمی‌تواند خالی باشد', 'error');
+      return;
+    }
+    if (universities.includes(university)) {
+      showNotification('دانشگاه قبلاً وجود دارد', 'error');
+      return;
+    }
+    setUniversities((prev) => [...prev, university]);
+    showNotification(`دانشگاه ${university} با موفقیت اضافه شد`, 'success');
+  };
+
+  const addCategory = (category: string) => {
+    if (category.trim() === '') {
+      showNotification('نام دسته‌بندی نمی‌تواند خالی باشد', 'error');
+      return;
+    }
+    if (categories.includes(category)) {
+      showNotification('دسته‌بندی قبلاً وجود دارد', 'error');
+      return;
+    }
+    setCategories((prev) => [...prev, category]);
+    showNotification(`دسته‌بندی ${category} با موفقیت اضافه شد`, 'success');
   };
 
   const addCourse = async (course: Omit<Course, 'id'>) => {
@@ -241,6 +284,15 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         throw new Error(`استاد ${course.instructor} وجود ندارد`);
       }
       const newCourse: Course = { ...course, id: Math.max(...courses.map((c) => c.id), 0) + 1 };
+      if (!validateCourse(newCourse)) {
+        throw new Error('دوره نامعتبر است');
+      }
+      if (!universities.includes(newCourse.university)) {
+        addUniversity(newCourse.university);
+      }
+      if (!categories.includes(newCourse.category)) {
+        addCategory(newCourse.category);
+      }
       validateAndSetCourses((prev) => [...prev, newCourse]);
       showNotification('دوره با موفقیت اضافه شد', 'success');
     } catch (error: any) {
@@ -257,7 +309,7 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       if (!user || !['SuperAdmin', 'Admin'].includes(user.role)) {
         throw new Error('فقط سوپرادمین و ادمین می‌توانند دوره را حذف کنند');
       }
-      setCourses((prev) => prev.filter((course) => course.id !== courseId));
+      validateAndSetCourses((prev) => prev.filter((course) => course.id !== courseId));
       showNotification('دوره با موفقیت حذف شد', 'success');
     } catch (error: any) {
       showNotification(error.message, 'error');
@@ -284,7 +336,7 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   }, [instructors]);
 
   return (
-    <CourseContext.Provider value={{ courses, setCourses: validateAndSetCourses, loading, addCourse, deleteCourse, fetchCourses }}>
+    <CourseContext.Provider value={{ courses, setCourses: validateAndSetCourses, universities, addUniversity, categories, addCategory, loading, addCourse, deleteCourse, fetchCourses }}>
       {children}
     </CourseContext.Provider>
   );

@@ -1,6 +1,9 @@
 export interface WishlistItem {
+  likeDate: string;
+  userId: number;
   id: number;
   type: 'course' | 'instructor' | 'blog';
+  name: string;userName?: string;
 }
 
 export interface CartItem {
@@ -32,10 +35,10 @@ export interface User {
   phone: string;
   university: string;
   gender: 'مرد' | 'زن';
-  profilePicture: string;
+  profilePicture?: string;
   wishlist: WishlistItem[];
   enrolledCourses: number[];
-  cart: CartItem[];
+  cart: any[];
   password: string;
   token: string;
   course?: string;
@@ -83,10 +86,12 @@ export interface Course {
   description: string;
   duration: string;
   courseNumber: string;
-  category: 'آناتومی' | 'پروتز' | 'ترمیمی' | 'عمومی';
+  category: string; 
   image: string;
-  price: string;
-  discountPrice?: string;
+  price: string; 
+  currency: string; 
+  discountPrice?: string; 
+  discountCurrency?: string;
   discountPercentage?: number;
   startDate: string;
   isOpen: boolean;
@@ -97,7 +102,7 @@ export interface Course {
   tags?: string[];
   prerequisites?: string[];
   courseType: 'Online' | 'Offline' | 'In-Person' | 'Hybrid';
-  university: string;
+  university?: string; 
   level?: 'Beginner' | 'Intermediate' | 'Advanced'; 
 }
 

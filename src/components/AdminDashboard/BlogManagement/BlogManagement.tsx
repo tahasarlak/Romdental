@@ -17,12 +17,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import SearchIcon from '@mui/icons-material/Search';
 import { useBlogContext, BlogPost } from '../../../Context/BlogContext';
 import { useNotificationContext } from '../../../Context/NotificationContext';
-import BlogDialog from '../BlogDialog/BlogDialog';
+import BlogDialog from './BlogDialog/BlogDialog';
+import EditBlogDialog from './EditBlogDialog/EditBlogDialog';
+import styles from './BlogManagement.module.css';
 
 const BlogManagement: React.FC = () => {
   const { blogPosts, setBlogPosts } = useBlogContext();
   const { showNotification } = useNotificationContext();
   const [openBlogDialog, setOpenBlogDialog] = useState(false);
+  const [openEditBlogDialog, setOpenEditBlogDialog] = useState(false);
   const [editPostId, setEditPostId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const baseUrl = process.env.REACT_APP_BASE_URL || 'http://localhost:3000';
@@ -41,7 +44,7 @@ const BlogManagement: React.FC = () => {
 
   const handleEditBlogPost = (id: number) => {
     setEditPostId(id);
-    setOpenBlogDialog(true);
+    setOpenEditBlogDialog(true);
   };
 
   const filteredPosts = blogPosts.filter((post: BlogPost) =>
@@ -51,14 +54,14 @@ const BlogManagement: React.FC = () => {
   );
 
   return (
-    <Box sx={{ mt: 2, p: 3, maxWidth: '1200px', margin: '0 auto' }}>
-      <Typography variant="h4" gutterBottom>
+    <Box className={styles.container}>
+      <Typography variant="h4" className={styles.title}>
         مدیریت وبلاگ
       </Typography>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Button
           variant="contained"
-          color="primary"
+          className={styles.createButton}
           onClick={() => {
             setEditPostId(null);
             setOpenBlogDialog(true);
@@ -72,44 +75,45 @@ const BlogManagement: React.FC = () => {
           size="small"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          className={styles.searchField}
           InputProps={{
             startAdornment: <SearchIcon sx={{ mr: 1 }} />,
           }}
         />
       </Box>
-      <Table>
+      <Table className={styles.table}>
         <TableHead>
-          <TableRow>
-            <TableCell>عنوان</TableCell>
-            <TableCell>نویسنده</TableCell>
-            <TableCell>دسته‌بندی</TableCell>
-            <TableCell>تاریخ</TableCell>
-            <TableCell>اقدامات</TableCell>
+          <TableRow className={styles.tableHeader}>
+            <TableCell className={styles.tableCell}>عنوان</TableCell>
+            <TableCell className={styles.tableCell}>نویسنده</TableCell>
+            <TableCell className={styles.tableCell}>دسته‌بندی</TableCell>
+            <TableCell className={styles.tableCell}>تاریخ</TableCell>
+            <TableCell className={styles.tableCell}>اقدامات</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {filteredPosts.map((post: BlogPost) => (
-            <TableRow key={post.id}>
-              <TableCell>{post.title}</TableCell>
-              <TableCell>{post.author}</TableCell>
-              <TableCell>{post.category}</TableCell>
-              <TableCell>{post.date}</TableCell>
-              <TableCell>
+            <TableRow key={post.id} className={styles.tableRow}>
+              <TableCell className={styles.tableCell}>{post.title}</TableCell>
+              <TableCell className={styles.tableCell}>{post.author}</TableCell>
+              <TableCell className={styles.tableCell}>{post.category}</TableCell>
+              <TableCell className={styles.tableCell}>{post.date}</TableCell>
+              <TableCell className={styles.tableCell}>
                 <IconButton
-                  color="primary"
+                  className={styles.editButton}
                   onClick={() => handleEditBlogPost(post.id)}
                   aria-label="ویرایش پست"
                 >
                   <EditIcon />
                 </IconButton>
                 <IconButton
-                  color="error"
+                  className={styles.deleteButton}
                   onClick={() => handleDeleteBlogPost(post.id)}
                   aria-label="حذف پست"
                 >
                   <DeleteIcon />
                 </IconButton>
-                <Link to={`${baseUrl}/blog/${post.id}`} className="text-blue-500 ml-2">
+                <Link to={`${baseUrl}/blog/${post.id}`} className={styles.viewLink}>
                   ببین
                 </Link>
               </TableCell>
@@ -121,6 +125,14 @@ const BlogManagement: React.FC = () => {
         open={openBlogDialog}
         onClose={() => {
           setOpenBlogDialog(false);
+          setEditPostId(null);
+        }}
+        postId={editPostId}
+      />
+      <EditBlogDialog
+        open={openEditBlogDialog}
+        onClose={() => {
+          setOpenEditBlogDialog(false);
           setEditPostId(null);
         }}
         postId={editPostId}

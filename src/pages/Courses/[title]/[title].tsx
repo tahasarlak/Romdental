@@ -1,3 +1,4 @@
+// [title].tsx
 import React, { useState, useCallback, useEffect, useRef, memo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -293,7 +294,7 @@ const CourseDetails: React.FC = memo(() => {
         <div className={styles.container}>
           <Breadcrumb />
           <CourseHeader
-            course={{ ...course, image: `${course.image}?format=webp` }}
+            course={course}
             courseReviews={courseReviews}
             isInWishlist={isInWishlist}
             toggleShareDropdown={toggleShareDropdown}

@@ -44,6 +44,7 @@ const PurchasedCourses: React.FC = () => {
         prerequisites: [],
         courseType: 'Online' as const,
         university: 'نامشخص',
+        currency: "IRR",
       }
     );
   };

@@ -20,13 +20,13 @@ const InstructorContext = createContext<InstructorContextType | undefined>(undef
 // Memoize initial instructors to prevent re-creation
 const initialInstructors: Instructor[] = [
   {
-    id: 1,
+    id: 2,
     name: 'سارا احمدی',
     specialty: 'آناتومی دندان',
     bio: 'دکتر سارا احمدی متخصص آناتومی دندان با بیش از 10 سال تجربه تدریس.',
     image: '/assets/instructors/ahmad-rasteh.jpg',
     experience: '10 سال',
-    coursesTaught: ['دوره جامع آناتومی دندان', 'دوره پیشرفته پروتز دندانی', 'دوره ترمیمی دندانپزشکی'],
+coursesTaught: ['دوره جامع آناتومی دندان'],
     averageRating: '4.5',
     totalStudents: 200,
     reviewCount: 50,
@@ -35,7 +35,7 @@ const initialInstructors: Instructor[] = [
     instagramLink: 'https://instagram.com/sara_ahmadi_dentist',
   },
   {
-    id: 2,
+    id: 1,
     name: 'علی محمدی',
     specialty: 'پروتز دندانی',
     bio: 'متخصص پروتز دندانی با تجربه در آموزش تکنیک‌های پیشرفته.',

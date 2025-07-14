@@ -4,6 +4,7 @@ interface SubscriptionContextType {
   email: string;
   setEmail: (email: string) => void;
   status: 'idle' | 'loading' | 'success' | 'error';
+  setStatus: (status: 'idle' | 'loading' | 'success' | 'error') => void;
   message: string;
   subscribe: (email: string) => Promise<void>;
 }
@@ -24,7 +25,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
     setStatus('loading');
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setStatus('success');
       setMessage('با موفقیت ثبت‌نام شدید!');
       setEmail('');
@@ -35,7 +36,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   return (
-    <SubscriptionContext.Provider value={{ email, setEmail, status, message, subscribe }}>
+    <SubscriptionContext.Provider value={{ email, setEmail, status, setStatus, message, subscribe }}>
       {children}
     </SubscriptionContext.Provider>
   );

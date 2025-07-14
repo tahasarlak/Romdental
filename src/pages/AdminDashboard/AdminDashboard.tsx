@@ -6,12 +6,12 @@ import { useNotificationContext } from '../../Context/NotificationContext';
 import BlogManagement from '../../components/AdminDashboard/BlogManagement/BlogManagement';
 import CourseManagement from '../../components/AdminDashboard/CourseManagement/CourseManagement';
 import UserManagement from '../../components/AdminDashboard/UserManagement/UserManagement';
-import ContactManagement from '../../components/AdminDashboard/ContactManagement/ContactManagement';
 import InstructorManagement from '../../components/AdminDashboard/InstructorManagement/InstructorManagement';
 import ReviewManagement from '../../components/AdminDashboard/ReviewManagement/ReviewManagement';
 import SubscriptionManagement from '../../components/AdminDashboard/SubscriptionManagement/SubscriptionManagement';
 import WishlistManagement from '../../components/AdminDashboard/WishlistManagement/WishlistManagement';
 import ScheduleManagement from '../../components/AdminDashboard/ScheduleManagement.tsx/ScheduleManagement';
+import ContactManagement from '../../components/AdminDashboard/ContactManagement/ContactManagement';
 
 const AdminDashboard: React.FC = () => {
   const { isAuthenticated, user, setIsAuthenticated } = useAuthContext();

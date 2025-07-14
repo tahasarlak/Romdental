@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useCourseContext } from './CourseContext';
 
-interface ScheduleItem {
+export interface ScheduleItem {
   id: number;
   day: string;
   time: string;
@@ -13,6 +13,7 @@ interface ScheduleItem {
 interface ScheduleContextType {
   weeklySchedule: ScheduleItem[];
   setWeeklySchedule: React.Dispatch<React.SetStateAction<ScheduleItem[]>>;
+  addScheduleItem: (item: Omit<ScheduleItem, 'id'>) => void; // Add this
 }
 
 const ScheduleContext = createContext<ScheduleContextType | undefined>(undefined);
@@ -35,8 +36,16 @@ export const ScheduleProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const [weeklySchedule, setWeeklySchedule] = useState<ScheduleItem[]>(initialSchedule);
 
+  const addScheduleItem = (item: Omit<ScheduleItem, 'id'>) => {
+    const newItem: ScheduleItem = {
+      id: weeklySchedule.length ? Math.max(...weeklySchedule.map((s) => s.id)) + 1 : 1, // Generate new ID
+      ...item,
+    };
+    setWeeklySchedule((prev) => [...prev, newItem]);
+  };
+
   return (
-    <ScheduleContext.Provider value={{ weeklySchedule, setWeeklySchedule }}>
+    <ScheduleContext.Provider value={{ weeklySchedule, setWeeklySchedule, addScheduleItem }}>
       {children}
     </ScheduleContext.Provider>
   );

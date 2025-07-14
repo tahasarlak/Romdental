@@ -68,15 +68,6 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     };
 
     try {
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-        },
-        body: JSON.stringify(newOrder),
-      });
-      if (!response.ok) throw new Error('خطا در ثبت سفارش');
       setOrders((prev) => [...prev, newOrder]);
       showNotification('سفارش با موفقیت ثبت شد.', 'success');
     } catch (error: any) {
@@ -98,15 +89,6 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
 
     try {
-      const response = await fetch(`/api/orders/${orderId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-        },
-        body: JSON.stringify({ status: 'canceled' }),
-      });
-      if (!response.ok) throw new Error('خطا در لغو سفارش');
       setOrders((prev) =>
         prev.map((o) => (o.id === orderId ? { ...o, status: 'canceled', items: o.items.map((item) => ({ ...item, status: 'canceled' })) } : o))
       );
