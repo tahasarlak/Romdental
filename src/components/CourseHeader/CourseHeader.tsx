@@ -13,9 +13,8 @@ import TelegramIcon from '@mui/icons-material/Telegram';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button';
 import styles from './CourseHeader.module.css';
-import { useCartContext } from '../../Context/CartContext'; // تغییر به CartContext
+import { useCartContext } from '../../Context/CartContext';
 
 interface ReviewItem {
   id: number;
@@ -36,7 +35,8 @@ interface Course {
   price: string;
   discountPrice?: string;
   discountPercentage?: number;
-  startDate: string;
+  startDateJalali: string;
+  startDateGregorian: string;
   university?: string;
   tags?: string[];
 }
@@ -73,7 +73,8 @@ const validateCourse = (course: Course): { isValid: boolean; data: Course; error
     courseNumber: '',
     image: '',
     price: '',
-    startDate: '',
+    startDateJalali: '',
+    startDateGregorian: '',
     university: '',
     tags: [],
   };
@@ -87,7 +88,8 @@ const validateCourse = (course: Course): { isValid: boolean; data: Course; error
     !course.courseNumber?.trim() ||
     !course.image?.match(/^https?:\/\/|^\/|^data:image\//) ||
     !course.price?.trim() ||
-    !course.startDate?.trim() ||
+    !course.startDateJalali?.trim() ||
+    !course.startDateGregorian?.trim() ||
     !course.university?.trim()
   ) {
     return { isValid: false, data: defaultCourse, error: 'یکی از فیلدهای مورد نیاز دوره نامعتبر یا خالی است.' };
@@ -133,7 +135,7 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({
   handleWishlistToggle,
   dropdownRef,
 }) => {
-  const { addToCart } = useCartContext(); // استفاده از CartContext
+  const { addToCart } = useCartContext();
 
   const { isValid, data, error } = useMemo(() => validateCourse(course), [course]);
   const validatedReviews = useMemo(() => validateReviews(courseReviews), [courseReviews]);
@@ -152,12 +154,12 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({
       description: sanitizeText(data.description),
       provider: {
         '@type': 'Organization',
-        name: sanitizeText(data.university),
+        name: sanitizeText(data.university || ''),
       },
       hasCourseInstance: {
         '@type': 'CourseInstance',
         courseMode: 'online',
-        startDate: sanitizeText(data.startDate),
+        startDate: sanitizeText(data.startDateGregorian),
         instructor: {
           '@type': 'Person',
           name: sanitizeText(data.instructor),
@@ -193,7 +195,7 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({
     );
   }
 
-  const { id, title, instructor, description, duration, courseNumber, image, price, discountPrice, discountPercentage, startDate, university, tags } = data;
+  const { id, title, instructor, description, duration, courseNumber, image, price, discountPrice, discountPercentage, startDateJalali, university, tags } = data;
 
   return (
     <section className={styles.courseHeader} aria-label="جزئیات دوره">
@@ -250,9 +252,9 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({
             )}
           </span>
           <span>
-            <CalendarTodayIcon aria-hidden="true" /> شروع: {sanitizeText(startDate)}
+            <CalendarTodayIcon aria-hidden="true" /> شروع: {sanitizeText(startDateJalali)}
           </span>
-          <span>دانشگاه: {sanitizeText(university)}</span>
+          <span>دانشگاه: {sanitizeText(university || '')}</span>
         </div>
         {tags?.length > 0 && (
           <div className={styles.tagsContainer}>
@@ -264,7 +266,6 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({
           </div>
         )}
         <div className={styles.actionButtons}>
-      
           <div className={styles.shareContainer}>
             <IconButton
               className={styles.shareButton}

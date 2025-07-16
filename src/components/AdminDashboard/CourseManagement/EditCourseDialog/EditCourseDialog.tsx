@@ -14,9 +14,12 @@ import {
   Autocomplete,
   ToggleButton,
   ToggleButtonGroup,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 import { useNotificationContext } from '../../../../Context/NotificationContext';
 import { useCourseContext } from '../../../../Context/CourseContext';
+import moment from 'moment-jalaali';
 import styles from './CourseDialog.module.css';
 
 type Course = ReturnType<typeof useCourseContext>['courses'][number];
@@ -30,14 +33,14 @@ interface EditCourseDialogProps {
 
 const EditCourseDialog: React.FC<EditCourseDialogProps> = ({ open, onClose, course, onUpdate }) => {
   const { showNotification } = useNotificationContext();
-  const { universities, categories, addUniversity, addCategory } = useCourseContext();
+  const { universities, categories, countries, addUniversity, addCategory, addCountry } = useCourseContext();
   const [imageInputMode, setImageInputMode] = useState<'url' | 'upload'>('url');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [formData, setFormData] = useState<Course>({ ...course, currency: course.currency || 'IRR' });
+  const [formData, setFormData] = useState<Course>({ ...course, currency: course.currency || 'IRR', countries: course.countries || [] });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    setFormData({ ...course, currency: course.currency || 'IRR' });
+    setFormData({ ...course, currency: course.currency || 'IRR', countries: course.countries || [] });
     setImageInputMode(course.image.startsWith('blob:') ? 'upload' : 'url');
   }, [course]);
 
@@ -51,8 +54,10 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({ open, onClose, cour
         return !value || value.trim() === '' ? 'توضیحات الزامی است' : '';
       case 'price':
         return !value || !/^\d+(,\d{3})*( تومان)?$/.test(value) ? 'قیمت باید به فرمت معتبر وارد شود (مثال: ۴,۵۰۰,۰۰۰)' : '';
-      case 'startDate':
-        return !value || !/^[ا-ی]+\s+\d{4}$/.test(value) ? 'تاریخ شروع باید به فرمت "ماه سال" باشد' : '';
+      case 'startDateJalali':
+        return !value || !/^\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/.test(value) ? 'تاریخ شروع جلالی باید به فرمت YYYY/MM/DD باشد' : '';
+      case 'startDateGregorian':
+        return !value || !/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(value) ? 'تاریخ شروع میلادی باید به فرمت YYYY-MM-DD باشد' : '';
       case 'category':
         return !value || value.trim() === '' ? 'دسته‌بندی الزامی است' : '';
       case 'image':
@@ -64,6 +69,8 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({ open, onClose, cour
         return value && !/^\d+(,\d{3})*( تومان)?$/.test(value) ? 'قیمت تخفیف باید به فرمت معتبر وارد شود (مثال: ۳,۸۰۰,۰۰۰)' : '';
       case 'currency':
         return !value || value.trim() === '' ? 'واحد پول الزامی است' : '';
+      case 'countries':
+        return !value || value.length === 0 ? 'حداقل یک کشور باید انتخاب شود' : '';
       default:
         return '';
     }
@@ -75,7 +82,6 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({ open, onClose, cour
     const { name, value } = e.target;
     let updatedFormData = { ...formData, [name]: value };
 
-    // Calculate discountPrice if discountPercentage is entered
     if (name === 'discountPercentage' && value) {
       const percentage = parseFloat(value);
       if (percentage >= 0 && percentage <= 100 && formData.price) {
@@ -85,9 +91,7 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({ open, onClose, cour
           updatedFormData.discountPrice = Math.round(discountPrice).toLocaleString('fa-IR') + ' تومان';
         }
       }
-    }
-    // Calculate discountPercentage if discountPrice is entered
-    else if (name === 'discountPrice' && value) {
+    } else if (name === 'discountPrice' && value) {
       const discountPriceNum = parseFloat(value.replace(/,/g, ''));
       if (formData.price) {
         const priceNum = parseFloat(formData.price.replace(/,/g, ''));
@@ -96,14 +100,19 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({ open, onClose, cour
           updatedFormData.discountPercentage = Math.round(percentage);
         }
       }
+    } else if (name === 'startDateJalali' && value) {
+      const gregorianDate = jalaliToGregorian(value);
+      if (gregorianDate) {
+        updatedFormData.startDateGregorian = gregorianDate;
+      }
     }
 
     setFormData(updatedFormData);
     setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
   };
 
-  const handleAutocompleteChange = (name: string, value: string | null) => {
-    setFormData((prev) => ({ ...prev, [name]: value || undefined }));
+  const handleAutocompleteChange = (name: string, value: string | string[] | null) => {
+    setFormData((prev) => ({ ...prev, [name]: value || (name === 'countries' ? [] : undefined) }));
     setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
   };
 
@@ -126,9 +135,19 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({ open, onClose, cour
     setErrors((prev) => ({ ...prev, image: validateField('image', file ? file.name : '') }));
   };
 
+  const jalaliToGregorian = (jalaliDate: string): string | null => {
+    if (!/^\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/.test(jalaliDate)) return null;
+    try {
+      const jalaliMoment = moment(jalaliDate, 'jYYYY/jMM/jDD');
+      return jalaliMoment.isValid() ? jalaliMoment.format('YYYY-MM-DD') : null;
+    } catch {
+      return null;
+    }
+  };
+
   const handleUpdate = () => {
     const newErrors: { [key: string]: string } = {};
-    ['title', 'instructor', 'description', 'price', 'startDate', 'category', 'image', 'currency'].forEach((field) => {
+    ['title', 'instructor', 'description', 'price', 'startDateJalali', 'startDateGregorian', 'category', 'image', 'currency', 'countries'].forEach((field) => {
       const error = validateField(field, formData[field as keyof Course]);
       if (error) newErrors[field] = error;
     });
@@ -139,12 +158,27 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({ open, onClose, cour
       return;
     }
 
-    // Add new university and category if they don't exist
+    if (formData.startDateJalali && formData.startDateGregorian) {
+      const gregorianFromJalali = jalaliToGregorian(formData.startDateJalali);
+      if (gregorianFromJalali !== formData.startDateGregorian) {
+        setErrors((prev) => ({ ...prev, startDateJalali: 'تاریخ‌های جلالی و میلادی همخوانی ندارند' }));
+        showNotification('تاریخ‌های جلالی و میلادی همخوانی ندارند!', 'error');
+        return;
+      }
+    }
+
     if (formData.university && !universities.includes(formData.university)) {
       addUniversity(formData.university);
     }
     if (formData.category && !categories.includes(formData.category)) {
       addCategory(formData.category);
+    }
+    if (formData.countries) {
+      formData.countries.forEach((country) => {
+        if (!countries.includes(country)) {
+          addCountry(country);
+        }
+      });
     }
 
     const updatedCourse: Course = {
@@ -153,7 +187,8 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({ open, onClose, cour
       university: formData.university || undefined,
       discountPrice: formData.discountPrice || undefined,
       discountPercentage: formData.discountPercentage || undefined,
-      currency: formData.currency || 'IRR', // Ensure currency is set
+      currency: formData.currency || 'IRR',
+      countries: formData.countries || [],
     };
     onUpdate(updatedCourse);
     setSelectedFile(null);
@@ -259,6 +294,26 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({ open, onClose, cour
             />
           )}
         />
+        <Autocomplete
+          multiple
+          freeSolo
+          options={countries}
+          value={formData.countries || []}
+          onChange={(event, value) => handleAutocompleteChange('countries', value)}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              margin="dense"
+              name="countries"
+              label="کشورها"
+              fullWidth
+              required
+              error={!!errors.countries}
+              helperText={errors.countries || 'کشورها را وارد کنید یا از موجود انتخاب کنید'}
+              className={styles.textField}
+            />
+          )}
+        />
         <TextField
           margin="dense"
           name="price"
@@ -353,15 +408,28 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({ open, onClose, cour
         )}
         <TextField
           margin="dense"
-          name="startDate"
-          label="تاریخ شروع"
+          name="startDateJalali"
+          label="تاریخ شروع جلالی (YYYY/MM/DD)"
           type="text"
           fullWidth
-          value={formData.startDate}
+          value={formData.startDateJalali}
           onChange={handleInputChange}
           required
-          error={!!errors.startDate}
-          helperText={errors.startDate}
+          error={!!errors.startDateJalali}
+          helperText={errors.startDateJalali}
+          className={styles.textField}
+        />
+        <TextField
+          margin="dense"
+          name="startDateGregorian"
+          label="تاریخ شروع میلادی (YYYY-MM-DD)"
+          type="text"
+          fullWidth
+          value={formData.startDateGregorian}
+          onChange={handleInputChange}
+          required
+          error={!!errors.startDateGregorian}
+          helperText={errors.startDateGregorian}
           className={styles.textField}
         />
         <TextField
@@ -390,6 +458,17 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({ open, onClose, cour
             <MenuItem value="Course 5">Course 5</MenuItem>
           </Select>
         </FormControl>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={formData.isOpen}
+              onChange={(e) => setFormData((prev) => ({ ...prev, isOpen: e.target.checked }))}
+              name="isOpen"
+            />
+          }
+          label="وضعیت دوره (باز/بسته)"
+          className={styles.switch}
+        />
       </DialogContent>
       <DialogActions className={styles.dialogActions}>
         <Button onClick={onClose} className={styles.cancelButton}>

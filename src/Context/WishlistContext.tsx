@@ -26,6 +26,7 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [isWishlistLoading, setIsWishlistLoading] = useState<boolean>(false);
 
+  // بارگذاری اولیه لیست علاقه‌مندی‌ها از localStorage یا user.wishlist
   useEffect(() => {
     if (isAuthenticated && user) {
       const userWishlist = Array.isArray(user.wishlist) ? user.wishlist : [];
@@ -36,7 +37,7 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
         .map((item: any) => ({
           ...item,
           id: Number(item.id),
-          userId: Number(item.userId) || 0, // Convert to number, fallback to 0
+          userId: Number(item.userId) || 0,
           likeDate: item.likeDate || new Date().toLocaleDateString('fa-IR'),
         }))
         .filter(
@@ -44,7 +45,7 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
             typeof item === 'object' &&
             item !== null &&
             typeof item.id === 'number' &&
-            typeof item.userId === 'number' && // Updated to expect number
+            typeof item.userId === 'number' &&
             ['course', 'instructor', 'blog'].includes(item.type) &&
             typeof item.likeDate === 'string' &&
             (typeof item.name === 'string' || item.name === undefined)
@@ -53,27 +54,28 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   }, [isAuthenticated, user]);
 
+  // ذخیره تغییرات wishlist در localStorage
   useEffect(() => {
     localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
-  }, [wishlistItems]);
+    if (isAuthenticated && user) {
+      const updatedUser: User = {
+        ...user,
+        wishlist: wishlistItems,
+      };
+      setUser(updatedUser);
+    }
+  }, [wishlistItems, isAuthenticated, user, setUser]);
 
+  // بررسی وجود آیتم در لیست علاقه‌مندی‌ها
   const isInWishlist = (id: number, type: 'course' | 'instructor' | 'blog'): boolean => {
     return wishlistItems.some((item) => item.id === id && item.type === type);
   };
 
+  // افزودن یا حذف آیتم از لیست علاقه‌مندی‌ها
   const toggleWishlist = async (itemId: number, type: 'course' | 'instructor' | 'blog', name: string) => {
-    if (!isAuthenticated || !user) {
-      showNotification('برای افزودن به لیست علاقه‌مندی‌ها، لطفاً ابتدا وارد حساب کاربری شوید.', 'warning');
-      throw new Error('User not authenticated');
-    }
-
     setIsWishlistLoading(true);
     try {
-      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-      if (!csrfToken) {
-        throw new Error('خطای امنیتی: توکن CSRF یافت نشد.');
-      }
-
+      // اعتبارسنجی آیتم
       if (type === 'course' && !courses.some((course) => course.id === itemId)) {
         throw new Error('دوره موردنظر یافت نشد.');
       }
@@ -90,68 +92,25 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
           `آیا مطمئن هستید که می‌خواهید "${DOMPurify.sanitize(name)}" را از علاقه‌مندی‌ها حذف کنید؟`
         );
         if (!confirmRemove) {
-          setIsWishlistLoading(false);
           return;
         }
 
-        const response = await fetch('/api/wishlist/remove', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': csrfToken,
-          },
-          body: JSON.stringify({ userId: user.id, itemId, type }), // Use user.id (number)
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'خطا در حذف از علاقه‌مندی‌ها');
-        }
-
+        // حذف آیتم از wishlist
         const newWishlist = wishlistItems.filter((item) => item.id !== itemId || item.type !== type);
         setWishlistItems(newWishlist);
-        const updatedUser: User = {
-          ...user,
-          wishlist: newWishlist,
-        };
-        await setUser(updatedUser);
         showNotification(`"${DOMPurify.sanitize(name)}" از علاقه‌مندی‌ها حذف شد.`, 'success');
       } else {
+        // افزودن آیتم به wishlist
         const newWishlistItem: WishlistItem = {
           id: itemId,
           type,
           name,
-          userId: user.id, // Use user.id (number)
+          userId: isAuthenticated && user ? user.id : 0,
           likeDate: new Date().toLocaleDateString('fa-IR'),
         };
 
-        const response = await fetch('/api/wishlist/add', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': csrfToken,
-          },
-          body: JSON.stringify({
-            userId: user.id, // Use user.id (number)
-            itemId,
-            type,
-            name,
-            likeDate: newWishlistItem.likeDate,
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'خطا در افزودن به علاقه‌مندی‌ها');
-        }
-
         const newWishlist = [...wishlistItems, newWishlistItem];
         setWishlistItems(newWishlist);
-        const updatedUser: User = {
-          ...user,
-          wishlist: newWishlist,
-        };
-        await setUser(updatedUser);
         showNotification(`"${DOMPurify.sanitize(name)}" به علاقه‌مندی‌ها اضافه شد.`, 'success');
       }
     } catch (error: any) {

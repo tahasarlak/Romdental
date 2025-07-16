@@ -106,7 +106,7 @@ const CourseManagement: React.FC = () => {
                 <TableCell>{course.price}</TableCell>
                 <TableCell>{course.discountPrice || '-'}</TableCell>
                 <TableCell>{course.discountPercentage ? `${course.discountPercentage}%` : '-'}</TableCell>
-                <TableCell>{course.startDate}</TableCell>
+                <TableCell>{course.startDateJalali}</TableCell>
                 <TableCell>{course.category}</TableCell>
                 <TableCell>{course.enrollmentCount}</TableCell>
                 <TableCell>{course.isOpen ? 'باز' : 'بسته'}</TableCell>

@@ -1,9 +1,14 @@
-
+// CourseContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
 import { useInstructorContext } from './InstructorContext';
 import { useNotificationContext } from './NotificationContext';
 import { useAuthContext } from './AuthContext';
-import { Course, SyllabusItem, ContentItem } from '../types/types';
+import { useEnrollmentContext } from './EnrollmentContext';
+import { Course, SyllabusItem, ContentItem, Enrollment } from '../types/types';
+import moment from 'moment-jalaali';
+
+moment.loadPersian({ dialect: 'persian-modern' });
 
 interface CourseContextType {
   courses: Course[];
@@ -12,6 +17,8 @@ interface CourseContextType {
   addUniversity: (university: string) => void;
   categories: string[];
   addCategory: (category: string) => void;
+  countries: string[];
+  addCountry: (country: string) => void;
   loading: boolean;
   addCourse: (course: Omit<Course, 'id'>) => Promise<void>;
   deleteCourse: (courseId: number) => Promise<void>;
@@ -20,182 +27,182 @@ interface CourseContextType {
 
 const CourseContext = createContext<CourseContextType | undefined>(undefined);
 
+const slugify = (text: string): string => {
+  return text
+    .trim()
+    .replace(/[\s+]/g, '-')
+    .replace(/[^\u0600-\u06FF\w-]/g, '')
+    .replace(/-+/g, '-')
+    .toLowerCase();
+};
+
+const parsePersianNumber = (numberStr: string): number => {
+  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  const standardDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  let cleanedStr = numberStr.replace(/[, ]/g, '');
+  persianDigits.forEach((digit, index) => {
+    cleanedStr = cleanedStr.replace(new RegExp(digit, 'g'), standardDigits[index]);
+  });
+  return parseFloat(cleanedStr);
+};
+
+const formatPriceWithCurrency = (price: number, currency: string): string => {
+  const currencySymbols: { [key: string]: string } = {
+    IRR: 'ریال',
+    RUB: 'روبل',
+    CNY: 'یوان',
+  };
+  return `${price.toLocaleString('fa-IR')} ${currencySymbols[currency] || currency}`;
+};
+
+const isValidJalaliDate = (dateStr: string): boolean => {
+  const jalaliDatePattern = /^\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/;
+  if (!jalaliDatePattern.test(dateStr)) return false;
+  try {
+    const jalaliDate = moment(dateStr, 'jYYYY/jMM/jDD');
+    return jalaliDate.isValid();
+  } catch (error) {
+    return false;
+  }
+};
+
+const isValidGregorianDate = (dateStr: string): boolean => {
+  const gregorianDatePattern = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+  if (!gregorianDatePattern.test(dateStr)) return false;
+  try {
+    const gregorianDate = moment(dateStr, 'YYYY-MM-DD');
+    return gregorianDate.isValid();
+  } catch (error) {
+    return false;
+  }
+};
+
+const jalaliToGregorian = (jalaliDate: string): string | null => {
+  if (!isValidJalaliDate(jalaliDate)) return null;
+  const jalaliMoment = moment(jalaliDate, 'jYYYY/jMM/jDD');
+  return jalaliMoment.format('YYYY-MM-DD');
+};
+
+const gregorianToJalali = (gregorianDate: string): string | null => {
+  if (!isValidGregorianDate(gregorianDate)) return null;
+  const gregorianMoment = moment(gregorianDate, 'YYYY-MM-DD');
+  return gregorianMoment.format('jYYYY/jMM/jDD');
+};
+
+const areDatesConsistent = (jalaliDate: string, gregorianDate: string): boolean => {
+  if (!isValidJalaliDate(jalaliDate) || !isValidGregorianDate(gregorianDate)) return false;
+  const jalaliToGreg = jalaliToGregorian(jalaliDate);
+  return jalaliToGreg === gregorianDate;
+};
+
 export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { instructors } = useInstructorContext();
   const { showNotification } = useNotificationContext();
   const { user } = useAuthContext();
+  const { enrollments } = useEnrollmentContext();
+  const { slug } = useParams();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [universities, setUniversities] = useState<string[]>(['Smashko', 'Piragova', 'RUDN', 'Sechenov']);
   const [categories, setCategories] = useState<string[]>(['آناتومی', 'پروتز', 'ترمیمی', 'عمومی']);
+  const [countries, setCountries] = useState<string[]>(['China', 'Russia', 'Iran']);
   const [courses, setCourses] = useState<Course[]>([
     {
-      id: 1,
-      title: "دوره جامع آناتومی دندان",
-      instructor: "سارا احمدی",
-      description: "آموزش کامل آناتومی دندان با تمرکز بر تکنیک‌های عملی و تئوری پیشرفته.",
-      duration: "8 هفته",
-      courseNumber: "Course 1",
-      category: "آناتومی",
-      image: "/assets/courses/anatomy.jpg",
-      price: "۴,۵۰۰,۰۰۰ تومان",
-      discountPrice: "۳,۸۰۰,۰۰۰ تومان",
-      discountPercentage: 15,
-      startDate: "اردیبهشت ۱۴۰۴",
-      isOpen: true, 
-      isFeatured: true,
-      enrollmentCount: 120,
-      syllabus: [
-        {
-          id: 1,
-          title: "مقدمه‌ای بر آناتومی دندان",
-          isLocked: false,
-          previewContent: "بررسی ساختار دندان و اجزای آن.",
-          contents: [
-            {
-              type: "video",
-              url: "https://example.com/videos/anatomy-intro.mp4",
-              title: "ویدیو معرفی آناتومی",
-            },
-            {
-              type: "image",
-              url: "/assets/images/anatomy-diagram.jpg",
-              title: "دیاگرام ساختار دندان",
-            },
-            {
-              type: "text",
-              text: "توضیحات متنی درباره ساختار دندان و کاربردهای آن در دندانپزشکی.",
-              title: "متن آموزشی",
-            },
-          ],
-          completed: true,
-          duration: "30 دقیقه",
-          isNew: true,
-        },
-      ],
-      faqs: [
-        { id: 1, question: "آیا این دوره پیش‌نیاز دارد؟", answer: "خیر، این دوره برای سطح متوسط طراحی شده است." },
-      ],
-      tags: ["آناتومی", "دندانپزشکی", "عملی"],
-      prerequisites: ["آشنایی اولیه با دندانپزشکی"],
-      courseType: "Online",
-      university: "Smashko",
-      slug: "anatomy-course",
-      currency: ''
-    },
-    {
-      id: 2,
-      title: "دوره پیشرفته پروتز دندانی",
-      instructor: "علی محمدی",
-      description: "آموزش تکنیک‌های پیشرفته در طراحی و ساخت پروتزهای دندانی با تمرکز بر مواد جدید.",
-      duration: "6 هفته",
-      courseNumber: "Course 2",
-      category: "پروتز",
-      image: "/assets/courses/prosthodontics.jpg",
-      price: "۵,۲۰۰,۰۰۰ تومان",
-      discountPrice: "۴,۵۰۰,۰۰۰ تومان",
-      discountPercentage: 13,
-      startDate: "خرداد ۱۴۰۴",
-      isOpen: true,
-      isFeatured: false,
-      enrollmentCount: 80,
-      syllabus: [
-        {
-          id: 1,
-          title: "مقدمه‌ای بر پروتزهای دندانی",
-          isLocked: false,
-          previewContent: "آشنایی با انواع پروتزهای دندانی.",
-          contents: [
-            {
-              type: "video",
-              url: "https://example.com/videos/prosthodontics-intro.mp4",
-              title: "ویدیو معرفی پروتز",
-            },
-            {
-              type: "quiz",
-              text: "آزمون کوتاه درباره انواع پروتزهای دندانی.",
-              title: "آزمون اولیه",
-            },
-          ],
-          completed: false,
-          duration: "45 دقیقه",
-          isNew: true,
-        },
-      ],
-      faqs: [
-        { id: 1, question: "چه مهارت‌هایی در این دوره کسب می‌شود؟", answer: "طراحی پروتزهای دندانی و استفاده از مواد جدید." },
-      ],
-      tags: ["پروتز", "دندانپزشکی", "پیشرفته"],
-      prerequisites: ["دانش پایه آناتومی دندان"],
-      courseType: "Hybrid",
-      university: "Sechenov",
-      slug: "prosthodontics-course",
-      currency: ''
-    },
-    {
       id: 3,
-      title: "دوره ترمیمی دندانپزشکی",
-      instructor: "مریم حسینی",
-      description: "آموزش تکنیک‌های ترمیمی در دندانپزشکی با تمرکز بر روش‌های مدرن.",
-      duration: "10 هفته",
-      courseNumber: "Course 3",
-      category: "ترمیمی",
-      image: "/assets/courses/restorative.jpg",
-      price: "۶,۰۰۰,۰۰۰ تومان",
+      title: 'دوره ترمیمی دندانپزشکی',
+      instructor: 'مریم حسینی',
+      description: 'آموزش تکنیک‌های ترمیمی در دندانپزشکی با تمرکز بر روش‌های مدرن.',
+      duration: '10 هفته',
+      courseNumber: 'Course 3',
+      category: 'ترمیمی',
+      image: '/assets/courses/restorative.jpg',
+      price: formatPriceWithCurrency(6000000, 'CNY'),
       discountPrice: undefined,
       discountPercentage: undefined,
-      startDate: "تیر ۱۴۰۴",
-      isOpen: false,
+      startDateJalali: '1404/04/01',
+      startDateGregorian: '2025-06-22',
+      isOpen: true,
       isFeatured: true,
-      enrollmentCount: 50,
+      enrollmentCount: 0,
       syllabus: [
         {
           id: 1,
-          title: "آشنایی با مواد ترمیمی",
-          isLocked: true,
-          previewContent: "بررسی مواد مورد استفاده در ترمیم دندان.",
+          title: 'آشنایی با مواد ترمیمی',
+          isLocked: false,
+          previewContent: 'بررسی مواد مورد استفاده در ترمیم دندان.',
           contents: [
             {
-              type: "text",
-              text: "توضیحات جامع درباره مواد ترمیمی و کاربردهای آن‌ها.",
-              title: "مواد ترمیمی",
+              type: 'text',
+              text: 'توضیحات جامع درباره مواد ترمیمی و کاربردهای آن‌ها.',
+              title: 'مواد ترمیمی',
             },
             {
-              type: "image",
-              url: "/assets/images/restorative-materials.jpg",
-              title: "تصویر مواد ترمیمی",
+              type: 'image',
+              url: '/assets/images/restorative-materials.jpg',
+              title: 'تصویر مواد ترمیمی',
             },
           ],
           completed: false,
-          duration: "40 دقیقه",
+          duration: '40 دقیقه',
           isNew: false,
+        },
+        {
+          id: 2,
+          title: 'تکنیک‌های ترمیمی پیشرفته',
+          isLocked: false,
+          previewContent: 'آموزش تکنیک‌های پیشرفته ترمیمی.',
+          contents: [
+            {
+              type: 'video',
+              url: 'https://example.com/restorative-techniques.mp4',
+              title: 'ویدیو تکنیک‌های ترمیمی',
+            },
+          ],
+          completed: false,
+          duration: '50 دقیقه',
+          isNew: true,
         },
       ],
       faqs: [
-        { id: 1, question: "آیا این دوره عملی است؟", answer: "بله، شامل جلسات عملی و تئوری است." },
+        { id: 1, question: 'آیا این دوره عملی است؟', answer: 'بله، شامل جلسات عملی و تئوری است.' },
       ],
-      tags: ["ترمیمی", "دندانپزشکی", "عملی"],
-      prerequisites: ["آشنایی با آناتومی دندان"],
-      courseType: "In-Person",
-      university: "RUDN",
-      slug: "restorative-dentistry-course",
-      currency: ''
+      tags: ['ترمیمی', 'دندانپزشکی', 'عم عملی'],
+      prerequisites: ['آشنایی با آناتومی دندان'],
+      courseType: 'In-Person',
+      university: 'RUDN',
+      slug: slugify('دوره ترمیمی دندانپزشکی'),
+      currency: 'CNY',
+      countries: ['China', 'Iran'],
+      level: 'Intermediate',
     },
   ]);
 
+  const updateCoursesWithEnrollmentCount = (courses: Course[], enrollments: Enrollment[]): Course[] => {
+    return courses.map((course) => ({
+      ...course,
+      enrollmentCount: enrollments.filter((e) => e.courseId === course.id).length,
+    }));
+  };
+
   const validateContentItem = (content: ContentItem): boolean => {
     const validTypes = ['video', 'image', 'text', 'quiz'];
-    return (
-      validTypes.includes(content.type) &&
-      (content.url === undefined ||
-        (typeof content.url === 'string' &&
-          (content.type === 'image' ? content.url.startsWith('/assets/') || /^https?:\/\/.*/.test(content.url) : /^https?:\/\/.*/.test(content.url)))) &&
-      (content.text === undefined || (typeof content.text === 'string' && content.text.length <= 500)) &&
-      (content.title === undefined || (typeof content.title === 'string' && content.title.length <= 100))
-    );
+    const isValidType = validTypes.includes(content.type);
+    const isValidUrl =
+      content.url === undefined ||
+      (typeof content.url === 'string' &&
+        (content.type === 'image'
+          ? content.url.startsWith('/assets/') || /^https?:\/\/.*/.test(content.url)
+          : /^https?:\/\/.*/.test(content.url)));
+    const isValidText =
+      content.text === undefined || (typeof content.text === 'string' && content.text.length <= 500);
+    const isValidTitle =
+      content.title === undefined || (typeof content.title === 'string' && content.title.length <= 100);
+
+    return isValidType && isValidUrl && isValidText && isValidTitle;
   };
 
   const validateSyllabusItem = (item: SyllabusItem): boolean => {
-    return (
+    const isValid =
       typeof item.id === 'number' &&
       typeof item.title === 'string' &&
       item.title.trim() !== '' &&
@@ -208,13 +215,15 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       (item.previewContent === undefined || (typeof item.previewContent === 'string' && item.previewContent.length <= 500)) &&
       Array.isArray(item.contents) &&
       item.contents.every(validateContentItem) &&
-      (item.isNew === undefined || typeof item.isNew === 'boolean')
-    );
+      (item.isNew === undefined || typeof item.isNew === 'boolean');
+    console.log(`Validating syllabus item ${item.id}:`, isValid, item);
+    return isValid;
   };
 
   const validateCourse = (course: Course): boolean => {
     const instructorNames = new Set(instructors.map((i) => i.name));
     const validCourseTypes = ['Online', 'Offline', 'In-Person', 'Hybrid'];
+    const validCurrencies = ['RUB', 'CNY', 'IRR'];
 
     if (!instructorNames.has(course.instructor)) {
       console.warn(`استاد ${course.instructor} برای دوره ${course.title} یافت نشد.`);
@@ -236,14 +245,63 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       console.warn(`سرفصل‌های دوره ${course.title} نامعتبر است.`);
       return false;
     }
-
+    if (!validCurrencies.includes(course.currency)) {
+      console.warn(`ارز ${course.currency} نامعتبر است.`);
+      return false;
+    }
+    if (
+      !Array.isArray(course.countries) ||
+      course.countries.length === 0 ||
+      !course.countries.every((c) => typeof c === 'string' && c.trim() !== '')
+    ) {
+      console.warn(`کشورهای ${course.countries} نامعتبر است.`);
+      return false;
+    }
+    const priceValue = parsePersianNumber(course.price);
+    if (isNaN(priceValue) || priceValue <= 0) {
+      console.warn(`قیمت ${course.price} نامعتبر است.`);
+      return false;
+    }
+    if (course.discountPrice !== undefined && course.discountPercentage !== undefined) {
+      const discountPriceValue = parsePersianNumber(course.discountPrice);
+      if (isNaN(discountPriceValue) || discountPriceValue >= priceValue) {
+        console.warn(`قیمت تخفیفی ${course.discountPrice} نامعتبر است.`);
+        return false;
+      }
+      if (typeof course.discountPercentage !== 'number' || course.discountPercentage <= 0 || course.discountPercentage >= 100) {
+        console.warn(`درصد تخفیف ${course.discountPercentage} نامعتبر است.`);
+        return false;
+      }
+      const calculatedDiscountPercentage = ((priceValue - discountPriceValue) / priceValue) * 100;
+      if (Math.abs(calculatedDiscountPercentage - course.discountPercentage) > 0.1) {
+        console.warn(`درصد تخفیف ${course.discountPercentage} با قیمت تخفیفی ${course.discountPrice} همخوانی ندارد.`);
+        return false;
+      }
+    } else if (course.discountPrice !== undefined || course.discountPercentage !== undefined) {
+      console.warn(`قیمت تخفیفی و درصد تخفیف باید هر دو مشخص شوند یا هیچ‌کدام.`);
+      return false;
+    }
+    if (!isValidJalaliDate(course.startDateJalali)) {
+      console.warn(`تاریخ شروع جلالی ${course.startDateJalali} نامعتبر است. باید در فرمت YYYY/MM/DD باشد.`);
+      return false;
+    }
+    if (!isValidGregorianDate(course.startDateGregorian)) {
+      console.warn(`تاریخ شروع میلادی ${course.startDateGregorian} نامعتبر است. باید در فرمت YYYY-MM-DD باشد.`);
+      return false;
+    }
+    if (!areDatesConsistent(course.startDateJalali, course.startDateGregorian)) {
+      console.warn(`تاریخ‌های جلالی ${course.startDateJalali} و میلادی ${course.startDateGregorian} همخوانی ندارند.`);
+      return false;
+    }
     return true;
   };
-console.log('Initial courses in CourseProvider:', courses);
+
   const validateAndSetCourses = (newCourses: Course[] | ((prev: Course[]) => Course[])) => {
     setCourses((prev) => {
       const updatedCourses = typeof newCourses === 'function' ? newCourses(prev) : newCourses;
-      return updatedCourses.filter(validateCourse);
+      const validatedCourses = updatedCourses.filter(validateCourse);
+      console.log('Validated courses:', validatedCourses);
+      return updateCoursesWithEnrollmentCount(validatedCourses, enrollments);
     });
   };
 
@@ -273,6 +331,19 @@ console.log('Initial courses in CourseProvider:', courses);
     showNotification(`دسته‌بندی ${category} با موفقیت اضافه شد`, 'success');
   };
 
+  const addCountry = (country: string) => {
+    if (country.trim() === '') {
+      showNotification('نام کشور نمی‌تواند خالی باشد', 'error');
+      return;
+    }
+    if (countries.includes(country)) {
+      showNotification('کشور قبلاً وجود دارد', 'error');
+      return;
+    }
+    setCountries((prev) => [...prev, country]);
+    showNotification(`کشور ${country} با موفقیت اضافه شد`, 'success');
+  };
+
   const addCourse = async (course: Omit<Course, 'id'>) => {
     setLoading(true);
     try {
@@ -283,7 +354,47 @@ console.log('Initial courses in CourseProvider:', courses);
       if (!instructorNames.has(course.instructor)) {
         throw new Error(`استاد ${course.instructor} وجود ندارد`);
       }
-      const newCourse: Course = { ...course, id: Math.max(...courses.map((c) => c.id), 0) + 1 };
+
+      let { startDateJalali, startDateGregorian } = course;
+      if (!startDateJalali || !startDateGregorian) {
+        throw new Error('هر دو تاریخ جلالی و میلادی باید مشخص شوند');
+      }
+      if (!isValidJalaliDate(startDateJalali)) {
+        throw new Error('تاریخ شروع جلالی نامعتبر است. باید در فرمت YYYY/MM/DD باشد.');
+      }
+      if (!isValidGregorianDate(startDateGregorian)) {
+        throw new Error('تاریخ شروع میلادی نامعتبر است. باید در فرمت YYYY-MM-DD باشد.');
+      }
+      if (!areDatesConsistent(startDateJalali, startDateGregorian)) {
+        const correctedGregorian = jalaliToGregorian(startDateJalali);
+        if (correctedGregorian) {
+          startDateGregorian = correctedGregorian;
+        } else {
+          throw new Error('تاریخ‌های جلالی و میلادی همخوانی ندارند');
+        }
+      }
+
+      let newCourse: Course = {
+        ...course,
+        id: Math.max(...courses.map((c) => c.id), 0) + 1,
+        enrollmentCount: 0,
+        startDateJalali,
+        startDateGregorian,
+        slug: slugify(course.title),
+      };
+
+      if (newCourse.discountPrice && !newCourse.discountPercentage) {
+        const priceValue = parsePersianNumber(newCourse.price);
+        const discountPriceValue = parsePersianNumber(newCourse.discountPrice);
+        newCourse.discountPercentage = ((priceValue - discountPriceValue) / priceValue) * 100;
+      } else if (newCourse.discountPercentage && !newCourse.discountPrice) {
+        const priceValue = parsePersianNumber(newCourse.price);
+        newCourse.discountPrice = formatPriceWithCurrency(
+          priceValue * (100 - newCourse.discountPercentage) / 100,
+          newCourse.currency
+        );
+      }
+
       if (!validateCourse(newCourse)) {
         throw new Error('دوره نامعتبر است');
       }
@@ -293,6 +404,11 @@ console.log('Initial courses in CourseProvider:', courses);
       if (!categories.includes(newCourse.category)) {
         addCategory(newCourse.category);
       }
+      newCourse.countries.forEach((country) => {
+        if (!countries.includes(country)) {
+          addCountry(country);
+        }
+      });
       validateAndSetCourses((prev) => [...prev, newCourse]);
       showNotification('دوره با موفقیت اضافه شد', 'success');
     } catch (error: any) {
@@ -322,7 +438,10 @@ console.log('Initial courses in CourseProvider:', courses);
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      validateAndSetCourses(courses);
+      const response = await fetch(`/api/courses${slug ? `/${slug}` : ''}`);
+      const data = await response.json();
+      const coursesData = Array.isArray(data) ? data : data.course ? [data.course] : [];
+      validateAndSetCourses(coursesData);
     } catch (error: any) {
       console.error('Failed to fetch courses:', error);
       showNotification('خطایی در بارگذاری دوره‌ها رخ داد. لطفاً دوباره تلاش کنید.', 'error');
@@ -333,10 +452,25 @@ console.log('Initial courses in CourseProvider:', courses);
 
   useEffect(() => {
     fetchCourses();
-  }, [instructors]);
+  }, [instructors, slug, location.pathname]);
 
   return (
-    <CourseContext.Provider value={{ courses, setCourses: validateAndSetCourses, universities, addUniversity, categories, addCategory, loading, addCourse, deleteCourse, fetchCourses }}>
+    <CourseContext.Provider
+      value={{
+        courses,
+        setCourses: validateAndSetCourses,
+        universities,
+        addUniversity,
+        categories,
+        addCategory,
+        countries,
+        addCountry,
+        loading,
+        addCourse,
+        deleteCourse,
+        fetchCourses,
+      }}
+    >
       {children}
     </CourseContext.Provider>
   );

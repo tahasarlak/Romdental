@@ -36,6 +36,7 @@ const sanitizeText = (text: string): string => {
 const isValidUrl = (url: string): boolean => /^https?:\/\/.*/.test(url);
 
 const validateSyllabus = (syllabus: SyllabusItem[]): SyllabusItem[] => {
+  console.log('Validating syllabus:', syllabus); // لاگ برای بررسی داده‌های ورودی
   return Array.isArray(syllabus)
     ? syllabus.filter(
         (item): item is SyllabusItem =>
@@ -95,6 +96,9 @@ const CourseSyllabus: React.FC<CourseSyllabusProps> = ({
   toggleSyllabus,
   openPreviewModal,
 }) => {
+  console.log('Course data:', course);
+  console.log('Syllabus data:', course?.syllabus);
+
   if (!course || !Array.isArray(course.syllabus)) {
     logError('CourseSyllabus: Invalid course or syllabus', { course });
     return (
@@ -108,6 +112,8 @@ const CourseSyllabus: React.FC<CourseSyllabusProps> = ({
   }
 
   const validatedSyllabus = validateSyllabus(course.syllabus);
+  console.log('Validated syllabus:', validatedSyllabus);
+
   const completedItems = validatedSyllabus.filter((item) => item.completed).length;
   const totalItems = validatedSyllabus.length;
   const progressPercentage = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;

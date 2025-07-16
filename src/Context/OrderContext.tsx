@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { useAuthContext } from './AuthContext';
 import { useCourseContext } from './CourseContext';
 import { useNotificationContext } from './NotificationContext';
@@ -9,6 +9,8 @@ interface OrderItem {
   price: string;
   purchaseDate: string;
   status: 'pending' | 'completed' | 'canceled';
+  instructorId: number;
+  receiptImageUrl?: string;
 }
 
 interface Order {
@@ -22,7 +24,7 @@ interface Order {
 
 interface OrderContextType {
   orders: Order[];
-  createOrder: (items: { courseId: number; courseTitle: string; price: string }[]) => Promise<void>;
+  createOrder: (items: OrderItem[]) => Promise<void>;
   cancelOrder: (orderId: number) => Promise<void>;
   getUserOrders: (userId: string) => Order[];
   setOrders: React.Dispatch<React.SetStateAction<Order[]>>;
@@ -36,7 +38,7 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const { showNotification } = useNotificationContext();
   const [orders, setOrders] = useState<Order[]>([]);
 
-  const createOrder = async (items: { courseId: number; courseTitle: string; price: string }[]) => {
+  const createOrder = async (items: OrderItem[]) => {
     if (!isAuthenticated || !user) {
       throw new Error('برای ثبت سفارش باید وارد حساب کاربری شوید.');
     }
@@ -59,8 +61,10 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       userId: user.email,
       items: items.map((item) => ({
         ...item,
-        purchaseDate: new Date().toLocaleDateString('fa-IR'),
-        status: 'pending' as const,
+        purchaseDate: item.purchaseDate || new Date().toLocaleDateString('fa-IR'),
+        status: item.status || 'pending',
+        instructorId: item.instructorId,
+        receiptImageUrl: item.receiptImageUrl,
       })),
       totalAmount,
       orderDate: new Date().toLocaleDateString('fa-IR'),

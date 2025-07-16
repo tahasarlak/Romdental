@@ -1,11 +1,9 @@
-// [title].tsx
 import React, { useState, useCallback, useEffect, useRef, memo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import DOMPurify from 'dompurify';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import styles from './CourseDetails.module.css';
-
 import { useAuthContext } from '../../../Context/AuthContext';
 import { useCartContext } from '../../../Context/CartContext';
 import { useCourseContext } from '../../../Context/CourseContext';
@@ -13,6 +11,8 @@ import { useInstructorContext } from '../../../Context/InstructorContext';
 import { useNotificationContext } from '../../../Context/NotificationContext';
 import { useReviewContext } from '../../../Context/ReviewContext';
 import { useWishlistContext } from '../../../Context/WishlistContext';
+import { useEnrollmentContext } from '../../../Context/EnrollmentContext';
+import { useShareContext } from '../../../Context/ShareContext';
 import { Course, SyllabusItem, ContentItem, User, ReviewItem } from '../../../types/types';
 import Breadcrumb from '../../../components/Breadcrumb/Breadcrumb';
 import CourseAbout from '../../../components/CourseAbout/CourseAbout';
@@ -22,9 +22,12 @@ import CourseReviews from '../../../components/CourseReviews/CourseReviews';
 import CourseSyllabus from '../../../components/CourseSyllabus/CourseSyllabus';
 import PreviewModal from '../../../components/PreviewModal/PreviewModal';
 import StickyEnrollBar from '../../../components/StickyEnrollBar/StickyEnrollBar';
+import moment from 'moment-jalaali';
+
+moment.loadPersian({ dialect: 'persian-modern' });
 
 const CourseDetails: React.FC = memo(() => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { courses, loading, fetchCourses } = useCourseContext();
   const { instructors } = useInstructorContext();
@@ -33,6 +36,8 @@ const CourseDetails: React.FC = memo(() => {
   const { addToCart, cartItems } = useCartContext();
   const { showNotification } = useNotificationContext();
   const { isInWishlist, toggleWishlist, isWishlistLoading } = useWishlistContext();
+  const { isCourseActiveForUser, getEnrollmentsByStudent } = useEnrollmentContext();
+  const { shareConfig } = useShareContext();
   const [expandedSyllabus, setExpandedSyllabus] = useState<number | null>(null);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,35 +54,58 @@ const CourseDetails: React.FC = memo(() => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
-  const courseId = id && !isNaN(parseInt(id)) ? parseInt(id) : null;
-  const course = courses.find((c) => c.id === courseId);
+  const decodedSlug = slug ? decodeURIComponent(slug) : '';
+  const course = courses.find((c) => c.slug === decodedSlug);
+  const courseId = course ? course.id : null;
   const courseIds = new Set(courses.map((c) => c.id));
   const instructorIds = new Set(instructors.map((i) => i.id));
-  const courseReviews = reviews.filter((review) => review.courseId === courseId);
+  const courseReviews = courseId ? reviews.filter((review) => review.courseId === courseId) : [];
   const instructor = course ? instructors.find((i) => i.name === course.instructor) : null;
   const instructorId = instructor ? instructor.id : 0;
 
   useEffect(() => {
-    const loadCourses = async () => {
-      try {
-        await fetchCourses();
-      } catch (error) {
+    console.log('Courses:', courses);
+    console.log('Slug:', decodedSlug);
+    console.log('Course:', course);
+    if (!courses.length && !loading) {
+      fetchCourses().catch((error) => {
         console.error('Failed to fetch courses:', error);
         showNotification('خطایی در بارگذاری دوره‌ها رخ داد. لطفاً دوباره تلاش کنید.', 'error');
-      }
-    };
-    if (!courses.length && !loading) {
-      loadCourses();
+      });
     }
-  }, [courses, loading, fetchCourses, showNotification]);
+  }, [courses, loading, fetchCourses, showNotification, decodedSlug, course]);
+
+  useEffect(() => {
+    if (user && course) {
+      const validEnrolledCourses = user.enrolledCourses.filter((id) => courseIds.has(id));
+      const validWishlist = user.wishlist.filter(
+        (item) =>
+          (item.type === 'course' && courseIds.has(item.id)) ||
+          (item.type === 'instructor' && instructorIds.has(item.id)) ||
+          (item.type === 'blog')
+      );
+      if (
+        validEnrolledCourses.length !== user.enrolledCourses.length ||
+        validWishlist.length !== user.wishlist.length
+      ) {
+        setUser({
+          ...user,
+          enrolledCourses: validEnrolledCourses,
+          wishlist: validWishlist,
+          cart: user.cart || [],
+        });
+      }
+      setIsEnrolled(validEnrolledCourses.includes(course.id));
+    }
+  }, [user, course, courseIds, instructorIds, setUser]);
 
   const toggleSyllabus = useCallback((id: number) => {
-    setExpandedSyllabus(expandedSyllabus === id ? null : id);
-  }, [expandedSyllabus]);
+    setExpandedSyllabus((prev) => (prev === id ? null : id));
+  }, []);
 
   const toggleFaq = useCallback((id: number) => {
-    setExpandedFaq(expandedFaq === id ? null : id);
-  }, [expandedFaq]);
+    setExpandedFaq((prev) => (prev === id ? null : id));
+  }, []);
 
   const openPreviewModal = useCallback((item: SyllabusItem, content?: ContentItem) => {
     setModalContent({
@@ -106,16 +134,14 @@ const CourseDetails: React.FC = memo(() => {
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [handleClickOutside]);
 
   const shareCourse = useCallback(
     async (platform: 'native' | 'telegram' | 'whatsapp' | 'copy') => {
       if (!course) return;
       const shareUrl = encodeURI(window.location.href);
-      const shareText = DOMPurify.sanitize(`دوره "${course.title}" را در روم دنتال بررسی کنید!`);
+      const shareText = DOMPurify.sanitize(shareConfig.shareMessageTemplate(course.title, shareUrl));
       try {
         if (platform === 'native' && navigator.share) {
           await navigator.share({ title: course.title, text: shareText, url: shareUrl });
@@ -124,7 +150,7 @@ const CourseDetails: React.FC = memo(() => {
           window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
           showNotification('لینک دوره در تلگرام به اشتراک گذاشته شد!', 'success');
         } else if (platform === 'whatsapp') {
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, '_blank');
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
           showNotification('لینک دوره در واتساپ به اشتراک گذاشته شد!', 'success');
         } else if (platform === 'copy') {
           await navigator.clipboard.writeText(shareUrl);
@@ -136,7 +162,7 @@ const CourseDetails: React.FC = memo(() => {
       }
       setIsShareDropdownOpen(false);
     },
-    [course, showNotification]
+    [course, showNotification, shareConfig]
   );
 
   const handleEnroll = useCallback(async () => {
@@ -156,17 +182,38 @@ const CourseDetails: React.FC = memo(() => {
   }, [course, isEnrolled, addToCart, cartItems, showNotification]);
 
   const handleJoinClass = useCallback(() => {
-    if (!courseId) return;
+    if (!courseId || !course) return;
     if (!isAuthenticated) {
       showNotification('برای ورود به کلاس آنلاین، لطفاً ابتدا وارد حساب کاربری شوید.', 'warning');
       navigate('/login');
       return;
     }
-    if (!isEnrolled) {
-      showNotification('شما در این دوره ثبت‌نام نکرده‌اید. لطفاً ابتدا ثبت‌نام کنید.', 'warning');
+    if (!user) {
+      showNotification('اطلاعات کاربر یافت نشد. لطفاً دوباره وارد شوید.', 'error');
+      navigate('/login');
+      return;
+    }
+
+    const isActive = isCourseActiveForUser(user.id, courseId);
+    if (!isActive) {
+      showNotification('شما در این دوره ثبت‌نام نکرده‌اید یا دوره غیرفعال است. لطفاً ابتدا ثبت‌نام کنید.', 'warning');
       navigate(`/checkout/${courseId}`);
       return;
     }
+
+    const userEnrollments = getEnrollmentsByStudent(user.id);
+    const enrollment = userEnrollments.find((e) => e.courseId === courseId);
+    if (!enrollment) {
+      showNotification('ثبت‌نام شما یافت نشد.', 'error');
+      return;
+    }
+
+    const authorizedGroups = ['Group A', 'Default'];
+    if (!authorizedGroups.includes(enrollment.group)) {
+      showNotification(`دسترسی به کلاس آنلاین برای گروه ${enrollment.group} مجاز نیست.`, 'error');
+      return;
+    }
+
     try {
       navigate(`/classroom/${courseId}`);
       showNotification('در حال ورود به کلاس آنلاین...', 'info');
@@ -174,7 +221,7 @@ const CourseDetails: React.FC = memo(() => {
       console.error('Error joining class:', error);
       showNotification('خطایی در ورود به کلاس آنلاین رخ داد.', 'error');
     }
-  }, [courseId, isAuthenticated, isEnrolled, navigate, showNotification]);
+  }, [courseId, course, isAuthenticated, user, isCourseActiveForUser, getEnrollmentsByStudent, navigate, showNotification]);
 
   const handleWishlistToggle = useCallback(async () => {
     if (!isAuthenticated) {
@@ -191,7 +238,7 @@ const CourseDetails: React.FC = memo(() => {
     } catch (error: any) {
       showNotification(error.message || 'خطایی در به‌روزرسانی لیست علاقه‌مندی‌ها رخ داد.', 'error');
     }
-  }, [courseId, course, isInWishlist, toggleWishlist, isAuthenticated, navigate, showNotification]);
+  }, [courseId, course, toggleWishlist, isAuthenticated, navigate, showNotification]);
 
   const handleReplySubmit = useCallback(
     async (reviewId: number) => {
@@ -218,30 +265,6 @@ const CourseDetails: React.FC = memo(() => {
       [reviewId]: !prev[reviewId],
     }));
   }, []);
-
-  useEffect(() => {
-    if (user && course) {
-      const validEnrolledCourses = user.enrolledCourses.filter((id) => courseIds.has(id));
-      const validWishlist = user.wishlist.filter(
-        (item) =>
-          (item.type === 'course' && courseIds.has(item.id)) ||
-          (item.type === 'instructor' && instructorIds.has(item.id)) ||
-          (item.type === 'blog')
-      );
-      if (
-        validEnrolledCourses.length !== user.enrolledCourses.length ||
-        validWishlist.length !== user.wishlist.length
-      ) {
-        setUser({
-          ...user,
-          enrolledCourses: validEnrolledCourses,
-          wishlist: validWishlist,
-          cart: user.cart || [],
-        });
-      }
-      setIsEnrolled(validEnrolledCourses.includes(course.id));
-    }
-  }, [user, course, courseIds, instructorIds, setUser]);
 
   if (loading) {
     return (
@@ -287,7 +310,7 @@ const CourseDetails: React.FC = memo(() => {
         />
         <meta property="og:type" content="website" />
         <meta property="og:image" content={`${course.image}?format=webp`} />
-        <link rel="alternate" hrefLang="fa" href={`/courses/${courseId}`} />
+        <link rel="alternate" hrefLang="fa" href={`/courses/${course.slug}`} />
         <script type="application/ld+json">{JSON.stringify(getCourseStructuredData(course))}</script>
       </Helmet>
       <section className={styles.courseDetailsSection} ref={sectionRef} role="main">
@@ -369,7 +392,7 @@ export const getCourseStructuredData = (course: Course) => ({
   hasCourseInstance: {
     '@type': 'CourseInstance',
     courseMode: course.courseType,
-    startDate: course.startDate,
+    startDate: course.startDateGregorian,
   },
 });
 

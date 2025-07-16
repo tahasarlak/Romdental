@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
 import DOMPurify from 'dompurify';
 import { useAuthContext } from './AuthContext';
 import { useNotificationContext } from './NotificationContext';
 import { useReviewContext } from './ReviewContext';
 import { useCourseContext } from './CourseContext';
-import { ReviewItem, Instructor } from '../types/types';
+import { Instructor, ReviewItem } from '../types/types';
 
 interface InstructorContextType {
   instructors: Instructor[];
@@ -12,42 +12,13 @@ interface InstructorContextType {
   setInstructors: React.Dispatch<React.SetStateAction<Instructor[]>>;
   fetchInstructors: () => Promise<void>;
   addInstructor: (instructor: Omit<Instructor, 'id'>) => Promise<void>;
+  updateInstructor: (instructorId: number, instructor: Omit<Instructor, 'id'>) => Promise<void>;
   deleteInstructor: (instructorId: number) => Promise<void>;
 }
 
 const InstructorContext = createContext<InstructorContextType | undefined>(undefined);
 
-// Memoize initial instructors to prevent re-creation
 const initialInstructors: Instructor[] = [
-  {
-    id: 2,
-    name: 'سارا احمدی',
-    specialty: 'آناتومی دندان',
-    bio: 'دکتر سارا احمدی متخصص آناتومی دندان با بیش از 10 سال تجربه تدریس.',
-    image: '/assets/instructors/ahmad-rasteh.jpg',
-    experience: '10 سال',
-coursesTaught: ['دوره جامع آناتومی دندان'],
-    averageRating: '4.5',
-    totalStudents: 200,
-    reviewCount: 50,
-    whatsappLink: 'https://wa.me/+989123456789',
-    telegramLink: 'https://t.me/sara_ahmadi',
-    instagramLink: 'https://instagram.com/sara_ahmadi_dentist',
-  },
-  {
-    id: 1,
-    name: 'علی محمدی',
-    specialty: 'پروتز دندانی',
-    bio: 'متخصص پروتز دندانی با تجربه در آموزش تکنیک‌های پیشرفته.',
-    image: '/assets/instructors/ahmad-rasteh.jpg',
-    experience: '15 سال',
-    coursesTaught: ['دوره پیشرفته پروتز دندانی'],
-    averageRating: '4.8',
-    totalStudents: 150,
-    reviewCount: 30,
-    telegramLink: 'https://t.me/ali_mohammadi',
-    whatsappLink: 'https://wa.me/+989123456789',
-  },
   {
     id: 3,
     name: 'مریم حسینی',
@@ -57,10 +28,17 @@ coursesTaught: ['دوره جامع آناتومی دندان'],
     experience: '8 سال',
     coursesTaught: ['دوره ترمیمی دندانپزشکی'],
     averageRating: '4.2',
-    totalStudents: 100,
+    totalStudents: 0,
     reviewCount: 20,
     whatsappLink: 'https://wa.me/+989123456788',
     instagramLink: 'https://instagram.com/maryam_hosseini_dentist',
+    bankAccounts: [
+      {
+        bankName: 'بانک ملت',
+        accountHolder: 'مریم حسینی',
+        accountNumber: '1234-5678-9012-3456',
+      },
+    ],
   },
 ];
 
@@ -73,13 +51,13 @@ export const InstructorProvider: React.FC<{ children: ReactNode }> = ({ children
   const fetchInstructors = useCallback(async () => {
     try {
       setLoading(true);
-      // Simulate fetching instructors (no actual state change needed if data is static)
       const data = initialInstructors.map((instructor) => ({
         ...instructor,
         reviewCount: instructor.reviewCount ?? 0,
+        totalStudents: instructor.totalStudents ?? 0,
+        bankAccounts: instructor.bankAccounts ?? [],
       }));
       setInstructors((prev) => {
-        // Only update if data has changed to prevent unnecessary renders
         if (JSON.stringify(prev) !== JSON.stringify(data)) {
           return data;
         }
@@ -116,6 +94,11 @@ export const InstructorProvider: React.FC<{ children: ReactNode }> = ({ children
           whatsappLink: instructor.whatsappLink ? DOMPurify.sanitize(instructor.whatsappLink) : undefined,
           telegramLink: instructor.telegramLink ? DOMPurify.sanitize(instructor.telegramLink) : undefined,
           instagramLink: instructor.instagramLink ? DOMPurify.sanitize(instructor.instagramLink) : undefined,
+          bankAccounts: instructor.bankAccounts.map((account) => ({
+            bankName: DOMPurify.sanitize(account.bankName),
+            accountHolder: DOMPurify.sanitize(account.accountHolder),
+            accountNumber: DOMPurify.sanitize(account.accountNumber),
+          })),
         };
         if (instructors.some((inst) => inst.name === sanitizedInstructor.name)) {
           throw new Error(`استاد با نام ${sanitizedInstructor.name} قبلاً وجود دارد`);
@@ -129,6 +112,50 @@ export const InstructorProvider: React.FC<{ children: ReactNode }> = ({ children
       } catch (error: any) {
         console.error('Error adding instructor:', error);
         showNotification(error.message || 'خطا در افزودن استاد', 'error');
+        throw error;
+      }
+    },
+    [user, instructors, showNotification]
+  );
+
+  const updateInstructor = useCallback(
+    async (instructorId: number, instructor: Omit<Instructor, 'id'>) => {
+      try {
+        if (!user || !['SuperAdmin', 'Admin'].includes(user.role)) {
+          throw new Error('فقط سوپرادمین و ادمین می‌توانند استاد را ویرایش کنند');
+        }
+        const sanitizedInstructor: Omit<Instructor, 'id'> = {
+          ...instructor,
+          name: DOMPurify.sanitize(instructor.name),
+          specialty: DOMPurify.sanitize(instructor.specialty),
+          bio: DOMPurify.sanitize(instructor.bio),
+          experience: DOMPurify.sanitize(instructor.experience),
+          coursesTaught: instructor.coursesTaught.map((course) => DOMPurify.sanitize(course)),
+          averageRating: DOMPurify.sanitize(instructor.averageRating || '0.0'),
+          reviewCount: instructor.reviewCount ?? 0,
+          totalStudents: instructor.totalStudents ?? 0,
+          whatsappLink: instructor.whatsappLink ? DOMPurify.sanitize(instructor.whatsappLink) : undefined,
+          telegramLink: instructor.telegramLink ? DOMPurify.sanitize(instructor.telegramLink) : undefined,
+          instagramLink: instructor.instagramLink ? DOMPurify.sanitize(instructor.instagramLink) : undefined,
+          bankAccounts: instructor.bankAccounts.map((account) => ({
+            bankName: DOMPurify.sanitize(account.bankName),
+            accountHolder: DOMPurify.sanitize(account.accountHolder),
+            accountNumber: DOMPurify.sanitize(account.accountNumber),
+          })),
+        };
+        const existingInstructor = instructors.find((inst) => inst.id === instructorId);
+        if (!existingInstructor) {
+          throw new Error('استاد مورد نظر یافت نشد');
+        }
+        setInstructors((prev) =>
+          prev.map((inst) =>
+            inst.id === instructorId ? { ...sanitizedInstructor, id: instructorId } : inst
+          )
+        );
+        showNotification(`استاد "${sanitizedInstructor.name}" با موفقیت به‌روزرسانی شد`, 'success');
+      } catch (error: any) {
+        console.error('Error updating instructor:', error);
+        showNotification(error.message || 'خطا در به‌روزرسانی استاد', 'error');
         throw error;
       }
     },
@@ -160,7 +187,6 @@ export const InstructorProvider: React.FC<{ children: ReactNode }> = ({ children
     [user, instructors, showNotification]
   );
 
-  // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(
     () => ({
       instructors,
@@ -168,9 +194,10 @@ export const InstructorProvider: React.FC<{ children: ReactNode }> = ({ children
       setInstructors,
       fetchInstructors,
       addInstructor,
+      updateInstructor,
       deleteInstructor,
     }),
-    [instructors, loading, fetchInstructors, addInstructor, deleteInstructor]
+    [instructors, loading, fetchInstructors, addInstructor, updateInstructor, deleteInstructor]
   );
 
   return <InstructorContext.Provider value={contextValue}>{children}</InstructorContext.Provider>;
@@ -201,6 +228,7 @@ export const useInstructorMetrics = (instructor: Instructor | null): Instructor 
       whatsappLink: undefined,
       telegramLink: undefined,
       instagramLink: undefined,
+      bankAccounts: [],
     };
   }
 

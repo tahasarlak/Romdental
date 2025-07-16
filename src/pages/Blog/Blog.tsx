@@ -82,24 +82,24 @@ const Blog: React.FC = () => {
   };
 
   // Filtered and sorted posts
-  const filteredPosts = useMemo(() => {
-    return blogPosts
-      .filter((post) => (filterCategory === 'all' ? true : post.category === filterCategory))
-      .filter((post) => (filterAuthor === 'all' ? true : post.author === filterAuthor))
-      .filter((post) => (filterTag === 'all' ? true : post.tags.includes(filterTag)))
-      .filter((post) =>
-        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
-      .sort((a, b) => {
-        if (sortBy === 'title') return a.title.localeCompare(b.title);
-        if (sortBy === 'date') return new Date(b.date).getTime() - new Date(a.date).getTime();
-        if (sortBy === 'author') return a.author.localeCompare(b.author);
-        return 0;
-      });
-  }, [blogPosts, filterCategory, filterAuthor, filterTag, searchQuery, sortBy]);
-
+ // Add type for tag in the filter callback
+const filteredPosts = useMemo(() => {
+  return blogPosts
+    .filter((post) => (filterCategory === 'all' ? true : post.category === filterCategory))
+    .filter((post) => (filterAuthor === 'all' ? true : post.author === filterAuthor))
+    .filter((post) => (filterTag === 'all' ? true : post.tags.includes(filterTag)))
+    .filter((post) =>
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+    )
+    .sort((a, b) => {
+      if (sortBy === 'title') return a.title.localeCompare(b.title);
+      if (sortBy === 'date') return new Date(b.date).getTime() - new Date(a.date).getTime();
+      if (sortBy === 'author') return a.author.localeCompare(b.author);
+      return 0;
+    });
+}, [blogPosts, filterCategory, filterAuthor, filterTag, searchQuery, sortBy]);
   // Pagination logic
   const indexOfLastPost = currentPage * POSTS_PER_PAGE;
   const indexOfFirstPost = indexOfLastPost - POSTS_PER_PAGE;

@@ -20,7 +20,7 @@ export const BlogProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       title: 'مقدمه‌ای بر آناتومی دندان',
       content: 'این پست به بررسی اصول اولیه آناتومی دندان می‌پردازد.',
       excerpt: 'آشنایی با ساختار دندان و کاربردهای آن در دندانپزشکی.',
-      author: 'سارا احمدی',
+      author: 'سی',
       date: '1404-02-15',
       category: 'آموزش',
       tags: ['آناتومی', 'دندانپزشکی'],

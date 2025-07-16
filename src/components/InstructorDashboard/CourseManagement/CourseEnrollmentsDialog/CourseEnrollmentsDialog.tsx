@@ -16,7 +16,6 @@ import {
   DialogContentText,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-
 import styles from './CourseEnrollmentsDialog.module.css';
 import { useAuthContext } from '../../../../Context/AuthContext';
 import { useCourseContext } from '../../../../Context/CourseContext';
@@ -41,7 +40,7 @@ const CourseEnrollmentsDialog: React.FC<CourseEnrollmentsDialogProps> = ({ open,
 
   const handleUnenroll = async (user: User) => {
     try {
-      await manageUser(user.email, {
+      await manageUser(user.id, {
         enrolledCourses: user.enrolledCourses.filter((id) => id !== courseId),
       });
       showNotification(`کاربر ${user.name} با موفقیت از دوره حذف شد.`, 'success');

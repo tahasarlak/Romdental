@@ -126,11 +126,11 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user: us
         profilePicture: formData.profilePicture || undefined,
       };
 
-      await manageUser(updatedUser.email, updatedUser);
+      await manageUser(updatedUser.id, updatedUser);
       setUsers((prev: User[]) =>
-        prev.map((u: User) => (u.email === updatedUser.email ? updatedUser : u))
+        prev.map((u: User) => (u.id === updatedUser.id ? updatedUser : u))
       );
-      if (currentUser?.email === updatedUser.email) {
+      if (currentUser?.id === updatedUser.id) {
         await setUser(updatedUser);
       }
       showNotification('کاربر با موفقیت به‌روزرسانی شد', 'success');

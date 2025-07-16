@@ -17,9 +17,12 @@ import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import styles from './Courses.module.css';
 import { Helmet } from 'react-helmet-async';
 import { Course, ReviewItem } from '../../types/types';
+import moment from 'moment-jalaali';
+
+moment.loadPersian({ dialect: 'persian-modern' });
 
 const Courses: React.FC = () => {
-  const { courses, loading, fetchCourses } = useCourseContext();
+  const { courses, loading, fetchCourses, countries } = useCourseContext();
   const { instructors } = useInstructorContext();
   const { reviews } = useReviewContext();
   const { cartItems, addToCart, removeFromCart } = useCartContext();
@@ -33,6 +36,7 @@ const Courses: React.FC = () => {
   const [filterInstructor, setFilterInstructor] = useState<string>('all');
   const [filterCourseType, setFilterCourseType] = useState<string>('all');
   const [filterUniversity, setFilterUniversity] = useState<string>('all');
+  const [filterCountry, setFilterCountry] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('title');
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -73,7 +77,8 @@ const Courses: React.FC = () => {
   const uniqueInstructors = useMemo(() => ['all', ...new Set(courses.map((course) => course.instructor))].sort(), [courses]);
   const uniqueStatuses = useMemo(() => ['all', 'open', 'closed'], []);
   const uniqueCourseTypes = useMemo(() => ['all', 'Online', 'Offline', 'In-Person', 'Hybrid'], []);
-  const uniqueUniversities = useMemo(() => ['all', 'Smashko', 'Piragova', 'RUDN', 'Sechenov'].sort(), []);
+  const uniqueUniversities = useMemo(() => ['all', ...new Set(courses.map((course) => course.university))].sort(), [courses]);
+  const uniqueCountries = useMemo(() => ['all', ...new Set(countries)].sort(), [countries]);
 
   const getAverageRating = useCallback((courseId: number) => {
     const courseReviews = reviews.filter((review) => review.courseId === courseId);
@@ -93,6 +98,7 @@ const Courses: React.FC = () => {
       .filter((course) => (filterInstructor === 'all' ? true : course.instructor === filterInstructor))
       .filter((course) => (filterCourseType === 'all' ? true : course.courseType === filterCourseType))
       .filter((course) => (filterUniversity === 'all' ? true : course.university === filterUniversity))
+      .filter((course) => (filterCountry === 'all' ? true : course.countries.includes(filterCountry)))
       .filter(
         (course) =>
           course.title.toLowerCase().includes(sanitizedQuery.toLowerCase()) ||
@@ -105,7 +111,7 @@ const Courses: React.FC = () => {
           const priceB = b.discountPrice ? parsePrice(b.discountPrice) : parsePrice(b.price);
           return priceA - priceB;
         }
-        if (sortBy === 'startDate') return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+        if (sortBy === 'startDate') return new Date(a.startDateGregorian).getTime() - new Date(b.startDateGregorian).getTime();
         if (sortBy === 'rating') {
           const avgRatingA = parseFloat(getAverageRating(a.id));
           const avgRatingB = parseFloat(getAverageRating(b.id));
@@ -122,6 +128,7 @@ const Courses: React.FC = () => {
     filterInstructor,
     filterCourseType,
     filterUniversity,
+    filterCountry,
     searchQuery,
     sortBy,
     getAverageRating,
@@ -199,6 +206,7 @@ const Courses: React.FC = () => {
     setFilterInstructor('all');
     setFilterCourseType('all');
     setFilterUniversity('all');
+    setFilterCountry('all');
     setSearchQuery('');
     setSortBy('title');
     setCurrentPage(1);
@@ -292,6 +300,20 @@ const Courses: React.FC = () => {
             tabIndex={0}
           >
             {university === 'all' ? 'همه' : university}
+          </button>
+        ))}
+      </div>
+      <div className={styles.filterGroup}>
+        <label htmlFor="filter-country">کشور:</label>
+        {uniqueCountries.map((country) => (
+          <button
+            key={country}
+            className={`${styles.filterButton} ${filterCountry === country ? styles.active : styles.filterTransition}`}
+            onClick={() => setFilterCountry(country)}
+            aria-pressed={filterCountry === country}
+            tabIndex={0}
+          >
+            {country === 'all' ? 'همه' : country}
           </button>
         ))}
       </div>

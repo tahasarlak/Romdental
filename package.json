@@ -24,6 +24,7 @@
     "framer-motion": "^12.7.4",
     "hoist-non-react-statics": "^3.3.2",
     "lodash.debounce": "^4.0.8",
+    "moment-jalaali": "^0.10.4",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -68,6 +69,7 @@
   },
   "devDependencies": {
     "@types/lodash.debounce": "^4.0.9",
+    "@types/moment-jalaali": "^0.7.9",
     "@types/react-helmet": "^6.1.11",
     "@types/react-helmet-async": "^1.0.1",
     "@types/react-lazyload": "^3.2.3",

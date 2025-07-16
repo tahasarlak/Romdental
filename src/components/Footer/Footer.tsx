@@ -1,7 +1,8 @@
 import React from 'react';
-import InstagramIcon from '@mui/icons-material/Instagram'; // آیکون اینستاگرام
-import TelegramIcon from '@mui/icons-material/Telegram'; // آیکون تلگرام
-import WhatsAppIcon from '@mui/icons-material/WhatsApp'; // آیکون واتس‌اپ
+import InstagramIcon from '@mui/icons-material/Instagram';
+import TelegramIcon from '@mui/icons-material/Telegram';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import styles from './Footer.module.css';
 
 const Footer: React.FC = () => {
@@ -9,6 +10,7 @@ const Footer: React.FC = () => {
     e.preventDefault();
     const email = (e.target as any).email.value;
     // اینجا می‌توانید درخواست به سرور بفرستید
+    console.log('Newsletter subscription:', email);
   };
 
   return (
@@ -27,11 +29,11 @@ const Footer: React.FC = () => {
         <div className={styles.section}>
           <h4 className={styles.sectionTitle}>لینک‌های مفید</h4>
           <ul className={styles.list}>
-            <li><a href="#home" className={styles.link}>خانه</a></li>
-            <li><a href="#about" className={styles.link}>درباره ما</a></li>
-            <li><a href="#courses" className={styles.link}>دوره‌ها</a></li>
-            <li><a href="#contact" className={styles.link}>تماس با ما</a></li>
-            <li><a href="#blog" className={styles.link}>وبلاگ</a></li>
+            <li><a href="/" className={styles.link}>خانه</a></li>
+            <li><a href="/about" className={styles.link}>درباره ما</a></li>
+            <li><a href="/courses" className={styles.link}>دوره‌ها</a></li>
+            <li><a href="/contact" className={styles.link}>تماس با ما</a></li>
+            <li><a href="/blog" className={styles.link}>وبلاگ</a></li>
           </ul>
         </div>
 
@@ -57,21 +59,24 @@ const Footer: React.FC = () => {
             <button type="submit" className={styles.newsletterButton}>اشتراک</button>
           </form>
           <div className={styles.socialIcons}>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+            <a href="https://www.instagram.com/roomdental" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
               <InstagramIcon />
             </a>
-            <a href="https://telegram.me/rom-dental" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+            <a href="https://t.me/roomdental" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
               <TelegramIcon />
             </a>
-            <a href="https://whatsapp.com" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+            <a href="https://wa.me/+989123456789" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
               <WhatsAppIcon />
+            </a>
+            <a href="https://www.linkedin.com/company/roomdental" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+              <LinkedInIcon />
             </a>
           </div>
         </div>
       </div>
       <div className={styles.bottomBar}>
         <p>طراحی و توسعه توسط 
-          <a href="#team" className={styles.link}>تیم روم دنتال</a></p>
+          <a href="/about#team" className={styles.link}>تیم روم دنتال</a></p>
       </div>
     </footer>
   );

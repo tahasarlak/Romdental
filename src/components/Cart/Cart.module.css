@@ -1,58 +1,76 @@
-/* src/styles/Cart.module.css */
-.cartItems {
+/* src/pages/Cart/Cart.module.css */
+.cartContainer {
   max-width: var(--max-width);
-  width: 100%;
-  margin: 0 auto;
+  margin: 2rem auto;
   padding: 1.5rem;
+  background-color: var(--white);
+  box-shadow: var(--shadow);
+  border-radius: var(--border-radius);
+  direction: rtl;
+  font-family: var(--font-family);
+}
+
+.cartTitle {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.cartItems {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  transition: var(--transition);
 }
 
 .cartItem {
   display: flex;
   align-items: center;
-  background-color: var(--white);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
   padding: 1rem;
-  gap: 1rem;
+  border-bottom: 1px solid var(--gray);
   transition: var(--transition);
 }
 
+.cartItem:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
 .courseImage {
-  width: clamp(80px, 15vw, 120px);
-  height: auto;
-  border-radius: var(--border-radius);
+  width: 100px;
+  height: 100px;
   object-fit: cover;
+  border-radius: var(--border-radius);
+  margin-left: 1rem;
 }
 
 .courseDetails {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  flex: 1;
 }
 
 .courseTitle {
-  font-family: var(--font-family);
-  color: var(--text-color);
-  font-size: clamp(1.1rem, 4vw, 1.25rem);
+  font-size: 1.25rem;
   font-weight: 500;
-  margin: 0;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
 }
 
 .instructor {
-  font-family: var(--font-family);
+  font-size: 0.9rem;
   color: var(--gray);
-  font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+  margin-bottom: 0.5rem;
 }
 
 .price {
-  font-family: var(--font-family);
-  color: var(--text-color);
-  font-size: clamp(0.9rem, 3.5vw, 1rem);
+  font-size: 1rem;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.itemStatus {
+  font-size: 0.9rem;
+  color: var(--gray);
+  margin-bottom: 0.5rem;
 }
 
 .quantityControls {
@@ -62,50 +80,41 @@
 }
 
 .quantity {
-  font-family: var(--font-family);
+  font-size: 1rem;
   color: var(--text-color);
-  font-size: clamp(0.9rem, 3.5vw, 1rem);
   min-width: 2rem;
   text-align: center;
 }
 
 .removeButton {
-  color: #d32f2f; /* قرمز برای دکمه حذف */
+  color: var(--gray);
   transition: var(--transition);
 }
 
 .removeButton:hover {
-  color: #b71c1c; /* قرمز تیره‌تر برای هاور */
+  color: var(--accent-color-hover);
 }
 
 .cartSummary {
-  max-width: var(--max-width);
-  width: 100%;
-  margin: 1.5rem auto;
-  padding: 1rem;
-  background-color: var(--white);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: var(--transition);
+  padding: 1.5rem;
+  background-color: var(--secondary-color);
+  border-radius: var(--border-radius);
+  margin-top: 1.5rem;
 }
 
-.cartSummary h3 {
-  font-family: var(--font-family);
-  color: var(--text-color);
-  font-size: clamp(1.1rem, 4vw, 1.25rem);
-  margin: 0;
+.totalPrice {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--primary-color);
 }
 
 .checkoutButton {
   background-color: var(--accent-color);
-  color: var(--white);
-  font-family: var(--font-family);
-  font-size: clamp(0.9rem, 3.5vw, 1rem);
   padding: 0.75rem 1.5rem;
-  border-radius: var(--border-radius);
+  font-size: 1rem;
   transition: var(--transition);
 }
 
@@ -113,140 +122,50 @@
   background-color: var(--accent-color-hover);
 }
 
-.emptyCart {
+.emptyCartContainer {
   max-width: var(--max-width);
-  width: 100%;
-  margin: 0 auto;
+  margin: 2rem auto;
   padding: 2rem;
   text-align: center;
-  background-color: var(--white);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
+}
+
+.emptyCartAlert {
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+}
+
+.browseCoursesButton {
+  background-color: var(--accent-color);
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
   transition: var(--transition);
 }
 
-.emptyCart h2 {
-  font-family: var(--font-family);
-  color: var(--text-color);
-  font-size: clamp(1.25rem, 5vw, 1.5rem);
-  margin-bottom: 1rem;
+.browseCoursesButton:hover {
+  background-color: var(--accent-color-hover);
 }
 
-.emptyCart p {
-  font-family: var(--font-family);
-  color: var(--gray);
-  font-size: clamp(0.9rem, 4vw, 1rem);
-}
-
-/* استایل‌های حالت تیره */
-.dark .cartItem,
-.dark .cartSummary,
-.dark .emptyCart {
+/* Dark mode adjustments */
+.dark .cartContainer {
   background-color: var(--secondary-color);
 }
 
+.dark .cartTitle,
 .dark .courseTitle,
 .dark .price,
-.dark .quantity,
-.dark .cartSummary h3,
-.dark .emptyCart h2 {
+.dark .totalPrice {
   color: var(--primary-color);
 }
 
 .dark .instructor,
-.dark .emptyCart p {
+.dark .itemStatus {
   color: var(--gray);
 }
 
-.dark .checkoutButton {
-  background-color: var(--accent-color);
+.dark .cartSummary {
+  background-color: var(--primary-color);
 }
 
-.dark .checkoutButton:hover {
-  background-color: var(--accent-color-hover);
-}
-
-.dark .removeButton {
-  color: #ef5350; /* قرمز روشن‌تر برای حالت تیره */
-}
-
-.dark .removeButton:hover {
-  color: #ff867c; /* قرمز روشن برای هاور در حالت تیره */
-}
-
-/* Media Queries برای ریسپانسیو بودن */
-@media (max-width: 768px) {
-  .cartItems {
-    padding: 1rem;
-  }
-
-  .cartItem {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0.75rem;
-  }
-
-  .courseImage {
-    width: 100%;
-    max-width: 200px;
-  }
-
-  .courseDetails {
-    width: 100%;
-  }
-
-  .quantityControls {
-    justify-content: center;
-  }
-
-  .cartSummary {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 0.75rem;
-  }
-
-  .checkoutButton {
-    width: 100%;
-    max-width: 200px;
-  }
-}
-
-@media (max-width: 480px) {
-  .cartItems {
-    padding: 0.5rem;
-  }
-
-  .cartItem {
-    padding: 0.5rem;
-  }
-
-  .courseTitle {
-    font-size: clamp(1rem, 3.5vw, 1.1rem);
-  }
-
-  .instructor,
-  .price,
-  .quantity {
-    font-size: clamp(0.8rem, 3vw, 0.9rem);
-  }
-
-  .courseImage {
-    max-width: 150px;
-  }
-
-  .cartSummary h3 {
-    font-size: clamp(1rem, 3.5vw, 1.1rem);
-  }
-
-  .emptyCart {
-    padding: 1rem;
-  }
-
-  .emptyCart h2 {
-    font-size: clamp(1.1rem, 4.5vw, 1.3rem);
-  }
-
-  .emptyCart p {
-    font-size: clamp(0.8rem, 3.5vw, 0.9rem);
-  }
+.dark .cartItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }

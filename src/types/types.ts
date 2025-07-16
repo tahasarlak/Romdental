@@ -1,13 +1,20 @@
+export interface BankAccount {
+  bankName: string;
+  accountHolder: string;
+  accountNumber: string;
+}
+
 export interface WishlistItem {
-  likeDate: string;
-  userId: number;
   id: number;
   type: 'course' | 'instructor' | 'blog';
-  name: string;userName?: string;
+  name: string;
+  userName?: string;
+  likeDate: string;
+  userId: number;
 }
 
 export interface CartItem {
-  id: string; // شناسه منحصربه‌فرد برای هر آیتم سبد خرید
+  id: string;
   courseId: number;
   quantity: number;
 }
@@ -26,32 +33,42 @@ export interface Instructor {
   whatsappLink?: string;
   telegramLink?: string;
   instagramLink?: string;
+  bankAccounts: BankAccount[];
 }
 
 export interface User {
   id: number;
   name: string;
   email: string;
+  password: string;
   phone: string;
   university: string;
   gender: 'مرد' | 'زن';
+  role: 'Student' | 'Instructor' | 'Blogger' | 'Admin' | 'SuperAdmin';
   profilePicture?: string;
   wishlist: WishlistItem[];
   enrolledCourses: number[];
-  cart: any[];
-  password: string;
-  token: string;
+  cart: CartItem[];
+  token?: string;
   course?: string;
-  role: 'Student' | 'Instructor' | 'Blogger' | 'Admin' | 'SuperAdmin';
+}
+
+export interface BlogPost {
+  id: number;
+  title: string;
+  author: string;
+  category: string;
+  tags: string[];
+  date: string;
+  content: string;
+  excerpt?: string;
+  images?: string[];
+  videos?: string[];
 }
 
 export interface CategorizedUsers {
-  superAdmins: User[];
-  admins: User[];
-  instructors: User[];
-  students: User[];
   bloggers: User[];
-  multiRole: User[];
+  students: User[];
 }
 
 export interface ContentItem {
@@ -79,31 +96,32 @@ export interface FaqItem {
 }
 
 export interface Course {
-  slug: string;
   id: number;
   title: string;
   instructor: string;
   description: string;
   duration: string;
   courseNumber: string;
-  category: string; 
+  category: string;
   image: string;
-  price: string; 
-  currency: string; 
-  discountPrice?: string; 
-  discountCurrency?: string;
+  price: string;
+  discountPrice?: string;
   discountPercentage?: number;
-  startDate: string;
+  startDateJalali: string;
+  startDateGregorian: string;
   isOpen: boolean;
   isFeatured: boolean;
   enrollmentCount: number;
   syllabus: SyllabusItem[];
-  faqs: FaqItem[];
-  tags?: string[];
-  prerequisites?: string[];
+  faqs: { id: number; question: string; answer: string }[];
+  tags: string[];
+  prerequisites: string[];
   courseType: 'Online' | 'Offline' | 'In-Person' | 'Hybrid';
-  university?: string; 
-  level?: 'Beginner' | 'Intermediate' | 'Advanced'; 
+  university: string;
+  slug: string;
+  currency: 'RUB' | 'CNY' | 'IRR';
+  countries: string[];
+  level?: string;
 }
 
 export interface ReplyItem {
@@ -129,19 +147,15 @@ export interface ReviewItem {
   replies: ReplyItem[];
 }
 
-export interface BlogPost {
+export interface Enrollment {
   id: number;
-  title: string;
-  content: string;
-  slug?: string;
-  image?: string;
-  author?: string;
-  date?: string;
-  tags?: string[];
-  category?: string;
-  excerpt?: string;
-  images?: string[];
-  videos?: string[];
+  studentId: number;
+  courseId: number;
+  instructorId: number;
+  status: 'active' | 'inactive';
+  group?: string;
+  enrollmentDate: string;
 }
+
 export const VALID_COURSE_TYPES = ['Online', 'Offline', 'In-Person', 'Hybrid'] as const;
 export type CourseType = typeof VALID_COURSE_TYPES[number];

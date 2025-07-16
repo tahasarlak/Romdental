@@ -1,0 +1,140 @@
+/* src/pages/Checkout/CheckoutMultiple.module.css */
+.checkoutContainer {
+  max-width: var(--max-width);
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: var(--white);
+  box-shadow: var(--shadow);
+  border-radius: var(--border-radius);
+  direction: rtl;
+  font-family: var(--font-family);
+}
+
+.checkoutTitle {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.orderDetails {
+  padding: 1.5rem;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+}
+
+.orderItem {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--gray);
+}
+
+.itemTitle {
+  font-size: 1rem;
+  color: var(--text-color);
+  margin-bottom: 0.25rem;
+}
+
+.itemPrice {
+  font-size: 1rem;
+  color: var(--primary-color);
+}
+
+.itemStatus {
+  font-size: 0.9rem;
+  color: var(--gray);
+}
+
+.totalAmount {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  margin-top: 1rem;
+}
+
+.fileInputContainer {
+  margin: 1.5rem 0;
+}
+
+.fileInputLabel {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.fileInput {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--gray);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  color: var(--text-color);
+  background-color: var(--white);
+}
+
+.fileName {
+  font-size: 0.9rem;
+  color: var(--gray);
+  margin-top: 0.5rem;
+}
+
+.errorAlert {
+  margin: 1rem 0;
+}
+
+.submitButton {
+  background-color: var(--accent-color);
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  width: 100%;
+  margin-top: 1rem;
+  transition: var(--transition);
+}
+
+.submitButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.errorContainer {
+  max-width: var(--max-width);
+  margin: 2rem auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Dark mode adjustments */
+.dark .checkoutContainer,
+.dark .orderDetails {
+  background-color: var(--secondary-color);
+}
+
+.dark .checkoutTitle,
+.dark .sectionTitle,
+.dark .itemTitle,
+.dark .itemPrice,
+.dark .totalAmount {
+  color: var(--primary-color);
+}
+
+.dark .itemStatus,
+.dark .fileInputLabel,
+.dark .fileName {
+  color: var(--gray);
+}
+
+.dark .fileInput {
+  background-color: var(--secondary-color);
+  border-color: var(--gray);
+  color: var(--primary-color);
+}

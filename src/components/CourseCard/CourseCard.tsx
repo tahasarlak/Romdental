@@ -11,12 +11,16 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ShareIcon from '@mui/icons-material/Share';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import FlagIcon from '@mui/icons-material/Flag';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import styles from './CourseCard.module.css';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import { useCartContext } from '../../Context/CartContext';
+import { useShareContext } from '../../Context/ShareContext';
 import { Course } from '../../types/types';
 
 interface CourseCardProps {
@@ -76,6 +80,7 @@ const CourseCard: React.FC<CourseCardProps> = memo(
   }) => {
     const { showNotification } = useNotificationContext();
     const { cartItems, removeFromCart } = useCartContext();
+    const { shareConfig } = useShareContext();
     const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -97,9 +102,18 @@ const CourseCard: React.FC<CourseCardProps> = memo(
     const sanitizedUniversity = useMemo(() => DOMPurify.sanitize(course.university), [course.university]);
     const sanitizedPrice = useMemo(() => DOMPurify.sanitize(course.price), [course.price]);
     const sanitizedDiscountPrice = course.discountPrice ? DOMPurify.sanitize(course.discountPrice) : undefined;
+    const sanitizedCountries = useMemo(
+      () => DOMPurify.sanitize(course.countries?.length ? course.countries.join(', ') : 'نامشخص'),
+      [course.countries]
+    );
 
     const imageSrc = isValidImageUrl(course.image) ? course.image : '/assets/fallback.jpg';
     const baseUrl = process.env.REACT_APP_BASE_URL || 'https://roomdental.com';
+    const shareUrl = encodeURI(`${baseUrl}/courses/${course.slug}`);
+    const shareText = useMemo(
+      () => DOMPurify.sanitize(shareConfig.shareMessageTemplate(course.title, shareUrl, course.description, course.image)),
+      [shareConfig, course.title, course.description, course.image, shareUrl]
+    );
 
     const articleId = `course-title-${course.id}-${Math.random().toString(36).substring(2, 9)}`;
     const descriptionId = `course-description-${course.id}-${Math.random().toString(36).substring(2, 9)}`;
@@ -160,19 +174,35 @@ const CourseCard: React.FC<CourseCardProps> = memo(
     }, [handleClickOutside]);
 
     const shareCourse = useCallback(
-      async (platform: 'native' | 'telegram' | 'whatsapp' | 'copy') => {
-        const shareUrl = encodeURI(`${baseUrl}/courses/${course.id}`);
-        const shareText = DOMPurify.sanitize(`دوره "${course.title}" را در روم دنتال بررسی کنید!`);
+      async (platform: 'native' | 'telegram' | 'whatsapp' | 'copy' | 'instagram' | 'linkedin') => {
         try {
           if (platform === 'native' && navigator.share) {
             await navigator.share({ title: course.title, text: shareText, url: shareUrl });
             showNotification('دوره با موفقیت به اشتراک گذاشته شد!', 'success');
           } else if (platform === 'telegram') {
-            window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
+            window.open(
+              `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`,
+              '_blank'
+            );
             showNotification('لینک دوره در تلگرام به اشتراک گذاشته شد!', 'success');
           } else if (platform === 'whatsapp') {
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, '_blank');
+            window.open(
+              `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`,
+              '_blank'
+            );
             showNotification('لینک دوره در واتساپ به اشتراک گذاشته شد!', 'success');
+          } else if (platform === 'instagram') {
+            window.open(
+              `https://www.instagram.com/?url=${encodeURIComponent(shareUrl)}`,
+              '_blank'
+            );
+            showNotification('لینک دوره در اینستاگرام به اشتراک گذاشته شد!', 'success');
+          } else if (platform === 'linkedin') {
+            window.open(
+              `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+              '_blank'
+            );
+            showNotification('لینک دوره در لینکدین به اشتراک گذاشته شد!', 'success');
           } else if (platform === 'copy') {
             await navigator.clipboard.writeText(shareUrl);
             showNotification('لینک دوره با موفقیت کپی شد!', 'success');
@@ -183,7 +213,7 @@ const CourseCard: React.FC<CourseCardProps> = memo(
         }
         setIsShareDropdownOpen(false);
       },
-      [course, baseUrl, showNotification]
+      [course.title, shareText, shareUrl, showNotification]
     );
 
     return (
@@ -194,7 +224,7 @@ const CourseCard: React.FC<CourseCardProps> = memo(
           <meta property="og:description" content={sanitizedDescription} />
           <meta property="og:image" content={imageSrc} />
           <meta property="og:type" content="website" />
-          <meta property="og:url" content={`${baseUrl}/courses/${course.slug}`} />
+          <meta property="og:url" content={shareUrl} />
           <meta property="og:site_name" content="روم دنتال" />
           <meta name="twitter:card" content="summary_large_image" />
           <script type="application/ld+json">{JSON.stringify(getCourseStructuredData(course))}</script>
@@ -227,7 +257,7 @@ const CourseCard: React.FC<CourseCardProps> = memo(
                   role="menu"
                   onKeyDown={(e) => e.key === 'Escape' && toggleShareDropdown()}
                 >
-                  {navigator.share && (
+                  {shareConfig.availablePlatforms.includes('native') && navigator.share && (
                     <button
                       className={styles.shareOption}
                       onClick={() => shareCourse('native')}
@@ -237,30 +267,56 @@ const CourseCard: React.FC<CourseCardProps> = memo(
                       <ShareIcon aria-hidden="true" /> اشتراک‌گذاری
                     </button>
                   )}
-                  <button
-                    className={styles.shareOption}
-                    onClick={() => shareCourse('telegram')}
-                    role="menuitem"
-                    aria-label="اشتراک‌گذاری در تلگرام"
-                  >
-                    <TelegramIcon aria-hidden="true" /> تلگرام
-                  </button>
-                  <button
-                    className={styles.shareOption}
-                    onClick={() => shareCourse('whatsapp')}
-                    role="menuitem"
-                    aria-label="اشتراک‌گذاری در واتساپ"
-                  >
-                    <WhatsAppIcon aria-hidden="true" /> واتساپ
-                  </button>
-                  <button
-                    className={styles.shareOption}
-                    onClick={() => shareCourse('copy')}
-                    role="menuitem"
-                    aria-label="کپی لینک دوره"
-                  >
-                    <ContentCopyIcon aria-hidden="true" /> کپی لینک
-                  </button>
+                  {shareConfig.availablePlatforms.includes('telegram') && (
+                    <button
+                      className={styles.shareOption}
+                      onClick={() => shareCourse('telegram')}
+                      role="menuitem"
+                      aria-label="اشتراک‌گذاری در تلگرام"
+                    >
+                      <TelegramIcon aria-hidden="true" /> تلگرام
+                    </button>
+                  )}
+                  {shareConfig.availablePlatforms.includes('whatsapp') && (
+                    <button
+                      className={styles.shareOption}
+                      onClick={() => shareCourse('whatsapp')}
+                      role="menuitem"
+                      aria-label="اشتراک‌گذاری در واتساپ"
+                    >
+                      <WhatsAppIcon aria-hidden="true" /> واتساپ
+                    </button>
+                  )}
+                  {shareConfig.availablePlatforms.includes('instagram') && (
+                    <button
+                      className={styles.shareOption}
+                      onClick={() => shareCourse('instagram')}
+                      role="menuitem"
+                      aria-label="اشتراک‌گذاری در اینستاگرام"
+                    >
+                      <InstagramIcon aria-hidden="true" /> اینستاگرام
+                    </button>
+                  )}
+                  {shareConfig.availablePlatforms.includes('linkedin') && (
+                    <button
+                      className={styles.shareOption}
+                      onClick={() => shareCourse('linkedin')}
+                      role="menuitem"
+                      aria-label="اشتراک‌گذاری در لینکدین"
+                    >
+                      <LinkedInIcon aria-hidden="true" /> لینکدین
+                    </button>
+                  )}
+                  {shareConfig.availablePlatforms.includes('copy') && (
+                    <button
+                      className={styles.shareOption}
+                      onClick={() => shareCourse('copy')}
+                      role="menuitem"
+                      aria-label="کپی لینک دوره"
+                    >
+                      <ContentCopyIcon aria-hidden="true" /> کپی لینک
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -338,8 +394,10 @@ const CourseCard: React.FC<CourseCardProps> = memo(
               <Tooltip title="دانشگاه" enterDelay={500}>
                 <span>{sanitizedUniversity}</span>
               </Tooltip>
-              <Tooltip title="تعداد شرکت‌کنندگان" enterDelay={500}>
-                <span>{course.enrollmentCount} شرکت‌کننده</span>
+              <Tooltip title="کشورها" enterDelay={500}>
+                <span>
+                  <FlagIcon aria-hidden="true" /> {sanitizedCountries}
+                </span>
               </Tooltip>
             </div>
             {course.tags?.length > 0 && (
@@ -398,7 +456,7 @@ const CourseCard: React.FC<CourseCardProps> = memo(
                 )}
               </button>
               <Link
-                to={`/courses/${course.id}`}
+                to={`/courses/${course.slug}`}
                 className={styles.detailsLink}
                 aria-label={`جزئیات بیشتر درباره دوره ${sanitizedTitle}`}
               >

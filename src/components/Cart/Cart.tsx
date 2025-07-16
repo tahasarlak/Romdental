@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
 import { useCourseContext } from '../../Context/CourseContext';
 import { useCartContext } from '../../Context/CartContext';
 import { useAuthContext } from '../../Context/AuthContext';
@@ -48,7 +49,7 @@ const Cart: React.FC = () => {
       .map((item) => {
         const course = courses.find((c) => c.id === item.courseId);
         if (!course) return null;
-        return { ...course, quantity: item.quantity, cartItemId: item.id };
+        return { ...course, quantity: item.quantity, cartItemId: item.id, status: item.status };
       })
       .filter((course): course is NonNullable<typeof course> => course !== null);
   }, [cartItems, courses]);
@@ -60,46 +61,94 @@ const Cart: React.FC = () => {
     }, 0);
   }, [cartCourses]);
 
-  const handleRemoveItem = (itemId: string) => {
-    if (!isAuthenticated) {
-      showNotification('برای حذف از سبد خرید، لطفاً وارد شوید.', 'error');
-      navigate('/login');
-      return;
-    }
-    const course = cartCourses.find((c) => c.cartItemId === itemId);
-    if (course) {
-      const confirmRemove = window.confirm(`آیا مطمئن هستید که می‌خواهید دوره "${course.title}" را از سبد خرید حذف کنید؟`);
-      if (confirmRemove) {
-        removeFromCart(itemId);
+  const handleRemoveItem = useCallback(
+    (itemId: string) => {
+      if (!isAuthenticated) {
+        showNotification('برای حذف از سبد خرید، لطفاً وارد شوید.', 'error');
+        navigate('/login');
+        return;
       }
-    }
-  };
+      const course = cartCourses.find((c) => c.cartItemId === itemId);
+      if (course?.status === 'pending') {
+        showNotification('نمی‌توانید آیتم‌های در انتظار پرداخت را حذف کنید.', 'warning');
+        return;
+      }
+      if (course) {
+        const confirmRemove = window.confirm(`آیا مطمئن هستید که می‌خواهید دوره "${course.title}" را از سبد خرید حذف کنید؟`);
+        if (confirmRemove) {
+          removeFromCart(itemId);
+          showNotification(`دوره "${course.title}" از سبد خرید حذف شد.`, 'success');
+        }
+      }
+    },
+    [cartCourses, isAuthenticated, navigate, removeFromCart, showNotification]
+  );
 
-  const handleQuantityChange = (itemId: string, newQuantity: number) => {
+  const handleQuantityChange = useCallback(
+    (itemId: string, newQuantity: number) => {
+      if (!isAuthenticated) {
+        showNotification('برای تغییر تعداد، لطفاً وارد شوید.', 'error');
+        navigate('/login');
+        return;
+      }
+      const course = cartCourses.find((c) => c.cartItemId === itemId);
+      if (course?.status === 'pending') {
+        showNotification('نمی‌توانید آیتم‌های در انتظار پرداخت را ویرایش کنید.', 'warning');
+        return;
+      }
+      if (newQuantity < 1) {
+        showNotification('تعداد نمی‌تواند کمتر از ۱ باشد.', 'warning');
+        return;
+      }
+      updateCartItemQuantity(itemId, newQuantity);
+      showNotification('تعداد دوره به‌روزرسانی شد.', 'success');
+    },
+    [isAuthenticated, navigate, updateCartItemQuantity, showNotification, cartCourses]
+  );
+
+  const handleCheckout = useCallback(() => {
     if (!isAuthenticated) {
-      showNotification('برای تغییر تعداد، لطفاً وارد شوید.', 'error');
+      showNotification('برای ادامه به پرداخت، لطفاً وارد شوید.', 'error');
       navigate('/login');
       return;
     }
-    if (newQuantity < 1) return;
-    updateCartItemQuantity(itemId, newQuantity);
-  };
+    const hasPendingItems = cartCourses.some((course) => course.status === 'pending');
+    if (hasPendingItems) {
+      showNotification('سبد خرید شامل آیتم‌های در انتظار پرداخت است. لطفاً منتظر تأیید ادمین باشید.', 'warning');
+      return;
+    }
+    proceedToCheckout();
+  }, [isAuthenticated, navigate, proceedToCheckout, showNotification, cartCourses]);
 
   if (cartCourses.length === 0) {
     return (
-      <div className={styles.emptyCart}>
-        <h2>سبد خرید خالی است</h2>
-        <p>دوره‌ای به سبد خرید اضافه نشده است.</p>
+      <div className={styles.emptyCartContainer}>
+        <Alert severity="info" className={styles.emptyCartAlert}>
+          سبد خرید خالی است. دوره‌ای به سبد خرید اضافه نشده است.
+        </Alert>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate('/courses')}
+          className={styles.browseCoursesButton}
+        >
+          مرور دوره‌ها
+        </Button>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className={styles.cartContainer}>
+      <h1 className={styles.cartTitle}>سبد خرید</h1>
       <div className={styles.cartItems}>
         {cartCourses.map((course) => {
           const cartItem = cartItems.find((item) => item.id === course.cartItemId);
           if (!cartItem) return null;
+          const price = course.discountPrice ? parsePrice(course.discountPrice) : parsePrice(course.price);
+          const totalItemPrice = price * cartItem.quantity;
+          const isPending = cartItem.status === 'pending';
+
           return (
             <div key={cartItem.id} className={styles.cartItem}>
               <img
@@ -115,14 +164,20 @@ const Cart: React.FC = () => {
                 <h3 className={styles.courseTitle}>{course.title}</h3>
                 <p className={styles.instructor}>استاد: {course.instructor}</p>
                 <p className={styles.price}>
-                  قیمت: {course.discountPrice || course.price} (تعداد: {cartItem.quantity})
+                  قیمت واحد: {formatPrice(price)} | مجموع: {formatPrice(totalItemPrice)}
                 </p>
+                {isPending && (
+                  <p className={styles.itemStatus}>
+                    <strong>وضعیت:</strong> در انتظار پرداخت
+                  </p>
+                )}
                 <div className={styles.quantityControls}>
                   <Button
                     variant="outlined"
                     size="small"
                     onClick={() => handleQuantityChange(cartItem.id, cartItem.quantity - 1)}
                     aria-label={`کاهش تعداد دوره ${course.title}`}
+                    disabled={isPending}
                   >
                     -
                   </Button>
@@ -132,6 +187,7 @@ const Cart: React.FC = () => {
                     size="small"
                     onClick={() => handleQuantityChange(cartItem.id, cartItem.quantity + 1)}
                     aria-label={`افزایش تعداد دوره ${course.title}`}
+                    disabled={isPending}
                   >
                     +
                   </Button>
@@ -141,6 +197,7 @@ const Cart: React.FC = () => {
                 className={styles.removeButton}
                 onClick={() => handleRemoveItem(cartItem.id)}
                 aria-label={`حذف دوره ${course.title} از سبد خرید`}
+                disabled={isPending}
               >
                 <DeleteIcon />
               </IconButton>
@@ -149,11 +206,11 @@ const Cart: React.FC = () => {
         })}
       </div>
       <div className={styles.cartSummary}>
-        <h3>جمع کل: {formatPrice(totalPrice)}</h3>
+        <h3 className={styles.totalPrice}>جمع کل: {formatPrice(totalPrice)}</h3>
         <Button
           variant="contained"
           color="primary"
-          onClick={proceedToCheckout}
+          onClick={handleCheckout}
           className={styles.checkoutButton}
           aria-label="تسویه حساب"
         >

@@ -1,24 +1,37 @@
-import React, { useState, useCallback } from 'react';
-import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  IconButton,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useInstructorContext } from '../../../../Context/InstructorContext';
-import { Instructor } from '../../../../types/types'; // وارد کردن مستقیم Instructor از types
 import { useNotificationContext } from '../../../../Context/NotificationContext';
+import { Instructor, BankAccount } from '../../../../types/types';
+import styles from './InstructorDialog.module.css';
 
-/**
- * Props for the InstructorDialog component
- */
 interface InstructorDialogProps {
   open: boolean;
   onClose: () => void;
+  instructor?: Instructor | null;
 }
 
-/**
- * InstructorDialog component for creating a new instructor
- * @param props - The component props
- * @returns JSX.Element
- */
-const InstructorDialog: React.FC<InstructorDialogProps> = ({ open, onClose }) => {
-  const { addInstructor } = useInstructorContext();
+const InstructorDialog: React.FC<InstructorDialogProps> = ({ open, onClose, instructor }) => {
+  const { addInstructor, updateInstructor } = useInstructorContext();
   const { showNotification } = useNotificationContext();
   const [newInstructor, setNewInstructor] = useState<Partial<Instructor>>({
     name: '',
@@ -33,85 +46,18 @@ const InstructorDialog: React.FC<InstructorDialogProps> = ({ open, onClose }) =>
     whatsappLink: '',
     telegramLink: '',
     instagramLink: '',
+    bankAccounts: [],
   });
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [newBankAccount, setNewBankAccount] = useState<BankAccount>({
+    bankName: '',
+    accountHolder: '',
+    accountNumber: '',
+  });
 
-  /**
-   * Validates input fields
-   * @returns True if all inputs are valid, false otherwise
-   */
-  const validateInputs = useCallback(() => {
-    const newErrors: { [key: string]: string } = {};
-    if (!newInstructor.name?.trim()) newErrors.name = 'نام الزامی است.';
-    if (!newInstructor.specialty?.trim()) newErrors.specialty = 'تخصص الزامی است.';
-    if (!newInstructor.bio?.trim()) newErrors.bio = 'بیوگرافی الزامی است.';
-    if (!newInstructor.image?.trim()) newErrors.image = 'لینک تصویر الزامی است.';
-    else if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(newInstructor.image)) {
-      newErrors.image = 'لینک تصویر نامعتبر است.';
-    }
-    if (!newInstructor.experience?.trim()) newErrors.experience = 'تجربه الزامی است.';
-    if (newInstructor.totalStudents && isNaN(Number(newInstructor.totalStudents))) {
-      newErrors.totalStudents = 'تعداد دانشجویان باید عدد باشد.';
-    }
-    if (newInstructor.whatsappLink && !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(newInstructor.whatsappLink)) {
-      newErrors.whatsappLink = 'لینک واتساپ نامعتبر است.';
-    }
-    if (newInstructor.telegramLink && !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(newInstructor.telegramLink)) {
-      newErrors.telegramLink = 'لینک تلگرام نامعتبر است.';
-    }
-    if (newInstructor.instagramLink && !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(newInstructor.instagramLink)) {
-      newErrors.instagramLink = 'لینک اینستاگرام نامعتبر است.';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [newInstructor]);
-
-  /**
-   * Handles input changes for form fields
-   * @param e - The input change event
-   */
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const { name, value } = e.target;
-      if (name === 'coursesTaught') {
-        setNewInstructor((prev: Partial<Instructor>) => ({
-          ...prev,
-          coursesTaught: value.split(',').map((course) => course.trim()).filter(Boolean),
-        }));
-      } else {
-        setNewInstructor((prev: Partial<Instructor>) => ({ ...prev, [name]: value }));
-      }
-      setErrors((prev) => ({ ...prev, [name]: '' }));
-    },
-    []
-  );
-
-  /**
-   * Creates a new instructor
-   */
-  const handleCreate = useCallback(async () => {
-    if (!validateInputs()) {
-      showNotification('لطفاً تمام خطاها را برطرف کنید!', 'error');
-      return;
-    }
-
-    try {
-      const instructor: Omit<Instructor, 'id'> = {
-        name: newInstructor.name!,
-        specialty: newInstructor.specialty!,
-        bio: newInstructor.bio!,
-        image: newInstructor.image!,
-        experience: newInstructor.experience!,
-        coursesTaught: newInstructor.coursesTaught || [],
-        averageRating: newInstructor.averageRating || '0',
-        totalStudents: Number(newInstructor.totalStudents) || 0,
-        reviewCount: 0,
-        whatsappLink: newInstructor.whatsappLink || undefined,
-        telegramLink: newInstructor.telegramLink || undefined,
-        instagramLink: newInstructor.instagramLink || undefined,
-      };
-
-      await addInstructor(instructor);
+  useEffect(() => {
+    if (instructor) {
+      setNewInstructor(instructor);
+    } else {
       setNewInstructor({
         name: '',
         specialty: '',
@@ -125,161 +71,231 @@ const InstructorDialog: React.FC<InstructorDialogProps> = ({ open, onClose }) =>
         whatsappLink: '',
         telegramLink: '',
         instagramLink: '',
+        bankAccounts: [],
       });
+    }
+  }, [instructor]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewInstructor((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleBankAccountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewBankAccount((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const addBankAccount = () => {
+    if (newBankAccount.bankName && newBankAccount.accountHolder && newBankAccount.accountNumber) {
+      setNewInstructor((prev) => ({
+        ...prev,
+        bankAccounts: [...(prev.bankAccounts || []), newBankAccount],
+      }));
+      setNewBankAccount({ bankName: '', accountHolder: '', accountNumber: '' });
+    } else {
+      showNotification('لطفاً تمام فیلدهای حساب بانکی را پر کنید.', 'error');
+    }
+  };
+
+  const removeBankAccount = (index: number) => {
+    setNewInstructor((prev) => ({
+      ...prev,
+      bankAccounts: (prev.bankAccounts || []).filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (!newInstructor.name || !newInstructor.specialty || !newInstructor.bio) {
+      showNotification('لطفاً تمام فیلدهای الزامی را پر کنید.', 'error');
+      return;
+    }
+
+    try {
+      const instructorData: Omit<Instructor, 'id'> = {
+        name: newInstructor.name!,
+        specialty: newInstructor.specialty!,
+        bio: newInstructor.bio!,
+        image: newInstructor.image || '/assets/default-instructor.jpg',
+        experience: newInstructor.experience || '',
+        coursesTaught: newInstructor.coursesTaught || [],
+        averageRating: newInstructor.averageRating || '0',
+        totalStudents: newInstructor.totalStudents || 0,
+        reviewCount: newInstructor.reviewCount || 0,
+        whatsappLink: newInstructor.whatsappLink || '',
+        telegramLink: newInstructor.telegramLink || '',
+        instagramLink: newInstructor.instagramLink || '',
+        bankAccounts: newInstructor.bankAccounts || [],
+      };
+
+      if (instructor) {
+        await updateInstructor(instructor.id, instructorData);
+        showNotification('استاد با موفقیت به‌روزرسانی شد.', 'success');
+      } else {
+        await addInstructor(instructorData);
+        showNotification('استاد با موفقیت اضافه شد.', 'success');
+      }
       onClose();
     } catch (error: any) {
-      showNotification(error.message || 'خطا در ایجاد استاد', 'error');
+      showNotification(error.message || 'خطایی در ذخیره استاد رخ داد.', 'error');
     }
-  }, [newInstructor, addInstructor, showNotification, onClose, validateInputs]);
+  };
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      aria-labelledby="instructor-dialog-title"
-      aria-describedby="instructor-dialog-description"
-    >
-      <DialogTitle id="instructor-dialog-title">ایجاد استاد جدید</DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>{instructor ? 'ویرایش استاد' : 'اضافه کردن استاد جدید'}</DialogTitle>
       <DialogContent>
         <TextField
-          autoFocus
-          margin="dense"
-          name="name"
           label="نام"
-          type="text"
-          fullWidth
-          value={newInstructor.name}
+          name="name"
+          value={newInstructor.name || ''}
           onChange={handleInputChange}
+          fullWidth
           required
-          error={!!errors.name}
-          helperText={errors.name}
-          inputProps={{ 'aria-required': true }}
+          margin="normal"
         />
         <TextField
-          margin="dense"
-          name="specialty"
           label="تخصص"
-          type="text"
-          fullWidth
-          value={newInstructor.specialty}
+          name="specialty"
+          value={newInstructor.specialty || ''}
           onChange={handleInputChange}
+          fullWidth
           required
-          error={!!errors.specialty}
-          helperText={errors.specialty}
-          inputProps={{ 'aria-required': true }}
+          margin="normal"
         />
         <TextField
-          margin="dense"
-          name="bio"
           label="بیوگرافی"
-          type="text"
+          name="bio"
+          value={newInstructor.bio || ''}
+          onChange={handleInputChange}
           fullWidth
+          required
           multiline
           rows={4}
-          value={newInstructor.bio}
-          onChange={handleInputChange}
-          required
-          error={!!errors.bio}
-          helperText={errors.bio}
-          inputProps={{ 'aria-required': true }}
+          margin="normal"
         />
         <TextField
-          margin="dense"
-          name="image"
           label="لینک تصویر"
-          type="text"
-          fullWidth
-          value={newInstructor.image}
+          name="image"
+          value={newInstructor.image || ''}
           onChange={handleInputChange}
-          required
-          error={!!errors.image}
-          helperText={errors.image}
-          inputProps={{ 'aria-required': true }}
+          fullWidth
+          margin="normal"
         />
         <TextField
-          margin="dense"
+          label="تجربه"
           name="experience"
-          label="تجربه (سال)"
-          type="text"
-          fullWidth
-          value={newInstructor.experience}
+          value={newInstructor.experience || ''}
           onChange={handleInputChange}
-          required
-          error={!!errors.experience}
-          helperText={errors.experience}
-          inputProps={{ 'aria-required': true }}
+          fullWidth
+          margin="normal"
         />
         <TextField
-          margin="dense"
-          name="coursesTaught"
-          label="دوره‌های تدریس‌شده (با کاما جدا کنید)"
-          type="text"
-          fullWidth
-          value={newInstructor.coursesTaught?.join(', ')}
-          onChange={handleInputChange}
-          helperText="مثال: دوره ایمپلنت, دوره ارتودنسی"
-        />
-        <TextField
-          margin="dense"
+          label="میانگین امتیاز"
           name="averageRating"
-          label="امتیاز میانگین"
-          type="text"
-          fullWidth
-          value={newInstructor.averageRating}
+          value={newInstructor.averageRating || ''}
           onChange={handleInputChange}
-          helperText="بین 0 تا 5 (پیش‌فرض: 0)"
+          fullWidth
+          margin="normal"
         />
         <TextField
-          margin="dense"
-          name="totalStudents"
           label="تعداد دانشجویان"
+          name="totalStudents"
           type="number"
-          fullWidth
-          value={newInstructor.totalStudents}
+          value={newInstructor.totalStudents || 0}
           onChange={handleInputChange}
-          error={!!errors.totalStudents}
-          helperText={errors.totalStudents}
+          fullWidth
+          margin="normal"
         />
         <TextField
-          margin="dense"
+          label="تعداد نظرات"
+          name="reviewCount"
+          type="number"
+          value={newInstructor.reviewCount || 0}
+          onChange={handleInputChange}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="لینک واتساپ"
           name="whatsappLink"
-          label="لینک واتساپ (اختیاری)"
-          type="text"
-          fullWidth
-          value={newInstructor.whatsappLink}
+          value={newInstructor.whatsappLink || ''}
           onChange={handleInputChange}
-          error={!!errors.whatsappLink}
-          helperText={errors.whatsappLink}
+          fullWidth
+          margin="normal"
         />
         <TextField
-          margin="dense"
+          label="لینک تلگرام"
           name="telegramLink"
-          label="لینک تلگرام (اختیاری)"
-          type="text"
-          fullWidth
-          value={newInstructor.telegramLink}
+          value={newInstructor.telegramLink || ''}
           onChange={handleInputChange}
-          error={!!errors.telegramLink}
-          helperText={errors.telegramLink}
+          fullWidth
+          margin="normal"
         />
         <TextField
-          margin="dense"
+          label="لینک اینستاگرام"
           name="instagramLink"
-          label="لینک اینستاگرام (اختیاری)"
-          type="text"
-          fullWidth
-          value={newInstructor.instagramLink}
+          value={newInstructor.instagramLink || ''}
           onChange={handleInputChange}
-          error={!!errors.instagramLink}
-          helperText={errors.instagramLink}
+          fullWidth
+          margin="normal"
         />
+        <div className={styles.bankAccountSection}>
+          <h3>حساب‌های بانکی</h3>
+          <TextField
+            label="نام بانک"
+            name="bankName"
+            value={newBankAccount.bankName}
+            onChange={handleBankAccountChange}
+            margin="normal"
+          />
+          <TextField
+            label="نام صاحب حساب"
+            name="accountHolder"
+            value={newBankAccount.accountHolder}
+            onChange={handleBankAccountChange}
+            margin="normal"
+          />
+          <TextField
+            label="شماره حساب"
+            name="accountNumber"
+            value={newBankAccount.accountNumber}
+            onChange={handleBankAccountChange}
+            margin="normal"
+          />
+          <IconButton onClick={addBankAccount} color="primary">
+            <AddIcon />
+          </IconButton>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>نام بانک</TableCell>
+                <TableCell>نام صاحب حساب</TableCell>
+                <TableCell>شماره حساب</TableCell>
+                <TableCell>حذف</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {(newInstructor.bankAccounts || []).map((account, index) => (
+                <TableRow key={index}>
+                  <TableCell>{account.bankName}</TableCell>
+                  <TableCell>{account.accountHolder}</TableCell>
+                  <TableCell>{account.accountNumber}</TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => removeBankAccount(index)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} aria-label="لغو ایجاد استاد">
-          لغو
-        </Button>
-        <Button onClick={handleCreate} variant="contained" aria-label="ایجاد استاد جدید">
-          ایجاد
+        <Button onClick={onClose}>لغو</Button>
+        <Button onClick={handleSubmit} color="primary">
+          {instructor ? 'به‌روزرسانی' : 'اضافه کردن'}
         </Button>
       </DialogActions>
     </Dialog>

@@ -15,11 +15,16 @@ import Chip from '@mui/material/Chip';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../Context/AuthContext';
 import { useCourseContext } from '../../Context/CourseContext';
+import { useEnrollmentContext } from '../../Context/EnrollmentContext';
 import { Course, SyllabusItem } from '../../types/types';
+import moment from 'moment-jalaali';
+
+moment.loadPersian({ dialect: 'persian-modern' });
 
 const PurchasedCourses: React.FC = () => {
   const { user } = useAuthContext();
   const { courses } = useCourseContext();
+  const { getEnrollmentsByStudent, isCourseActiveForUser } = useEnrollmentContext();
 
   const getCourseDetails = (courseId: number): Course => {
     return (
@@ -31,10 +36,13 @@ const PurchasedCourses: React.FC = () => {
         description: 'بدون توضیحات',
         duration: 'نامشخص',
         courseNumber: 'نامشخص',
-        category: 'عمومی' as const,
+        category: 'عمومی',
         image: '/assets/courses/default.jpg',
-        price: '۰ تومان',
-        startDate: 'نامشخص',
+        price: '۰',
+        currency: 'IRR',
+        countries: [],
+        startDateJalali: 'نامشخص',
+        startDateGregorian: 'نامشخص',
         isOpen: false,
         isFeatured: false,
         enrollmentCount: 0,
@@ -42,9 +50,8 @@ const PurchasedCourses: React.FC = () => {
         faqs: [],
         tags: [],
         prerequisites: [],
-        courseType: 'Online' as const,
+        courseType: 'Online',
         university: 'نامشخص',
-        currency: "IRR",
       }
     );
   };
@@ -55,13 +62,35 @@ const PurchasedCourses: React.FC = () => {
     return Math.round((completedItems / syllabus.length) * 100);
   };
 
-  const activeCourses = user?.enrolledCourses
-    ?.map((courseId) => getCourseDetails(courseId))
-    .filter((course) => course.isOpen) || [];
+  const getCurrencySymbol = (currency: string): string => {
+    switch (currency) {
+      case 'IRR':
+        return 'تومان';
+      case 'RUB':
+        return '₽';
+      case 'CNY':
+        return '¥';
+      default:
+        return '';
+    }
+  };
 
-  const completedCourses = user?.enrolledCourses
-    ?.map((courseId) => getCourseDetails(courseId))
-    .filter((course) => !course.isOpen) || [];
+  const formatJalaliDate = (jalaliDate: string): string => {
+    if (!jalaliDate || jalaliDate === 'نامشخص') return 'نامشخص';
+    try {
+      return moment(jalaliDate, 'jYYYY/jMM/jDD').format('jD jMMMM jYYYY');
+    } catch {
+      return 'نامشخص';
+    }
+  };
+
+  const enrollments = user ? getEnrollmentsByStudent(user.id) : [];
+  const activeCourses = enrollments
+    .filter((enrollment) => isCourseActiveForUser(user?.id || 0, enrollment.courseId))
+    .map((enrollment) => ({ course: getCourseDetails(enrollment.courseId), group: enrollment.group }));
+  const completedCourses = enrollments
+    .filter((enrollment) => !isCourseActiveForUser(user?.id || 0, enrollment.courseId))
+    .map((enrollment) => ({ course: getCourseDetails(enrollment.courseId), group: enrollment.group }));
 
   return (
     <div className={styles.purchasedCoursesContainer}>
@@ -77,7 +106,7 @@ const PurchasedCourses: React.FC = () => {
           </Typography>
           <List>
             {activeCourses.length > 0 ? (
-              activeCourses.map((course) => {
+              activeCourses.map(({ course, group }) => {
                 const completionPercentage = calculateCompletionPercentage(course.syllabus);
                 return (
                   <ListItem key={course.id} className={styles.purchasedCourseItem}>
@@ -86,15 +115,29 @@ const PurchasedCourses: React.FC = () => {
                     </ListItemAvatar>
                     <ListItemText
                       primary={
-                        <Link to={`/courses/${course.id}`} className={styles.courseLink}>
-                          {course.title}
-                        </Link>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Link to={`/courses/${course.id}`} className={styles.courseLink}>
+                            {course.title}
+                          </Link>
+                          {group && <Chip label={`گروه: ${group}`} size="small" />}
+                        </Box>
                       }
                       secondary={
                         <Box>
                           <Typography variant="body2">{course.description}</Typography>
                           <Typography variant="caption" color="text.secondary">
-                            مدرس: {course.instructor} | مدت: {course.duration} | شروع: {course.startDate}
+                            مدرس: {course.instructor} | مدت: {course.duration} | شروع: {formatJalaliDate(course.startDateJalali)}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" component="div">
+                            قیمت: {course.price} {getCurrencySymbol(course.currency)}
+                            {course.discountPrice && (
+                              <>
+                                {' | '}قیمت با تخفیف: {course.discountPrice} {getCurrencySymbol(course.currency)}
+                              </>
+                            )}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" component="div">
+                            کشورها: {course.countries.length > 0 ? course.countries.join(', ') : 'نامشخص'}
                           </Typography>
                           <Box sx={{ mt: 1 }}>
                             <Typography variant="caption" color="text.secondary">
@@ -140,7 +183,7 @@ const PurchasedCourses: React.FC = () => {
           </Typography>
           <List>
             {completedCourses.length > 0 ? (
-              completedCourses.map((course) => {
+              completedCourses.map(({ course, group }) => {
                 const completionPercentage = calculateCompletionPercentage(course.syllabus);
                 return (
                   <ListItem key={course.id} className={styles.purchasedCourseItem}>
@@ -154,13 +197,25 @@ const PurchasedCourses: React.FC = () => {
                             {course.title}
                           </Link>
                           <Chip label="تکمیل‌شده" color="success" size="small" />
+                          {group && <Chip label={`گروه: ${group}`} size="small" />}
                         </Box>
                       }
                       secondary={
                         <Box>
                           <Typography variant="body2">{course.description}</Typography>
                           <Typography variant="caption" color="text.secondary">
-                            مدرس: {course.instructor} | مدت: {course.duration} | شروع: {course.startDate}
+                            مدرس: {course.instructor} | مدت: {course.duration} | شروع: {formatJalaliDate(course.startDateJalali)}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" component="div">
+                            قیمت: {course.price} {getCurrencySymbol(course.currency)}
+                            {course.discountPrice && (
+                              <>
+                                {' | '}قیمت با تخفیف: {course.discountPrice} {getCurrencySymbol(course.currency)}
+                              </>
+                            )}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" component="div">
+                            کشورها: {course.countries.length > 0 ? course.countries.join(', ') : 'نامشخص'}
                           </Typography>
                           <Box sx={{ mt: 1 }}>
                             <Typography variant="caption" color="text.secondary">

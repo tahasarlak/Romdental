@@ -30,7 +30,7 @@ export const ReviewProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     {
       id: 1,
       courseId: 1,
-      user: 'سارا احمدی',
+      user: 'سارا احم',
       rating: 5,
       comment: 'دوره بسیار کاربردی و با تدریس عالی بود!',
       date: 'فروردین ۱۴۰۴',

@@ -5,6 +5,18 @@ import { useNotificationContext } from './NotificationContext';
 import { useOrderContext } from './OrderContext';
 import { useCartContext } from './CartContext';
 import { useCourseContext } from './CourseContext';
+import { useInstructorContext } from './InstructorContext';
+import { Instructor } from '../types/types';
+
+// Define OrderItem type based on expected structure
+interface OrderItem {
+  courseId: number;
+  courseTitle: string;
+  price: string;
+  purchaseDate: string;
+  status: 'pending' | 'completed' | 'canceled';
+  instructorId: number;
+}
 
 interface CheckoutContextType {
   proceedToCheckout: () => Promise<void>;
@@ -17,8 +29,9 @@ export const CheckoutProvider: React.FC<{ children: ReactNode }> = ({ children }
   const { isAuthenticated, user } = useAuthContext();
   const { showNotification } = useNotificationContext();
   const { createOrder } = useOrderContext();
-  const { cartItems, clearCart } = useCartContext();
+  const { cartItems } = useCartContext();
   const { courses } = useCourseContext();
+  const { instructors } = useInstructorContext();
 
   const proceedToCheckout = async () => {
     if (!isAuthenticated || !user) {
@@ -32,20 +45,23 @@ export const CheckoutProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
 
     try {
-      const orderItems = cartItems
+      const orderItems: OrderItem[] = cartItems
         .map((item) => {
           const course = courses.find((c) => c.id === item.courseId);
           if (!course) return null;
+          const instructor = instructors.find((i: Instructor) => i.name === course.instructor);
           return {
             courseId: item.courseId,
             courseTitle: course.title,
             price: course.discountPrice || course.price,
+            purchaseDate: new Date().toISOString(),
+            status: 'pending', // Removed 'as const' to match OrderItem's status type
+            instructorId: instructor?.id || 0
           };
         })
-        .filter((item): item is { courseId: number; courseTitle: string; price: string } => item !== null);
+        .filter((item): item is OrderItem => item !== null);
 
       await createOrder(orderItems);
-      await clearCart();
       showNotification('سفارش با موفقیت ثبت شد و به درگاه پرداخت هدایت می‌شوید.', 'success');
       navigate('/checkout/multiple');
     } catch (error: any) {
