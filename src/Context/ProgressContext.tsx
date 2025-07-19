@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuthContext } from './AuthContext';
+import { useAuthContext } from './Auth/UserAuthContext';
 import { useCourseContext } from './CourseContext';
 import { useEnrollmentContext } from './EnrollmentContext';
 import { useQuizContext } from './QuizContext';

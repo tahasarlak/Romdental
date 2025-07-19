@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
-import { useAuthContext } from './AuthContext';
+import { useAuthContext } from './Auth/UserAuthContext';
 import { useCourseContext } from './CourseContext';
 import { useNotificationContext } from './NotificationContext';
 

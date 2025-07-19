@@ -1,6 +1,6 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthContext } from './AuthContext';
+import { useAuthContext } from './Auth/UserAuthContext';
 import { useNotificationContext } from './NotificationContext';
 import { useOrderContext } from './OrderContext';
 import { useCartContext } from './CartContext';
@@ -8,7 +8,6 @@ import { useCourseContext } from './CourseContext';
 import { useInstructorContext } from './InstructorContext';
 import { Instructor } from '../types/types';
 
-// Define OrderItem type based on expected structure
 interface OrderItem {
   courseId: number;
   courseTitle: string;
@@ -55,8 +54,8 @@ export const CheckoutProvider: React.FC<{ children: ReactNode }> = ({ children }
             courseTitle: course.title,
             price: course.discountPrice || course.price,
             purchaseDate: new Date().toISOString(),
-            status: 'pending', // Removed 'as const' to match OrderItem's status type
-            instructorId: instructor?.id || 0
+            status: 'pending',
+            instructorId: instructor?.id || 0,
           };
         })
         .filter((item): item is OrderItem => item !== null);

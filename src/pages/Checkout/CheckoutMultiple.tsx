@@ -5,12 +5,12 @@ import { usePaymentContext } from '../../Context/PaymentContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import { useCartContext } from '../../Context/CartContext';
 import { useCourseContext } from '../../Context/CourseContext';
-import { useAuthContext } from '../../Context/AuthContext';
 import { useInstructorContext } from '../../Context/InstructorContext';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import styles from './CheckoutMultiple.module.css';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 
 const persianToEnglishDigits = (str: string): string => {
   const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];

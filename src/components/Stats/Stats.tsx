@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuthContext } from '../../Context/AuthContext';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 import { useCourseContext } from '../../Context/CourseContext';
 import { useReviewContext } from '../../Context/ReviewContext';
 import styles from './Stats.module.css';

@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCourseContext } from '../../Context/CourseContext';
-import { useAuthContext } from '../../Context/AuthContext';
 import ReactPlayer from 'react-player';
 import styles from './Classroom.module.css';
 import Button from '@mui/material/Button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 
 interface Course {
   id: number;

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Box, Tabs, Tab, Typography } from '@mui/material';
-import { useAuthContext } from '../../Context/AuthContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import { Helmet } from 'react-helmet-async';
 import BlogManagement from '../../components/BloggerDashboard/BlogManagement/BlogManagement';
 import DOMPurify from 'dompurify';
 import styles from './BloggerDashboard.module.css';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 
 const sanitizeText = (text: string): string => {
   return DOMPurify.sanitize(text, {

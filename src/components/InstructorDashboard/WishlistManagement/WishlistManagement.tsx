@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 import DOMPurify from 'dompurify';
-import { useAuthContext } from '../../../Context/AuthContext';
+import { useAuthContext } from '../../../Context/Auth/UserAuthContext';
 import { useCourseContext } from '../../../Context/CourseContext';
 import { useWishlistContext } from '../../../Context/WishlistContext';
 import styles from './WishlistManagement.module.css';

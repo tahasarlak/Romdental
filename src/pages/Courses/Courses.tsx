@@ -9,7 +9,7 @@ import { useCourseContext } from '../../Context/CourseContext';
 import { useInstructorContext } from '../../Context/InstructorContext';
 import { useReviewContext } from '../../Context/ReviewContext';
 import { useCartContext } from '../../Context/CartContext';
-import { useAuthContext } from '../../Context/AuthContext';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import { useWishlistContext } from '../../Context/WishlistContext';
 import CourseCard from '../../components/CourseCard/CourseCard';

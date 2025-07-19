@@ -1,9 +1,9 @@
-
-.signupSection {  background-color: var(--background);
+/* Signup Section */
+.signupSection {
+  background-color: var(--background);
   padding: 4rem 1rem;
   direction: rtl;
   min-height: 100vh;
-
   background-image: url('/public/assets/background.jpg');
   background-size: cover;
   background-position: center;
@@ -11,6 +11,7 @@
   position: relative;
 }
 
+/* Container */
 .container {
   max-width: 600px;
   margin: 0 auto;
@@ -20,6 +21,7 @@
   box-shadow: var(--shadow);
 }
 
+/* Title */
 .title {
   font-size: 2rem;
   font-weight: 700;
@@ -28,6 +30,7 @@
   margin-bottom: 1rem;
 }
 
+/* Subtitle */
 .subtitle {
   font-size: 1rem;
   color: var(--gray);
@@ -35,18 +38,21 @@
   margin-bottom: 2rem;
 }
 
+/* Signup Form */
 .signupForm {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
+/* Form Group */
 .formGroup {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
+/* Label */
 .label {
   display: flex;
   align-items: center;
@@ -60,7 +66,17 @@
   color: var(--accent-color);
 }
 
-.input, .phoneInput {
+/* Input Container */
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Input and Select */
+.input,
+.phoneInput,
+select.input {
   padding: 0.75rem;
   border: 1px solid var(--gray);
   border-radius: var(--border-radius);
@@ -68,32 +84,55 @@
   color: var(--text-color);
   background-color: var(--white);
   transition: var(--transition);
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-appearance: none; /* Remove default browser styling for select */
+  -moz-appearance: none;
+  appearance: none;
 }
 
-.input:focus, .phoneInput:focus {
+/* Custom arrow for select elements */
+select.input {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: left 0.75rem center;
+  background-size: 1rem;
+  padding-left: 2.5rem; /* Space for arrow */
+}
+
+/* Focus States */
+.input:focus,
+.phoneInput:focus,
+select.input:focus {
   outline: none;
   border-color: var(--accent-color);
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
+/* Phone Input */
 .phoneContainer {
   direction: ltr;
 }
 
 .phoneButton {
   background-color: var(--gray);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
 .phoneDropdown {
   background-color: var(--white);
   color: var(--text-color);
+  border: 1px solid var(--gray);
+  border-radius: var(--border-radius);
 }
 
+/* Error Message */
 .error {
   color: var(--error-color);
   font-size: 0.85rem;
 }
 
+/* Submit Button */
 .submitButton {
   padding: 0.75rem;
   background-color: var(--accent-color);
@@ -110,11 +149,74 @@
   background-color: var(--accent-color-hover);
 }
 
+.submitButton.disabled,
 .submitButton:disabled {
   background-color: var(--gray);
   cursor: not-allowed;
 }
 
+/* Loader (New) */
+.loader {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--white);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Captcha Note (New) */
+.captchaNote {
+  font-size: 0.9rem;
+  color: var(--gray);
+  text-align: center;
+  margin: 1rem 0;
+}
+
+/* Hidden (Accessibility) (New) */
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Toggle Password Button */
+.togglePassword {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.togglePassword svg {
+  font-size: 20px;
+  color: var(--gray);
+}
+
+.togglePassword:hover svg {
+  color: var(--text-color);
+}
+
+/* Link */
 .link {
   color: var(--accent-color);
   text-decoration: none;
@@ -125,7 +227,13 @@
   text-decoration: underline;
 }
 
-/* حالت تیره */
+.link:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Dark Mode */
 .dark .signupSection {
   background-color: var(--background-dark);
 }
@@ -146,7 +254,9 @@
   color: var(--text-color-dark);
 }
 
-.dark .input, .dark .phoneInput {
+.dark .input,
+.dark .phoneInput,
+.dark select.input {
   background-color: var(--primary-color);
   border-color: var(--gray-dark);
   color: var(--text-color-dark);
@@ -159,9 +269,44 @@
 .dark .phoneDropdown {
   background-color: var(--primary-color);
   color: var(--text-color-dark);
+  border-color: var(--gray-dark);
 }
 
-/* پاسخ‌گویی */
+.dark .error {
+  color: var(--error-color-dark); /* Assuming a dark mode error color variable */
+}
+
+.dark .captchaNote {
+  color: var(--gray-dark);
+}
+
+.dark .submitButton {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.dark .submitButton:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.dark .submitButton.disabled,
+.dark .submitButton:disabled {
+  background-color: var(--gray-dark);
+}
+
+.dark .togglePassword svg {
+  color: var(--gray-dark);
+}
+
+.dark .togglePassword:hover svg {
+  color: var(--text-color-dark);
+}
+
+.dark select.input {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ccc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
@@ -175,11 +320,50 @@
     font-size: 0.9rem;
   }
 
-  .input, .phoneInput {
+  .input,
+  .phoneInput,
+  select.input {
     font-size: 0.9rem;
   }
 
   .submitButton {
     font-size: 0.9rem;
+  }
+
+  .captchaNote {
+    font-size: 0.8rem;
+  }
+
+  .error {
+    font-size: 0.75rem;
+  }
+}
+
+/* High Contrast Mode (Optional for Accessibility) */
+@media (prefers-contrast: high) {
+  .input,
+  .phoneInput,
+  select.input {
+    border: 2px solid var(--text-color);
+  }
+
+  .submitButton {
+    border: 2px solid var(--white);
+  }
+
+  .link {
+    text-decoration: underline;
+  }
+
+  .error {
+    font-weight: bold;
+  }
+
+  .phoneButton {
+    border: 2px solid var(--text-color);
+  }
+
+  .phoneDropdown {
+    border: 2px solid var(--text-color);
   }
 }

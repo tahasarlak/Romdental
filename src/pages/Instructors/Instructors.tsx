@@ -11,11 +11,11 @@ import { useInstructorContext } from '../../Context/InstructorContext';
 import { Instructor } from '../../types/types';
 import { useCourseContext } from '../../Context/CourseContext';
 import { useWishlistContext } from '../../Context/WishlistContext';
-import { useAuthContext } from '../../Context/AuthContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import InstructorCard from '../../components/InstructorCard/InstructorCard';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import styles from './Instructors.module.css';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 
 const Instructors: React.FC = () => {
   const { instructors, loading, fetchInstructors } = useInstructorContext();

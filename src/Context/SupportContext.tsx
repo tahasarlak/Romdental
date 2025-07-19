@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuthContext } from './AuthContext';
+import { useAuthContext } from './Auth/UserAuthContext';
 import { useNotificationContext } from './NotificationContext';
 import { v4 as uuidv4 } from 'uuid';
 import DOMPurify from 'dompurify';

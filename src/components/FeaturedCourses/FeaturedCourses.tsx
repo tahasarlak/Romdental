@@ -6,7 +6,7 @@ import { useInstructorContext } from '../../Context/InstructorContext';
 import { useReviewContext } from '../../Context/ReviewContext';
 import { useWishlistContext } from '../../Context/WishlistContext';
 import { useCartContext } from '../../Context/CartContext';
-import { useAuthContext } from '../../Context/AuthContext';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import CourseCard from '../CourseCard/CourseCard';
 import { Course, ReviewItem } from '../../types/types';

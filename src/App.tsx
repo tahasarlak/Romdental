@@ -18,8 +18,8 @@ import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 import InstructorDashboard from './pages/InstructorDashboard/InstructorDashboard';
 import BlogPostDetails from './pages/Blog/BlogPostDetails/BlogPostDetails';
 import OrderHistory from './pages/OrderHistory/OrderHistory';
-import { AuthProvider, useAuthContext } from './Context/AuthContext';
-import { UserAuthProvider } from './Context/UserAuthContext';
+import ResetPassword from './pages/ResetPassword/ResetPassword'; // Import the ResetPassword component
+import { AuthProvider, useAuthContext } from './Context/Auth/UserAuthContext';
 import { CartProvider } from './Context/CartContext';
 import { BlogProvider } from './Context/BlogContext';
 import { ContactProvider } from './Context/ContactContext';
@@ -41,9 +41,9 @@ import { QuizProvider } from './Context/QuizContext';
 import { FileProvider } from './Context/FileContext';
 import { ProgressProvider } from './Context/ProgressContext';
 import { SearchProvider } from './Context/SearchContext';
-import { InstructorAuthProvider } from './Context/InstructorAuthContext';
-import { AdminAuthProvider } from './Context/AdminAuthContext';
-import { BloggerAuthProvider } from './Context/BloggerAuthContext';
+import { InstructorAuthProvider } from './Context/Auth/InstructorAuthContext';
+import { AdminAuthProvider } from './Context/Auth/AdminAuthContext';
+import { BloggerAuthProvider } from './Context/Auth/BloggerAuthContext';
 import { ShareProvider } from './Context/ShareContext';
 import './styles/global.css';
 import Layout from './components/Layout';
@@ -93,83 +93,82 @@ const AppContent: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <NotificationProvider>
-          <UserAuthProvider>
-            <InstructorProvider>
-              <InstructorAuthProvider>
-                <AdminAuthProvider>
-                  <BlogProvider>
-                    <BloggerAuthProvider>
+      <NotificationProvider>
+        <AuthProvider>
+          <InstructorProvider>
+            <InstructorAuthProvider>
+              <AdminAuthProvider>
+                <BlogProvider>
+                  <BloggerAuthProvider>
+                    <CourseProvider>
                       <EnrollmentProvider>
-                        <CourseProvider>
-                          <ReviewProvider>
-                            <CartProvider>
-                              <ScheduleProvider>
-                                <ContactProvider>
-                                  <WishlistProvider>
-                                    <SubscriptionProvider>
-                                      <OrderProvider>
-                                        <CheckoutProvider>
-                                          <PaymentProvider>
-                                            <GroupChatProvider>
-                                              <AnalyticsProvider>
-                                                <SupportProvider>
-                                                  <QuizProvider>
-                                                    <FileProvider>
-                                                      <ProgressProvider>
-                                                        <SearchProvider>
-                                                          <ShareProvider>
-                                                            <Layout key={location.pathname}>
-                                                              <Routes>
-                                                                <Route path="/" element={<Home key={location.pathname} />} />
-                                                                <Route path="/courses" element={<Courses key={location.pathname} />} />
-                                                                <Route path="/courses/:slug" element={<CourseDetails key={location.pathname} />} />
-                                                                <Route path="/instructors" element={<Instructors key={location.pathname} />} />
-                                                                <Route path="/instructors/:instructorName" element={<InstructorDetails key={location.pathname} />} />
-                                                                <Route path="/blog" element={<Blog key={location.pathname} />} />
-                                                                <Route path="/blog/:id" element={<BlogPostDetails key={location.pathname} />} />
-                                                                <Route path="/contact" element={<Contact key={location.pathname} />} />
-                                                                <Route path="/login" element={<Login key={location.pathname} />} />
-                                                                <Route path="/signup" element={<Signup key={location.pathname} />} />
-                                                                <Route path="/checkout/multiple" element={<CheckoutMultiple key={location.pathname} />} />
-                                                                <Route path="/classroom/:id" element={<Classroom key={location.pathname} />} />
-                                                                <Route path="/profile" element={<ProtectedRoute><Profile key={location.pathname} /></ProtectedRoute>} />
-                                                                <Route path="/wishlist" element={<ProtectedRoute><Wishlist key={location.pathname} /></ProtectedRoute>} />
-                                                                <Route path="/purchased-courses" element={<ProtectedRoute><PurchasedCourses key={location.pathname} /></ProtectedRoute>} />
-                                                                <Route path="/orders" element={<ProtectedRoute><OrderHistory key={location.pathname} /></ProtectedRoute>} />
-                                                                <Route path="/admin" element={<RestrictedRoute roles={['SuperAdmin', 'Admin']}><AdminDashboard key={location.pathname} /></RestrictedRoute>} />
-                                                                <Route path="/about" element={<AboutUs key={location.pathname} />} />
-                                                                <Route path="/instructor" element={<RestrictedRoute roles={['SuperAdmin', 'Instructor']}><InstructorDashboard key={location.pathname} /></RestrictedRoute>} />
-                                                              </Routes>
-                                                            </Layout>
-                                                          </ShareProvider>
-                                                        </SearchProvider>
-                                                      </ProgressProvider>
-                                                    </FileProvider>
-                                                  </QuizProvider>
-                                                </SupportProvider>
-                                              </AnalyticsProvider>
-                                            </GroupChatProvider>
-                                          </PaymentProvider>
-                                        </CheckoutProvider>
-                                      </OrderProvider>
-                                    </SubscriptionProvider>
-                                  </WishlistProvider>
-                                </ContactProvider>
-                              </ScheduleProvider>
-                            </CartProvider>
-                          </ReviewProvider>
-                        </CourseProvider>
+                        <ReviewProvider>
+                          <CartProvider>
+                            <ScheduleProvider>
+                              <ContactProvider>
+                                <WishlistProvider>
+                                  <SubscriptionProvider>
+                                    <OrderProvider>
+                                      <CheckoutProvider>
+                                        <PaymentProvider>
+                                          <GroupChatProvider>
+                                            <AnalyticsProvider>
+                                              <SupportProvider>
+                                                <QuizProvider>
+                                                  <FileProvider>
+                                                    <ProgressProvider>
+                                                      <SearchProvider>
+                                                        <ShareProvider>
+                                                          <Layout key={location.pathname}>
+                                                            <Routes>
+                                                              <Route path="/" element={<Home key={location.pathname} />} />
+                                                              <Route path="/courses" element={<Courses key={location.pathname} />} />
+                                                              <Route path="/courses/:slug" element={<CourseDetails key={location.pathname} />} />
+                                                              <Route path="/instructors" element={<Instructors key={location.pathname} />} />
+                                                              <Route path="/instructors/:instructorName" element={<InstructorDetails key={location.pathname} />} />
+                                                              <Route path="/blog" element={<Blog key={location.pathname} />} />
+                                                              <Route path="/blog/:id" element={<BlogPostDetails key={location.pathname} />} />
+                                                              <Route path="/contact" element={<Contact key={location.pathname} />} />
+                                                              <Route path="/login" element={<Login key={location.pathname} />} />
+                                                              <Route path="/signup" element={<Signup key={location.pathname} />} />
+                                                              <Route path="/reset-password" element={<ResetPassword key={location.pathname} />} /> {/* Added ResetPassword route */}
+                                                              <Route path="/checkout/multiple" element={<CheckoutMultiple key={location.pathname} />} />
+                                                              <Route path="/classroom/:id" element={<Classroom key={location.pathname} />} />
+                                                              <Route path="/profile" element={<ProtectedRoute><Profile key={location.pathname} /></ProtectedRoute>} />
+                                                              <Route path="/wishlist" element={<ProtectedRoute><Wishlist key={location.pathname} /></ProtectedRoute>} />
+                                                              <Route path="/purchased-courses" element={<ProtectedRoute><PurchasedCourses key={location.pathname} /></ProtectedRoute>} />
+                                                              <Route path="/orders" element={<ProtectedRoute><OrderHistory key={location.pathname} /></ProtectedRoute>} />
+                                                              <Route path="/admin" element={<RestrictedRoute roles={['SuperAdmin', 'Admin']}><AdminDashboard key={location.pathname} /></RestrictedRoute>} />
+                                                              <Route path="/about" element={<AboutUs key={location.pathname} />} />
+                                                              <Route path="/instructor" element={<RestrictedRoute roles={['SuperAdmin', 'Instructor']}><InstructorDashboard key={location.pathname} /></RestrictedRoute>} />
+                                                            </Routes>
+                                                          </Layout>
+                                                        </ShareProvider>
+                                                      </SearchProvider>
+                                                    </ProgressProvider>
+                                                  </FileProvider>
+                                                </QuizProvider>
+                                              </SupportProvider>
+                                            </AnalyticsProvider>
+                                          </GroupChatProvider>
+                                        </PaymentProvider>
+                                      </CheckoutProvider>
+                                    </OrderProvider>
+                                  </SubscriptionProvider>
+                                </WishlistProvider>
+                              </ContactProvider>
+                            </ScheduleProvider>
+                          </CartProvider>
+                        </ReviewProvider>
                       </EnrollmentProvider>
-                    </BloggerAuthProvider>
-                  </BlogProvider>
-                </AdminAuthProvider>
-              </InstructorAuthProvider>
-            </InstructorProvider>
-          </UserAuthProvider>
-        </NotificationProvider>
-      </AuthProvider>
+                    </CourseProvider>
+                  </BloggerAuthProvider>
+                </BlogProvider>
+              </AdminAuthProvider>
+            </InstructorAuthProvider>
+          </InstructorProvider>
+        </AuthProvider>
+      </NotificationProvider>
     </ErrorBoundary>
   );
 };

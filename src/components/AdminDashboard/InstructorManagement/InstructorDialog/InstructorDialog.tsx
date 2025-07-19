@@ -112,21 +112,31 @@ const InstructorDialog: React.FC<InstructorDialogProps> = ({ open, onClose, inst
     }
 
     try {
-      const instructorData: Omit<Instructor, 'id'> = {
-        name: newInstructor.name!,
-        specialty: newInstructor.specialty!,
-        bio: newInstructor.bio!,
-        image: newInstructor.image || '/assets/default-instructor.jpg',
-        experience: newInstructor.experience || '',
-        coursesTaught: newInstructor.coursesTaught || [],
-        averageRating: newInstructor.averageRating || '0',
-        totalStudents: newInstructor.totalStudents || 0,
-        reviewCount: newInstructor.reviewCount || 0,
-        whatsappLink: newInstructor.whatsappLink || '',
-        telegramLink: newInstructor.telegramLink || '',
-        instagramLink: newInstructor.instagramLink || '',
-        bankAccounts: newInstructor.bankAccounts || [],
-      };
+   // src/components/AdminDashboard/InstructorManagement/InstructorDialog/InstructorDialog.tsx
+// ... سایر کدها ...
+
+const instructorData: Omit<Instructor, 'id'> = {
+  name: newInstructor.name!,
+  specialty: newInstructor.specialty!,
+  bio: newInstructor.bio!,
+  image: newInstructor.image || '/assets/Profile/default-instructor.jpg',
+  experience: newInstructor.experience!,
+  coursesTaught: newInstructor.coursesTaught || [],
+  averageRating: newInstructor.averageRating || '0.0',
+  totalStudents: newInstructor.totalStudents || 0,
+  reviewCount: newInstructor.reviewCount || 0,
+  whatsappLink: newInstructor.whatsappLink,
+  telegramLink: newInstructor.telegramLink,
+  instagramLink: newInstructor.instagramLink,
+  bankAccounts: newInstructor.bankAccounts || [],
+  email: newInstructor.email || '', // اضافه کردن
+  phone: newInstructor.phone || '', // اضافه کردن
+  university: newInstructor.university || '', // اضافه کردن
+  gender: newInstructor.gender || 'مرد', // مقدار پیش‌فرض
+  password: newInstructor.password || '', // اضافه کردن
+};
+
+// ... ادامه کد ...
 
       if (instructor) {
         await updateInstructor(instructor.id, instructorData);

@@ -13,7 +13,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useWishlistContext } from '../../../Context/WishlistContext';
-import { useAuthContext } from '../../../Context/AuthContext';
+import { useAuthContext } from '../../../Context/Auth/UserAuthContext';
 import { useNotificationContext } from '../../../Context/NotificationContext';
 import { WishlistItem } from '../../../types/types';
 import WishlistDialog from './WishlistDialog/WishlistDialog';

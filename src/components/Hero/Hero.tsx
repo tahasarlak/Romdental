@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Hero.module.css';
 import { Link } from 'react-router-dom';
-import { useAuthContext } from '../../Context/AuthContext';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 
 const Hero: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);

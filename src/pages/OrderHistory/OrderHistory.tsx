@@ -1,6 +1,5 @@
 import React from 'react';
 import { useOrderContext } from '../../Context/OrderContext';
-import { useAuthContext } from '../../Context/AuthContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import {
   Box,
@@ -15,6 +14,7 @@ import {
   Button,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   marginTop: theme.spacing(3),

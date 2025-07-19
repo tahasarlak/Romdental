@@ -14,11 +14,15 @@ import {
   Autocomplete,
   ToggleButton,
   ToggleButtonGroup,
+  IconButton,
 } from '@mui/material';
-import { useAuthContext } from '../../../../Context/AuthContext';
+import { Add, Delete } from '@mui/icons-material';
 import { useNotificationContext } from '../../../../Context/NotificationContext';
-import { User } from '../../../../types/types';
+import { User, BankAccount } from '../../../../types/types';
 import styles from './EditUserDialog.module.css';
+import { useBloggerAuthContext } from '../../../../Context/Auth/BloggerAuthContext';
+import { useInstructorAuthContext } from '../../../../Context/Auth/InstructorAuthContext';
+import { useAuthContext } from '../../../../Context/Auth/UserAuthContext';
 
 interface EditUserDialogProps {
   open: boolean;
@@ -26,16 +30,34 @@ interface EditUserDialogProps {
   user: User;
 }
 
+interface InstructorFields {
+  specialty?: string;
+  bio?: string;
+  experience?: string;
+  bankAccounts?: BankAccount[];
+  whatsappLink?: string;
+  telegramLink?: string;
+  instagramLink?: string;
+}
+
 const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user: userToEdit }) => {
   const { user: currentUser, manageUser, setUsers, setUser, universities, addUniversity } = useAuthContext();
+  const { registerInstructor } = useInstructorAuthContext();
+  const { addBlogger, updateBlogger } = useBloggerAuthContext();
   const { showNotification } = useNotificationContext();
   const [imageInputMode, setImageInputMode] = useState<'url' | 'upload'>('url');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [formData, setFormData] = useState<User>({ ...userToEdit });
+  const [formData, setFormData] = useState<User & InstructorFields>({
+    ...userToEdit,
+    bankAccounts: userToEdit.role === 'Instructor' ? (userToEdit as any).bankAccounts || [] : [],
+  });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    setFormData({ ...userToEdit });
+    setFormData({
+      ...userToEdit,
+      bankAccounts: userToEdit.role === 'Instructor' ? (userToEdit as any).bankAccounts || [] : [],
+    });
     setImageInputMode(userToEdit.profilePicture?.startsWith('blob:') ? 'upload' : 'url');
   }, [userToEdit]);
 
@@ -56,6 +78,10 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user: us
           return value && !/^https?:\/\/.*/.test(value) ? 'لینک تصویر باید معتبر باشد' : '';
         }
         return selectedFile ? '' : value ? '' : 'تصویر یا لینک تصویر الزامی است';
+      case 'specialty':
+        return formData.role === 'Instructor' && (!value || value.trim() === '') ? 'تخصص الزامی است' : '';
+      case 'bio':
+        return formData.role === 'Instructor' || formData.role === 'Blogger' ? (!value || value.trim() === '' ? 'بیوگرافی الزامی است' : '') : '';
       default:
         return '';
     }
@@ -67,6 +93,28 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user: us
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
+  };
+
+  const handleBankAccountChange = (index: number, field: keyof BankAccount, value: string) => {
+    setFormData((prev) => {
+      const updatedBankAccounts = [...(prev.bankAccounts || [])];
+      updatedBankAccounts[index] = { ...updatedBankAccounts[index], [field]: value };
+      return { ...prev, bankAccounts: updatedBankAccounts };
+    });
+  };
+
+  const addBankAccount = () => {
+    setFormData((prev) => ({
+      ...prev,
+      bankAccounts: [...(prev.bankAccounts || []), { bankName: '', accountHolder: '', accountNumber: '' }],
+    }));
+  };
+
+  const removeBankAccount = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      bankAccounts: (prev.bankAccounts || []).filter((_, i) => i !== index),
+    }));
   };
 
   const handleAutocompleteChange = (name: string, value: string | null) => {
@@ -95,10 +143,26 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user: us
 
   const handleUpdate = async () => {
     const newErrors: { [key: string]: string } = {};
-    ['name', 'email', 'phone', 'university', 'gender', 'profilePicture'].forEach((field) => {
-      const error = validateField(field, formData[field as keyof User]);
+    const fieldsToValidate = ['name', 'email', 'phone', 'university', 'gender', 'profilePicture'];
+    if (formData.role === 'Instructor') fieldsToValidate.push('specialty', 'bio');
+    if (formData.role === 'Blogger') fieldsToValidate.push('bio');
+
+    fieldsToValidate.forEach((field) => {
+      const error = validateField(field, formData[field as keyof (User & InstructorFields)]);
       if (error) newErrors[field] = error;
     });
+
+    if (formData.role === 'Instructor') {
+      if (!formData.bankAccounts || formData.bankAccounts.length === 0) {
+        newErrors.bankAccounts = 'حداقل یک حساب بانکی الزامی است';
+      } else {
+        formData.bankAccounts.forEach((account, index) => {
+          if (!account.bankName) newErrors[`bankAccounts[${index}].bankName`] = 'نام بانک الزامی است';
+          if (!account.accountHolder) newErrors[`bankAccounts[${index}].accountHolder`] = 'نام صاحب حساب الزامی است';
+          if (!account.accountNumber) newErrors[`bankAccounts[${index}].accountNumber`] = 'شماره حساب الزامی است';
+        });
+      }
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -116,7 +180,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user: us
     }
 
     try {
-      const updatedUser: User = {
+      const updatedUser: User & InstructorFields = {
         ...formData,
         wishlist: formData.wishlist || [],
         enrolledCourses: formData.enrolledCourses || [],
@@ -124,7 +188,28 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user: us
         password: formData.password || userToEdit.password,
         token: formData.token || userToEdit.token,
         profilePicture: formData.profilePicture || undefined,
+        bankAccounts: formData.role === 'Instructor' ? formData.bankAccounts || [] : undefined,
       };
+
+      if (formData.role === 'Instructor') {
+        await registerInstructor({
+          ...updatedUser,
+          specialty: formData.specialty || '',
+          bio: formData.bio || '',
+          experience: formData.experience || '',
+          bankAccounts: formData.bankAccounts || [],
+          whatsappLink: formData.whatsappLink,
+          telegramLink: formData.telegramLink,
+          instagramLink: formData.instagramLink,
+          password: formData.password || userToEdit.password,
+        });
+      } else if (formData.role === 'Blogger') {
+        await updateBlogger(userToEdit.id, {
+          name: formData.name,
+          bio: formData.bio || '',
+          image: formData.profilePicture || '',
+        });
+      }
 
       await manageUser(updatedUser.id, updatedUser);
       setUsers((prev: User[]) =>
@@ -227,7 +312,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user: us
             value={formData.role}
             onChange={handleInputChange}
             label="نقش"
-            disabled={currentUser?.role !== 'SuperAdmin' || formData.role === 'SuperAdmin'}
+            disabled={currentUser?.role !== 'SuperAdmin' && formData.role === 'SuperAdmin'}
             className={styles.select}
           >
             <MenuItem value="Student">دانشجو</MenuItem>
@@ -237,6 +322,150 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user: us
             {currentUser?.role === 'SuperAdmin' && <MenuItem value="SuperAdmin">سوپر ادمین</MenuItem>}
           </Select>
         </FormControl>
+        {formData.role === 'Instructor' && (
+          <>
+            <TextField
+              margin="dense"
+              name="specialty"
+              label="تخصص"
+              type="text"
+              fullWidth
+              value={formData.specialty || ''}
+              onChange={handleInputChange}
+              required
+              error={!!errors.specialty}
+              helperText={errors.specialty}
+              className={styles.textField}
+            />
+            <TextField
+              margin="dense"
+              name="bio"
+              label="بیوگرافی"
+              type="text"
+              fullWidth
+              value={formData.bio || ''}
+              onChange={handleInputChange}
+              required
+              error={!!errors.bio}
+              helperText={errors.bio}
+              className={styles.textField}
+            />
+            <TextField
+              margin="dense"
+              name="experience"
+              label="تجربه"
+              type="text"
+              fullWidth
+              value={formData.experience || ''}
+              onChange={handleInputChange}
+              className={styles.textField}
+            />
+            <div>
+              <Button
+                startIcon={<Add />}
+                onClick={addBankAccount}
+                variant="outlined"
+                className={styles.addButton}
+              >
+                افزودن حساب بانکی
+              </Button>
+              {formData.bankAccounts?.map((account, index) => (
+                <div key={index} className={styles.bankAccountContainer}>
+                  <TextField
+                    margin="dense"
+                    label="نام بانک"
+                    type="text"
+                    fullWidth
+                    value={account.bankName}
+                    onChange={(e) => handleBankAccountChange(index, 'bankName', e.target.value)}
+                    required
+                    error={!!errors[`bankAccounts[${index}].bankName`]}
+                    helperText={errors[`bankAccounts[${index}].bankName`]}
+                    className={styles.textField}
+                  />
+                  <TextField
+                    margin="dense"
+                    label="نام صاحب حساب"
+                    type="text"
+                    fullWidth
+                    value={account.accountHolder}
+                    onChange={(e) => handleBankAccountChange(index, 'accountHolder', e.target.value)}
+                    required
+                    error={!!errors[`bankAccounts[${index}].accountHolder`]}
+                    helperText={errors[`bankAccounts[${index}].accountHolder`]}
+                    className={styles.textField}
+                  />
+                  <TextField
+                    margin="dense"
+                    label="شماره حساب"
+                    type="text"
+                    fullWidth
+                    value={account.accountNumber}
+                    onChange={(e) => handleBankAccountChange(index, 'accountNumber', e.target.value)}
+                    required
+                    error={!!errors[`bankAccounts[${index}].accountNumber`]}
+                    helperText={errors[`bankAccounts[${index}].accountNumber`]}
+                    className={styles.textField}
+                  />
+                  <IconButton
+                    onClick={() => removeBankAccount(index)}
+                    className={styles.deleteButton}
+                  >
+                    <Delete />
+                  </IconButton>
+                </div>
+              ))}
+              {errors.bankAccounts && (
+                <FormHelperText error>{errors.bankAccounts}</FormHelperText>
+              )}
+            </div>
+            <TextField
+              margin="dense"
+              name="whatsappLink"
+              label="لینک واتساپ"
+              type="text"
+              fullWidth
+              value={formData.whatsappLink || ''}
+              onChange={handleInputChange}
+              className={styles.textField}
+            />
+            <TextField
+              margin="dense"
+              name="telegramLink"
+              label="لینک تلگرام"
+              type="text"
+              fullWidth
+              value={formData.telegramLink || ''}
+              onChange={handleInputChange}
+              className={styles.textField}
+            />
+            <TextField
+              margin="dense"
+              name="instagramLink"
+              label="لینک اینستاگرام"
+              type="text"
+              fullWidth
+              value={formData.instagramLink || ''}
+              onChange={handleInputChange}
+              className={styles.textField}
+            />
+          </>
+        )}
+        {(formData.role === 'Instructor' || formData.role === 'Blogger') && (
+          <TextField
+            margin="dense"
+            name="bio"
+            label="بیوگرافی"
+            type="text"
+            fullWidth
+            value={formData.bio || ''}
+            onChange={handleInputChange}
+            required
+            error={!!errors.bio}
+            helperText={errors.bio}
+            className={styles.textField}
+          />
+        )}
         <TextField
           margin="dense"
           name="course"

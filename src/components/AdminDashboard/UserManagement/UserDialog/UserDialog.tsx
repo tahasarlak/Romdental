@@ -15,7 +15,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material';
-import { useAuthContext } from '../../../../Context/AuthContext';
+import { useAuthContext } from '../../../../Context/Auth/UserAuthContext';
 import { useNotificationContext } from '../../../../Context/NotificationContext';
 import { User } from '../../../../types/types';
 import styles from './UserDialog.module.css';
@@ -122,17 +122,16 @@ const UserDialog: React.FC<UserDialogProps> = ({ open, onClose }) => {
     }
 
     try {
-      await signup(
-        newUser.name!,
-        newUser.email!,
-        newUser.password!,
-        newUser.phone!,
-        newUser.university!,
-        newUser.gender! as 'مرد' | 'زن',
-        newUser.course,
-        newUser.role as 'Student' | 'Instructor' | 'Admin' | 'SuperAdmin',
-        newUser.profilePicture
-      );
+  await signup(
+  newUser.name,
+  newUser.email,
+  newUser.password,
+  newUser.phone,
+  newUser.university,
+  newUser.gender as 'مرد' | 'زن',
+  newUser.course,
+  newUser.role as 'Student' | 'Instructor' | 'Admin' | 'SuperAdmin'
+);
       showNotification('کاربر با موفقیت ایجاد شد', 'success');
       setNewUser({
         name: '',

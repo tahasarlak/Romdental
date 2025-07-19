@@ -27,7 +27,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PeopleIcon from '@mui/icons-material/People';
 import DOMPurify from 'dompurify';
-import { useAuthContext } from '../../../Context/AuthContext';
+import { useAuthContext } from '../../../Context/Auth/UserAuthContext';
 import { useCourseContext } from '../../../Context/CourseContext';
 import { useNotificationContext } from '../../../Context/NotificationContext';
 import { Course, SyllabusItem, ContentItem, User } from '../../../types/types';

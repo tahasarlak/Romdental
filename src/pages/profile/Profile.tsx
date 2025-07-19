@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuthContext } from '../../Context/AuthContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import styles from './Profile.module.css';
 import Button from '@mui/material/Button';
@@ -27,6 +26,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import DOMPurify from 'dompurify';
 import { User } from '../../types/types';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 
 const Profile: React.FC = () => {
   const { user, setUser, updatePassword } = useAuthContext();
@@ -39,7 +39,7 @@ const Profile: React.FC = () => {
     email: '',
     phone: '',
     university: '',
-    gender: 'مرد', // Default to 'مرد'
+    gender: 'مرد',
     course: '',
   });
   const [passwordData, setPasswordData] = useState({
@@ -82,11 +82,12 @@ const Profile: React.FC = () => {
       : allProfilePictures.filter((pic) => pic.path.includes('female-profile'))
     : allProfilePictures;
 
-  const defaultProfilePicture = formData.gender
-    ? formData.gender === 'مرد'
-      ? maleProfilePictures[Math.floor(Math.random() * maleProfilePictures.length)]
-      : femaleProfilePictures[Math.floor(Math.random() * femaleProfilePictures.length)]
-    : '/assets/default-profile.jpg';
+  // Memoize defaultProfilePicture to prevent recalculation
+  const defaultProfilePicture = useMemo(() => {
+    if (!formData.gender) return '/assets/default-profile.jpg';
+    const pictures = formData.gender === 'مرد' ? maleProfilePictures : femaleProfilePictures;
+    return pictures[Math.floor(Math.random() * pictures.length)];
+  }, [formData.gender]);
 
   useEffect(() => {
     if (!user) {
@@ -102,15 +103,19 @@ const Profile: React.FC = () => {
       course: user.course || '',
     });
     setSelectedPicture(user.profilePicture || defaultProfilePicture);
-  }, [user, navigate]);
+  }, [user, navigate, defaultProfilePicture]);
 
+  // Initialize profile picture when entering edit mode
   useEffect(() => {
-    if (isEditing && !selectedPicture.includes('blob:') && formData.gender) {
-      const pictures = formData.gender === 'مرد' ? maleProfilePictures : femaleProfilePictures;
-      const randomPicture = pictures[Math.floor(Math.random() * pictures.length)];
-      setSelectedPicture(randomPicture);
+    if (isEditing && formData.gender && !selectedPicture.includes('blob:')) {
+      // Only set a new picture if none is selected or it's the default/user picture
+      if (!selectedPicture || selectedPicture === user?.profilePicture || selectedPicture === defaultProfilePicture) {
+        const pictures = formData.gender === 'مرد' ? maleProfilePictures : femaleProfilePictures;
+        const randomPicture = pictures[Math.floor(Math.random() * pictures.length)];
+        setSelectedPicture(randomPicture);
+      }
     }
-  }, [isEditing, formData.gender, selectedPicture]);
+  }, [isEditing, formData.gender, user?.profilePicture, defaultProfilePicture]);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -121,7 +126,7 @@ const Profile: React.FC = () => {
       newErrors.phone = 'شماره تلفن معتبر وارد کنید';
     if (!formData.university) newErrors.university = 'دانشگاه الزامی است';
     if (!['مرد', 'زن'].includes(formData.gender || '')) newErrors.gender = 'جنسیت را انتخاب کنید';
-    if (!formData.course) newErrors.course = 'دوره الزامی است';
+    if (!formData.course && user?.role === 'Student') newErrors.course = 'دوره الزامی است';
     return newErrors;
   };
 
@@ -151,17 +156,20 @@ const Profile: React.FC = () => {
     const newGender = e.target.value as 'مرد' | 'زن';
     setFormData((prev) => ({ ...prev, gender: newGender }));
     setErrors((prev) => ({ ...prev, gender: '' }));
-    const pictures = newGender === 'مرد' ? maleProfilePictures : femaleProfilePictures;
-    const randomPicture = pictures[Math.floor(Math.random() * pictures.length)];
-    setSelectedPicture(randomPicture);
+    if (!selectedPicture.includes('blob:')) {
+      const pictures = newGender === 'مرد' ? maleProfilePictures : femaleProfilePictures;
+      const randomPicture = pictures[Math.floor(Math.random() * pictures.length)];
+      setSelectedPicture(randomPicture);
+    }
   };
 
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setProfilePicture(file);
-      setSelectedPicture(URL.createObjectURL(file));
-      setModalImage(URL.createObjectURL(file));
+      const blobUrl = URL.createObjectURL(file);
+      setSelectedPicture(blobUrl);
+      setModalImage(blobUrl);
     }
   };
 
@@ -203,7 +211,7 @@ const Profile: React.FC = () => {
           profilePicture: selectedPicture,
           wishlist: user.wishlist,
           enrolledCourses: user.enrolledCourses,
-          cart: user.cart, // Preserve cart
+          cart: user.cart,
           password: user.password,
           token: user.token,
           role: user.role,
@@ -415,7 +423,7 @@ const Profile: React.FC = () => {
                   className={styles.formField}
                   error={!!errors.course}
                   helperText={errors.course}
-                  required
+                  required={user?.role === 'Student'}
                 />
               </div>
               <div className={styles.formActions}>
@@ -434,8 +442,16 @@ const Profile: React.FC = () => {
                   onClick={() => {
                     setIsEditing(false);
                     setProfilePicture(null);
-                    setSelectedPicture(user?.profilePicture || '');
+                    setSelectedPicture(user?.profilePicture || defaultProfilePicture);
                     setErrors({});
+                    setFormData({
+                      name: user?.name || '',
+                      email: user?.email || '',
+                      phone: user?.phone || '',
+                      university: user?.university || '',
+                      gender: user?.gender || 'مرد',
+                      course: user?.course || '',
+                    });
                   }}
                   className={styles.cancelButton}
                   disabled={loading}

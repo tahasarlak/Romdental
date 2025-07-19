@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 import DOMPurify from 'dompurify';
-import { useAuthContext } from '../../../Context/AuthContext';
+import { useAuthContext } from '../../../Context/Auth/UserAuthContext';
 import { useOrderContext } from '../../../Context/OrderContext';
 import { useCourseContext } from '../../../Context/CourseContext';
 import styles from './OrderManagement.module.css';

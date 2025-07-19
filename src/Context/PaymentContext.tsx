@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuthContext } from './AuthContext';
+import { useAuthContext } from './Auth/UserAuthContext';
 import { useOrderContext } from './OrderContext';
 import { useNotificationContext } from './NotificationContext';
 import DOMPurify from 'dompurify';

@@ -1,12 +1,11 @@
-// CourseContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useInstructorContext } from './InstructorContext';
 import { useNotificationContext } from './NotificationContext';
-import { useAuthContext } from './AuthContext';
-import { useEnrollmentContext } from './EnrollmentContext';
-import { Course, SyllabusItem, ContentItem, Enrollment } from '../types/types';
+import { useAuthContext } from './Auth/UserAuthContext';
+import { Course, SyllabusItem, ContentItem } from '../types/types';
 import moment from 'moment-jalaali';
+import DOMPurify from 'dompurify';
 
 moment.loadPersian({ dialect: 'persian-modern' });
 
@@ -22,13 +21,13 @@ interface CourseContextType {
   loading: boolean;
   addCourse: (course: Omit<Course, 'id'>) => Promise<void>;
   deleteCourse: (courseId: number) => Promise<void>;
-  fetchCourses: () => Promise<void>;
+  fetchCourses: () => void;
 }
 
 const CourseContext = createContext<CourseContextType | undefined>(undefined);
 
 const slugify = (text: string): string => {
-  return text
+  return DOMPurify.sanitize(text)
     .trim()
     .replace(/[\s+]/g, '-')
     .replace(/[^\u0600-\u06FF\w-]/g, '')
@@ -99,90 +98,178 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const { instructors } = useInstructorContext();
   const { showNotification } = useNotificationContext();
   const { user } = useAuthContext();
-  const { enrollments } = useEnrollmentContext();
   const { slug } = useParams();
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
-  const [universities, setUniversities] = useState<string[]>(['Smashko', 'Piragova', 'RUDN', 'Sechenov']);
-  const [categories, setCategories] = useState<string[]>(['آناتومی', 'پروتز', 'ترمیمی', 'عمومی']);
-  const [countries, setCountries] = useState<string[]>(['China', 'Russia', 'Iran']);
-  const [courses, setCourses] = useState<Course[]>([
-    {
-      id: 3,
-      title: 'دوره ترمیمی دندانپزشکی',
-      instructor: 'مریم حسینی',
-      description: 'آموزش تکنیک‌های ترمیمی در دندانپزشکی با تمرکز بر روش‌های مدرن.',
-      duration: '10 هفته',
-      courseNumber: 'Course 3',
-      category: 'ترمیمی',
-      image: '/assets/courses/restorative.jpg',
-      price: formatPriceWithCurrency(6000000, 'CNY'),
-      discountPrice: undefined,
-      discountPercentage: undefined,
-      startDateJalali: '1404/04/01',
-      startDateGregorian: '2025-06-22',
-      isOpen: true,
-      isFeatured: true,
-      enrollmentCount: 0,
-      syllabus: [
-        {
-          id: 1,
-          title: 'آشنایی با مواد ترمیمی',
-          isLocked: false,
-          previewContent: 'بررسی مواد مورد استفاده در ترمیم دندان.',
-          contents: [
-            {
-              type: 'text',
-              text: 'توضیحات جامع درباره مواد ترمیمی و کاربردهای آن‌ها.',
-              title: 'مواد ترمیمی',
-            },
-            {
-              type: 'image',
-              url: '/assets/images/restorative-materials.jpg',
-              title: 'تصویر مواد ترمیمی',
-            },
-          ],
-          completed: false,
-          duration: '40 دقیقه',
-          isNew: false,
-        },
-        {
-          id: 2,
-          title: 'تکنیک‌های ترمیمی پیشرفته',
-          isLocked: false,
-          previewContent: 'آموزش تکنیک‌های پیشرفته ترمیمی.',
-          contents: [
-            {
-              type: 'video',
-              url: 'https://example.com/restorative-techniques.mp4',
-              title: 'ویدیو تکنیک‌های ترمیمی',
-            },
-          ],
-          completed: false,
-          duration: '50 دقیقه',
-          isNew: true,
-        },
-      ],
-      faqs: [
-        { id: 1, question: 'آیا این دوره عملی است؟', answer: 'بله، شامل جلسات عملی و تئوری است.' },
-      ],
-      tags: ['ترمیمی', 'دندانپزشکی', 'عم عملی'],
-      prerequisites: ['آشنایی با آناتومی دندان'],
-      courseType: 'In-Person',
-      university: 'RUDN',
-      slug: slugify('دوره ترمیمی دندانپزشکی'),
-      currency: 'CNY',
-      countries: ['China', 'Iran'],
-      level: 'Intermediate',
-    },
-  ]);
+  const [loading, setLoading] = useState(false);
+  const [universities, setUniversities] = useState<string[]>(() => {
+    const savedUniversities = localStorage.getItem('courseUniversities');
+    return savedUniversities ? JSON.parse(savedUniversities) : ['Smashko', 'Piragova', 'RUDN', 'Sechenov'];
+  });
+  const [categories, setCategories] = useState<string[]>(() => {
+    const savedCategories = localStorage.getItem('courseCategories');
+    return savedCategories ? JSON.parse(savedCategories) : ['آناتومی', 'پروتز', 'ترمیمی', 'عمومی'];
+  });
+  const [countries, setCountries] = useState<string[]>(() => {
+    const savedCountries = localStorage.getItem('courseCountries');
+    return savedCountries ? JSON.parse(savedCountries) : ['China', 'Russia', 'Iran'];
+  });
+  const [courses, setCourses] = useState<Course[]>(() => {
+    const savedCourses = localStorage.getItem('courses');
+    let initialCourses: Course[] = [
+      {
+        id: 3,
+        title: 'دوره ترمیمی دندانپزشکی',
+        instructor: 'مریم حسینی',
+        description: DOMPurify.sanitize('آموزش تکنیک‌های ترمیمی در دندانپزشکی با تمرکز بر روش‌های مدرن.'),
+        duration: '10 هفته',
+        courseNumber: 'Course 3',
+        category: 'ترمیمی',
+        image: '/assets/courses/restorative.jpg',
+        price: formatPriceWithCurrency(6000000, 'CNY'),
+        discountPrice: undefined,
+        discountPercentage: undefined,
+        startDateJalali: '1404/04/01',
+        startDateGregorian: '2025-06-22',
+        isOpen: true,
+        isFeatured: true,
+        enrollmentCount: 0,
+        syllabus: [
+          {
+            id: 1,
+            title: DOMPurify.sanitize('آشنایی با مواد ترمیمی'),
+            isLocked: false,
+            previewContent: DOMPurify.sanitize('بررسی مواد مورد استفاده در ترمیم دندان.'),
+            contents: [
+              {
+                type: 'text',
+                text: DOMPurify.sanitize('توضیحات جامع درباره مواد ترمیمی و کاربردهای آن‌ها.'),
+                title: DOMPurify.sanitize('مواد ترمیمی'),
+              },
+              {
+                type: 'image',
+                url: '/assets/images/restorative-materials.jpg',
+                title: DOMPurify.sanitize('تصویر مواد ترمیمی'),
+              },
+            ],
+            completed: false,
+            duration: '40 دقیقه',
+            isNew: false,
+          },
+          {
+            id: 2,
+            title: DOMPurify.sanitize('تکنیک‌های ترمیمی پیشرفته'),
+            isLocked: false,
+            previewContent: DOMPurify.sanitize('آموزش تکنیک‌های پیشرفته ترمیمی.'),
+            contents: [
+              {
+                type: 'video',
+                url: 'https://example.com/restorative-techniques.mp4',
+                title: DOMPurify.sanitize('ویدیو تکنیک‌های ترمیمی'),
+              },
+            ],
+            completed: false,
+            duration: '50 دقیقه',
+            isNew: true,
+          },
+        ],
+        faqs: [
+          { id: 1, question: DOMPurify.sanitize('آیا این دوره عملی است؟'), answer: DOMPurify.sanitize('بله، شامل جلسات عملی و تئوری است.') },
+        ],
+        tags: ['ترمیمی', 'دندانپزشکی', 'عم عملی'],
+        prerequisites: ['آشنایی با آناتومی دندان'],
+        courseType: 'In-Person',
+        university: 'RUDN',
+        slug: slugify('دوره ترمیمی دندانپزشکی'),
+        currency: 'CNY',
+        countries: ['China', 'Iran'],
+        level: 'Intermediate',
+      },
+      {
+        id: 2,
+        title: 'دوره آنلاین جراحی دندانپزشکی پیشرفته',
+        instructor: 'مریم حسینی',
+        description: DOMPurify.sanitize('آموزش تکنیک‌های پیشرفته جراحی دندانپزشکی به صورت آنلاین با تمرکز بر روش‌های نوین.'),
+        duration: '8 هفته',
+        courseNumber: 'Course 4',
+        category: 'جراحی',
+        image: '/assets/courses/surgery.jpg',
+        price: formatPriceWithCurrency(8000000, 'IRR'),
+        discountPrice: formatPriceWithCurrency(7200000, 'IRR'),
+        discountPercentage: 10,
+        startDateJalali: '1404/05/01',
+        startDateGregorian: '2025-07-23',
+        isOpen: true,
+        isFeatured: false,
+        syllabus: [
+          {
+            id: 1,
+            title: DOMPurify.sanitize('آشنایی با ابزارهای جراحی'),
+            isLocked: false,
+            previewContent: DOMPurify.sanitize('معرفی ابزارهای مورد استفاده در جراحی دندانپزشکی.'),
+            contents: [
+              {
+                type: 'text',
+                text: DOMPurify.sanitize('توضیحات جامع درباره ابزارهای جراحی و کاربردهای آن‌ها.'),
+                title: DOMPurify.sanitize('ابزارهای جراحی'),
+              },
+              {
+                type: 'image',
+                url: '/assets/images/surgery-tools.jpg',
+                title: DOMPurify.sanitize('تصویر ابزارهای جراحی'),
+              },
+            ],
+            completed: false,
+            duration: '45 دقیقه',
+            isNew: true,
+          },
+          {
+            id: 2,
+            title: DOMPurify.sanitize('تکنیک‌های جراحی پیشرفته'),
+            isLocked: true,
+            previewContent: DOMPurify.sanitize('آموزش تکنیک‌های جراحی پیشرفته به صورت عملی.'),
+            contents: [
+              {
+                type: 'video',
+                url: 'https://example.com/surgery-techniques.mp4',
+                title: DOMPurify.sanitize('ویدیو تکنیک‌های جراحی'),
+              },
+            ],
+            completed: false,
+            duration: '60 دقیقه',
+            isNew: false,
+          },
+        ],
+        faqs: [
+          {
+            id: 1,
+            question: DOMPurify.sanitize('آیا این دوره شامل جلسات عملی است؟'),
+            answer: DOMPurify.sanitize('بله، این دوره شامل ویدیوهای عملی و شبیه‌سازی‌های آنلاین است.'),
+          },
+        ],
+        tags: ['جراحی', 'دندانپزشکی', 'آنلاین'],
+        prerequisites: ['آشنایی با اصول اولیه جراحی دندانپزشکی'],
+        courseType: 'Online',
+        university: 'Sechenov',
+        currency: 'IRR',
+        countries: ['Iran', 'Russia'],
+        level: 'Advanced',
+        enrollmentCount: 0,
+        slug: ''
+      },
+    ];
+    return savedCourses ? JSON.parse(savedCourses) : initialCourses;
+  });
 
-  const updateCoursesWithEnrollmentCount = (courses: Course[], enrollments: Enrollment[]): Course[] => {
-    return courses.map((course) => ({
-      ...course,
-      enrollmentCount: enrollments.filter((e) => e.courseId === course.id).length,
-    }));
-  };
+  useEffect(() => {
+    try {
+      localStorage.setItem('courses', JSON.stringify(courses));
+      localStorage.setItem('courseUniversities', JSON.stringify(universities));
+      localStorage.setItem('courseCategories', JSON.stringify(categories));
+      localStorage.setItem('courseCountries', JSON.stringify(countries));
+    } catch (error) {
+      showNotification('خطا در ذخیره‌سازی داده‌های دوره‌ها!', 'error');
+    }
+  }, [courses, universities, categories, countries, showNotification]);
 
   const validateContentItem = (content: ContentItem): boolean => {
     const validTypes = ['video', 'image', 'text', 'quiz'];
@@ -202,7 +289,7 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   };
 
   const validateSyllabusItem = (item: SyllabusItem): boolean => {
-    const isValid =
+    return (
       typeof item.id === 'number' &&
       typeof item.title === 'string' &&
       item.title.trim() !== '' &&
@@ -215,9 +302,8 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       (item.previewContent === undefined || (typeof item.previewContent === 'string' && item.previewContent.length <= 500)) &&
       Array.isArray(item.contents) &&
       item.contents.every(validateContentItem) &&
-      (item.isNew === undefined || typeof item.isNew === 'boolean');
-    console.log(`Validating syllabus item ${item.id}:`, isValid, item);
-    return isValid;
+      (item.isNew === undefined || typeof item.isNew === 'boolean')
+    );
   };
 
   const validateCourse = (course: Course): boolean => {
@@ -225,123 +311,74 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const validCourseTypes = ['Online', 'Offline', 'In-Person', 'Hybrid'];
     const validCurrencies = ['RUB', 'CNY', 'IRR'];
 
-    if (!instructorNames.has(course.instructor)) {
-      console.warn(`استاد ${course.instructor} برای دوره ${course.title} یافت نشد.`);
-      return false;
-    }
-    if (typeof course.category !== 'string' || course.category.trim() === '') {
-      console.warn(`دسته‌بندی ${course.category} نامعتبر است.`);
-      return false;
-    }
-    if (!validCourseTypes.includes(course.courseType)) {
-      console.warn(`نوع دوره ${course.courseType} نامعتبر است.`);
-      return false;
-    }
-    if (typeof course.university !== 'string' || course.university.trim() === '') {
-      console.warn(`دانشگاه ${course.university} نامعتبر است.`);
-      return false;
-    }
-    if (!Array.isArray(course.syllabus) || !course.syllabus.every(validateSyllabusItem)) {
-      console.warn(`سرفصل‌های دوره ${course.title} نامعتبر است.`);
-      return false;
-    }
-    if (!validCurrencies.includes(course.currency)) {
-      console.warn(`ارز ${course.currency} نامعتبر است.`);
-      return false;
-    }
-    if (
-      !Array.isArray(course.countries) ||
-      course.countries.length === 0 ||
-      !course.countries.every((c) => typeof c === 'string' && c.trim() !== '')
-    ) {
-      console.warn(`کشورهای ${course.countries} نامعتبر است.`);
-      return false;
-    }
+    if (!instructorNames.has(course.instructor)) return false;
+    if (typeof course.category !== 'string' || course.category.trim() === '') return false;
+    if (!validCourseTypes.includes(course.courseType)) return false;
+    if (typeof course.university !== 'string' || course.university.trim() === '') return false;
+    if (!Array.isArray(course.syllabus) || !course.syllabus.every(validateSyllabusItem)) return false;
+    if (!validCurrencies.includes(course.currency)) return false;
+    if (!Array.isArray(course.countries) || course.countries.length === 0 || !course.countries.every((c) => typeof c === 'string' && c.trim() !== '')) return false;
     const priceValue = parsePersianNumber(course.price);
-    if (isNaN(priceValue) || priceValue <= 0) {
-      console.warn(`قیمت ${course.price} نامعتبر است.`);
-      return false;
-    }
+    if (isNaN(priceValue) || priceValue <= 0) return false;
     if (course.discountPrice !== undefined && course.discountPercentage !== undefined) {
       const discountPriceValue = parsePersianNumber(course.discountPrice);
-      if (isNaN(discountPriceValue) || discountPriceValue >= priceValue) {
-        console.warn(`قیمت تخفیفی ${course.discountPrice} نامعتبر است.`);
-        return false;
-      }
-      if (typeof course.discountPercentage !== 'number' || course.discountPercentage <= 0 || course.discountPercentage >= 100) {
-        console.warn(`درصد تخفیف ${course.discountPercentage} نامعتبر است.`);
-        return false;
-      }
+      if (isNaN(discountPriceValue) || discountPriceValue >= priceValue) return false;
+      if (typeof course.discountPercentage !== 'number' || course.discountPercentage <= 0 || course.discountPercentage >= 100) return false;
       const calculatedDiscountPercentage = ((priceValue - discountPriceValue) / priceValue) * 100;
-      if (Math.abs(calculatedDiscountPercentage - course.discountPercentage) > 0.1) {
-        console.warn(`درصد تخفیف ${course.discountPercentage} با قیمت تخفیفی ${course.discountPrice} همخوانی ندارد.`);
-        return false;
-      }
-    } else if (course.discountPrice !== undefined || course.discountPercentage !== undefined) {
-      console.warn(`قیمت تخفیفی و درصد تخفیف باید هر دو مشخص شوند یا هیچ‌کدام.`);
-      return false;
-    }
-    if (!isValidJalaliDate(course.startDateJalali)) {
-      console.warn(`تاریخ شروع جلالی ${course.startDateJalali} نامعتبر است. باید در فرمت YYYY/MM/DD باشد.`);
-      return false;
-    }
-    if (!isValidGregorianDate(course.startDateGregorian)) {
-      console.warn(`تاریخ شروع میلادی ${course.startDateGregorian} نامعتبر است. باید در فرمت YYYY-MM-DD باشد.`);
-      return false;
-    }
-    if (!areDatesConsistent(course.startDateJalali, course.startDateGregorian)) {
-      console.warn(`تاریخ‌های جلالی ${course.startDateJalali} و میلادی ${course.startDateGregorian} همخوانی ندارند.`);
-      return false;
-    }
+      if (Math.abs(calculatedDiscountPercentage - course.discountPercentage) > 0.1) return false;
+    } else if (course.discountPrice !== undefined || course.discountPercentage !== undefined) return false;
+    if (!isValidJalaliDate(course.startDateJalali) || !isValidGregorianDate(course.startDateGregorian)) return false;
+    if (!areDatesConsistent(course.startDateJalali, course.startDateGregorian)) return false;
     return true;
   };
 
   const validateAndSetCourses = (newCourses: Course[] | ((prev: Course[]) => Course[])) => {
     setCourses((prev) => {
       const updatedCourses = typeof newCourses === 'function' ? newCourses(prev) : newCourses;
-      const validatedCourses = updatedCourses.filter(validateCourse);
-      console.log('Validated courses:', validatedCourses);
-      return updateCoursesWithEnrollmentCount(validatedCourses, enrollments);
+      return updatedCourses.filter(validateCourse);
     });
   };
 
   const addUniversity = (university: string) => {
-    if (university.trim() === '') {
+    const sanitizedUniversity = DOMPurify.sanitize(university);
+    if (sanitizedUniversity.trim() === '') {
       showNotification('نام دانشگاه نمی‌تواند خالی باشد', 'error');
       return;
     }
-    if (universities.includes(university)) {
+    if (universities.includes(sanitizedUniversity)) {
       showNotification('دانشگاه قبلاً وجود دارد', 'error');
       return;
     }
-    setUniversities((prev) => [...prev, university]);
-    showNotification(`دانشگاه ${university} با موفقیت اضافه شد`, 'success');
+    setUniversities((prev) => [...prev, sanitizedUniversity]);
+    showNotification(`دانشگاه ${sanitizedUniversity} با موفقیت اضافه شد`, 'success');
   };
 
   const addCategory = (category: string) => {
-    if (category.trim() === '') {
+    const sanitizedCategory = DOMPurify.sanitize(category);
+    if (sanitizedCategory.trim() === '') {
       showNotification('نام دسته‌بندی نمی‌تواند خالی باشد', 'error');
       return;
     }
-    if (categories.includes(category)) {
+    if (categories.includes(sanitizedCategory)) {
       showNotification('دسته‌بندی قبلاً وجود دارد', 'error');
       return;
     }
-    setCategories((prev) => [...prev, category]);
-    showNotification(`دسته‌بندی ${category} با موفقیت اضافه شد`, 'success');
+    setCategories((prev) => [...prev, sanitizedCategory]);
+    showNotification(`دسته‌بندی ${sanitizedCategory} با موفقیت اضافه شد`, 'success');
   };
 
   const addCountry = (country: string) => {
-    if (country.trim() === '') {
+    const sanitizedCountry = DOMPurify.sanitize(country);
+    if (sanitizedCountry.trim() === '') {
       showNotification('نام کشور نمی‌تواند خالی باشد', 'error');
       return;
     }
-    if (countries.includes(country)) {
+    if (countries.includes(sanitizedCountry)) {
       showNotification('کشور قبلاً وجود دارد', 'error');
       return;
     }
-    setCountries((prev) => [...prev, country]);
-    showNotification(`کشور ${country} با موفقیت اضافه شد`, 'success');
+    setCountries((prev) => [...prev, sanitizedCountry]);
+    showNotification(`کشور ${sanitizedCountry} با موفقیت اضافه شد`, 'success');
   };
 
   const addCourse = async (course: Omit<Course, 'id'>) => {
@@ -374,13 +411,45 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         }
       }
 
-      let newCourse: Course = {
+      const sanitizedCourse: Omit<Course, 'id'> = {
         ...course,
+        title: DOMPurify.sanitize(course.title),
+        instructor: DOMPurify.sanitize(course.instructor),
+        description: DOMPurify.sanitize(course.description),
+        duration: DOMPurify.sanitize(course.duration),
+        courseNumber: DOMPurify.sanitize(course.courseNumber),
+        category: DOMPurify.sanitize(course.category),
+        image: DOMPurify.sanitize(course.image),
+        price: DOMPurify.sanitize(course.price),
+        discountPrice: course.discountPrice ? DOMPurify.sanitize(course.discountPrice) : undefined,
+        startDateJalali: DOMPurify.sanitize(startDateJalali),
+        startDateGregorian: DOMPurify.sanitize(startDateGregorian),
+        syllabus: course.syllabus.map((item) => ({
+          ...item,
+          title: DOMPurify.sanitize(item.title),
+          previewContent: item.previewContent ? DOMPurify.sanitize(item.previewContent) : undefined,
+          contents: item.contents.map((content) => ({
+            ...content,
+            title: content.title ? DOMPurify.sanitize(content.title) : undefined,
+            text: content.text ? DOMPurify.sanitize(content.text) : undefined,
+            url: content.url ? DOMPurify.sanitize(content.url) : undefined,
+          })),
+        })),
+        faqs: course.faqs.map((faq) => ({
+          id: faq.id,
+          question: DOMPurify.sanitize(faq.question),
+          answer: DOMPurify.sanitize(faq.answer),
+        })),
+        tags: course.tags.map((tag) => DOMPurify.sanitize(tag)),
+        prerequisites: course.prerequisites.map((prereq) => DOMPurify.sanitize(prereq)),
+        university: DOMPurify.sanitize(course.university),
+      };
+
+      let newCourse: Course = {
+        ...sanitizedCourse,
         id: Math.max(...courses.map((c) => c.id), 0) + 1,
         enrollmentCount: 0,
-        startDateJalali,
-        startDateGregorian,
-        slug: slugify(course.title),
+        slug: slugify(sanitizedCourse.title),
       };
 
       if (newCourse.discountPrice && !newCourse.discountPercentage) {
@@ -435,16 +504,17 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     }
   };
 
-  const fetchCourses = async () => {
+  const fetchCourses = () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/courses${slug ? `/${slug}` : ''}`);
-      const data = await response.json();
-      const coursesData = Array.isArray(data) ? data : data.course ? [data.course] : [];
-      validateAndSetCourses(coursesData);
+      if (slug) {
+        const filteredCourses = courses.filter((course) => course.slug === slug);
+        validateAndSetCourses(filteredCourses);
+      } else {
+        validateAndSetCourses(courses);
+      }
     } catch (error: any) {
-      console.error('Failed to fetch courses:', error);
-      showNotification('خطایی در بارگذاری دوره‌ها رخ داد. لطفاً دوباره تلاش کنید.', 'error');
+      showNotification(error.message || 'خطا در بارگذاری دوره‌ها', 'error');
     } finally {
       setLoading(false);
     }
@@ -452,7 +522,7 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   useEffect(() => {
     fetchCourses();
-  }, [instructors, slug, location.pathname]);
+  }, [slug]);
 
   return (
     <CourseContext.Provider

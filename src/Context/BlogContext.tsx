@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { useAuthContext } from './AuthContext';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useAuthContext } from './Auth/UserAuthContext';
 import { User, BlogPost } from '../types/types';
 
 interface BlogContextType {

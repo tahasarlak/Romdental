@@ -6,7 +6,7 @@ import { useInstructorContext } from '../../Context/InstructorContext';
 import { Instructor } from '../../types/types';
 import { useWishlistContext } from '../../Context/WishlistContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
-import { useAuthContext } from '../../Context/AuthContext';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 import InstructorCard from '../InstructorCard/InstructorCard';
 import styles from './FeaturedInstructors.module.css';
 
@@ -24,27 +24,31 @@ const FeaturedInstructors: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // انتخاب سه استاد تصادفی
   const displayedInstructors = useMemo(() => {
     return getRandomInstructors(instructors, 3);
   }, [instructors]);
 
   useEffect(() => {
     const loadInstructors = async () => {
-      try {
-        await fetchInstructors();
-        if (!instructors.length && !loading) {
-          setError('هیچ استادی یافت نشد.');
-          showNotification('هیچ استادی یافت نشد.', 'info');
+      if (instructors.length === 0) {
+        try {
+          await fetchInstructors();
+        } catch (error: any) {
+          console.error('Failed to fetch instructors:', error);
+          setError('خطا در بارگذاری اساتید.');
+          showNotification('خطا در بارگذاری اساتید.', 'error');
         }
-      } catch (error: any) {
-        console.error('Failed to fetch instructors:', error);
-        setError('خطا در بارگذاری اساتید.');
-        showNotification('خطا در بارگذاری اساتید.', 'error');
       }
     };
     loadInstructors();
-  }, [fetchInstructors, loading, showNotification]); // Removed instructors from dependencies
+  }, [fetchInstructors, instructors.length]);
+
+  useEffect(() => {
+    if (!loading && !instructors.length && !error) {
+      setError('هیچ استادی یافت نشد.');
+      showNotification('هیچ استادی یافت نشد.', 'info');
+    }
+  }, [instructors.length, loading, showNotification, error]);
 
   useEffect(() => {
     const handleScroll = () => {

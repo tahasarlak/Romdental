@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import styles from './Blog.module.css';
 import { useBlogContext } from '../../Context/BlogContext';
-import { useAuthContext } from '../../Context/AuthContext';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 import { useWishlistContext } from '../../Context/WishlistContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import BlogCard from '../../components/BlogCard/BlogCard';

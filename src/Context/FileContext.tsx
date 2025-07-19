@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuthContext } from './AuthContext';
+import { useAuthContext } from './Auth/UserAuthContext';
 import { useCourseContext } from './CourseContext';
 import { useEnrollmentContext } from './EnrollmentContext';
 import { useNotificationContext } from './NotificationContext';
@@ -10,9 +10,9 @@ interface CourseFile {
   id: string;
   courseId: number;
   title: string;
-  fileUrl: string; // URL فایل (مثل /assets/filename.pdf)
+  fileUrl: string;
   fileType: 'pdf' | 'video' | 'image' | 'other';
-  uploadedBy: number; // ID استاد یا ادمین
+  uploadedBy: number;
   uploadedAt: string;
 }
 
@@ -30,41 +30,35 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const { courses } = useCourseContext();
   const { enrollments } = useEnrollmentContext();
   const { showNotification } = useNotificationContext();
-  const [files, setFiles] = useState<CourseFile[]>([]);
-
-  // Load files from localStorage on mount
-  useEffect(() => {
+  const [files, setFiles] = useState<CourseFile[]>(() => {
     const storedFiles = localStorage.getItem('courseFiles');
-    if (storedFiles) {
-      try {
-        setFiles(JSON.parse(storedFiles));
-      } catch (error) {
-        console.error('Error parsing course files from localStorage:', error);
-      }
-    }
-  }, []);
+    return storedFiles ? JSON.parse(storedFiles) : [];
+  });
 
-  // Save files to localStorage on change
   useEffect(() => {
-    localStorage.setItem('courseFiles', JSON.stringify(files));
-  }, [files]);
+    try {
+      localStorage.setItem('courseFiles', JSON.stringify(files));
+    } catch (error) {
+      showNotification('خطا در ذخیره‌سازی فایل‌ها!', 'error');
+    }
+  }, [files, showNotification]);
 
   const uploadFile = async (courseId: number, title: string, fileUrl: string, fileType: 'pdf' | 'video' | 'image' | 'other') => {
-    if (!isAuthenticated || !user || !['SuperAdmin', 'Admin', 'Instructor'].includes(user.role)) {
-      throw new Error('فقط ادمین‌ها و اساتید می‌توانند فایل آپلود کنند.');
-    }
-    if (!title.trim() || !fileUrl.trim()) {
-      throw new Error('عنوان و آدرس فایل نمی‌توانند خالی باشند.');
-    }
-    const course = courses.find((c) => c.id === courseId);
-    if (!course) {
-      throw new Error('دوره یافت نشد.');
-    }
-    if (!/^\/assets\/.*\.(pdf|mp4|jpg|jpeg|png|mov)$/.test(fileUrl)) {
-      throw new Error('آدرس فایل معتبر نیست یا فرمت پشتیبانی نمی‌شود.');
-    }
-
     try {
+      if (!isAuthenticated || !user || !['SuperAdmin', 'Admin', 'Instructor'].includes(user.role)) {
+        throw new Error('فقط ادمین‌ها و اساتید می‌توانند فایل آپلود کنند.');
+      }
+      if (!title.trim() || !fileUrl.trim()) {
+        throw new Error('عنوان و آدرس فایل نمی‌توانند خالی باشند.');
+      }
+      const course = courses.find((c) => c.id === courseId);
+      if (!course) {
+        throw new Error('دوره یافت نشد.');
+      }
+      if (!/^\/assets\/.*\.(pdf|mp4|jpg|jpeg|png|mov)$/.test(fileUrl) && !/^https?:\/\/.*/.test(fileUrl)) {
+        throw new Error('آدرس فایل معتبر نیست یا فرمت پشتیبانی نمی‌شود.');
+      }
+
       const newFile: CourseFile = {
         id: uuidv4(),
         courseId,
@@ -90,15 +84,18 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const deleteFile = async (fileId: string) => {
-    if (!isAuthenticated || !user || !['SuperAdmin', 'Admin', 'Instructor'].includes(user.role)) {
-      throw new Error('فقط ادمین‌ها و اساتید می‌توانند فایل را حذف کنند.');
-    }
-    const file = files.find((f) => f.id === fileId);
-    if (!file) {
-      throw new Error('فایل یافت نشد.');
-    }
-
     try {
+      if (!isAuthenticated || !user || !['SuperAdmin', 'Admin', 'Instructor'].includes(user.role)) {
+        throw new Error('فقط ادمین‌ها و اساتید می‌توانند فایل را حذف کنند.');
+      }
+      const file = files.find((f) => f.id === fileId);
+      if (!file) {
+        throw new Error('فایل یافت نشد.');
+      }
+      if (file.uploadedBy !== user.id && !['SuperAdmin', 'Admin'].includes(user.role)) {
+        throw new Error('شما فقط می‌توانید فایل‌های خودتان را حذف کنید.');
+      }
+
       setFiles((prev) => prev.filter((f) => f.id !== fileId));
       showNotification('فایل با موفقیت حذف شد.', 'success');
     } catch (error: any) {

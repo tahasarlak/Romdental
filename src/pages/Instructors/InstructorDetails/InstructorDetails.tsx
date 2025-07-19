@@ -22,9 +22,9 @@ import { Instructor } from '../../../types/types';
 import { useCourseContext } from '../../../Context/CourseContext';
 import { useWishlistContext } from '../../../Context/WishlistContext';
 import { useNotificationContext } from '../../../Context/NotificationContext';
-import { useAuthContext } from '../../../Context/AuthContext';
 import Breadcrumb from '../../../components/Breadcrumb/Breadcrumb';
 import styles from './InstructorDetails.module.css';
+import { useAuthContext } from '../../../Context/Auth/UserAuthContext';
 
 const InstructorDetails: React.FC = memo(() => {
   const { instructorName } = useParams<{ instructorName: string }>();

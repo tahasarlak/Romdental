@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuthContext } from './AuthContext';
+import { useAuthContext } from './Auth/UserAuthContext';
 import { useCourseContext } from './CourseContext';
 import { useEnrollmentContext } from './EnrollmentContext';
 import { usePaymentContext } from './PaymentContext';
@@ -9,9 +9,9 @@ interface CourseAnalytics {
   courseId: number;
   title: string;
   enrollmentCount: number;
-  completionRate: number; // درصد تکمیل دوره
-  revenue: number; // درآمد حاصل از دوره
-  averageRating: number; // میانگین امتیاز نظرات
+  completionRate: number;
+  revenue: number;
+  averageRating: number;
 }
 
 interface UserAnalytics {
@@ -20,15 +20,15 @@ interface UserAnalytics {
   role: string;
   enrolledCourses: number;
   completedCourses: number;
-  totalSpent: number; // مجموع هزینه‌های پرداخت‌شده
-  lastActivity: string; // آخرین فعالیت کاربر
+  totalSpent: number;
+  lastActivity: string;
 }
 
 interface PlatformAnalytics {
   totalEnrollments: number;
   totalRevenue: number;
   activeUsers: number;
-  courseCompletionRate: number; // میانگین نرخ تکمیل تمام دوره‌ها
+  courseCompletionRate: number;
   topCourses: CourseAnalytics[];
   topUsers: UserAnalytics[];
 }
@@ -61,16 +61,13 @@ export const AnalyticsProvider: React.FC<{ children: ReactNode }> = ({ children 
     topUsers: [],
   });
 
-  // Helper function to calculate course completion rate
   const calculateCompletionRate = (courseId: number): number => {
     const courseEnrollments = enrollments.filter((e) => e.courseId === courseId);
     if (courseEnrollments.length === 0) return 0;
-    // Assuming completion is based on syllabus item completion (simplified)
     const completedEnrollments = courseEnrollments.filter((e) => e.status === 'active').length;
     return (completedEnrollments / courseEnrollments.length) * 100;
   };
 
-  // Helper function to calculate course revenue
   const calculateCourseRevenue = (courseId: number): number => {
     const coursePayments = payments
       .filter((p) => p.status === 'verified' && enrollments.some((e) => e.courseId === courseId && e.studentId === parseInt(p.userId)))
@@ -78,13 +75,10 @@ export const AnalyticsProvider: React.FC<{ children: ReactNode }> = ({ children 
     return coursePayments;
   };
 
-  // Helper function to calculate average rating (assuming ratings are available in reviews)
   const calculateAverageRating = (courseId: number): number => {
-    // Assuming ReviewContext provides ratings, simplified here
-    return 4.5; // Placeholder, replace with actual logic if ReviewContext is integrated
+    return 4.5;
   };
 
-  // Refresh analytics data
   const refreshAnalytics = () => {
     if (!isAuthenticated || !user || !['SuperAdmin', 'Admin', 'Instructor'].includes(user.role)) {
       showNotification('فقط ادمین‌ها و اساتید می‌توانند به تحلیل داده‌ها دسترسی داشته باشند.', 'error');
@@ -92,7 +86,6 @@ export const AnalyticsProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
 
     try {
-      // Course Analytics
       const newCourseAnalytics: CourseAnalytics[] = courses.map((course) => ({
         courseId: course.id,
         title: course.title,
@@ -102,7 +95,6 @@ export const AnalyticsProvider: React.FC<{ children: ReactNode }> = ({ children 
         averageRating: calculateAverageRating(course.id),
       }));
 
-      // User Analytics
       const newUserAnalytics: UserAnalytics[] = users.map((u) => ({
         userId: u.id,
         name: u.name,
@@ -112,10 +104,9 @@ export const AnalyticsProvider: React.FC<{ children: ReactNode }> = ({ children 
         totalSpent: payments
           .filter((p) => p.userId === u.email && p.status === 'verified')
           .reduce((sum, p) => sum + parseFloat(p.amount.replace(/[^\d.-]/g, '')), 0),
-        lastActivity: new Date().toLocaleString('fa-IR'), // Placeholder, replace with actual activity tracking
+        lastActivity: new Date().toLocaleString('fa-IR'),
       }));
 
-      // Platform Analytics
       const financialReport = getFinancialReport();
       const totalEnrollments = enrollments.length;
       const totalRevenue = parseFloat(financialReport.totalRevenue.replace(/[^\d.-]/g, ''));
@@ -142,7 +133,6 @@ export const AnalyticsProvider: React.FC<{ children: ReactNode }> = ({ children 
         topUsers,
       });
 
-      // Save to localStorage
       localStorage.setItem('courseAnalytics', JSON.stringify(newCourseAnalytics));
       localStorage.setItem('userAnalytics', JSON.stringify(newUserAnalytics));
       localStorage.setItem('platformAnalytics', JSON.stringify({
@@ -160,7 +150,6 @@ export const AnalyticsProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   };
 
-  // Load analytics from localStorage on mount
   useEffect(() => {
     const storedCourseAnalytics = localStorage.getItem('courseAnalytics');
     const storedUserAnalytics = localStorage.getItem('userAnalytics');
@@ -187,17 +176,12 @@ export const AnalyticsProvider: React.FC<{ children: ReactNode }> = ({ children 
         console.error('Error parsing platform analytics from localStorage:', error);
       }
     }
+  }, []);
 
-    // Initial refresh
-    refreshAnalytics();
-  }, [courses, enrollments, payments, users]);
-
-  // Get specific course report
   const getCourseReport = (courseId: number): CourseAnalytics | null => {
     return courseAnalytics.find((ca) => ca.courseId === courseId) || null;
   };
 
-  // Get specific user report
   const getUserReport = (userId: number): UserAnalytics | null => {
     return userAnalytics.find((ua) => ua.userId === userId) || null;
   };

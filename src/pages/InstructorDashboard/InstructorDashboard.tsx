@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Box, Tabs, Tab, Typography } from '@mui/material';
-import { useAuthContext } from '../../Context/AuthContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import { Helmet } from 'react-helmet-async';
 import CourseManagement from '../../components/InstructorDashboard/CourseManagement/CourseManagement';
@@ -11,6 +10,7 @@ import WishlistManagement from '../../components/InstructorDashboard/WishlistMan
 import StudentGroupManagement from '../../components/InstructorDashboard/StudentGroupManagement/StudentGroupManagement';
 import DOMPurify from 'dompurify';
 import styles from './InstructorDashboard.module.css';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 
 const sanitizeText = (text: string): string => {
   return DOMPurify.sanitize(text, {

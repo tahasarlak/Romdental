@@ -22,7 +22,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DOMPurify from 'dompurify';
-import { useAuthContext } from '../../../Context/AuthContext';
+import { useAuthContext } from '../../../Context/Auth/UserAuthContext';
 import { useBlogContext, BlogPost } from '../../../Context/BlogContext';
 import { useNotificationContext } from '../../../Context/NotificationContext';
 import BlogDialog from '../BlogDialog/BlogDialog';

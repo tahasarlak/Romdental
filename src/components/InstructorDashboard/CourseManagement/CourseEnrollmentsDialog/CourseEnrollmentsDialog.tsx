@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import styles from './CourseEnrollmentsDialog.module.css';
-import { useAuthContext } from '../../../../Context/AuthContext';
+import { useAuthContext } from '../../../../Context/Auth/UserAuthContext';
 import { useCourseContext } from '../../../../Context/CourseContext';
 import { useNotificationContext } from '../../../../Context/NotificationContext';
 import { User, Course } from '../../../../types/types';

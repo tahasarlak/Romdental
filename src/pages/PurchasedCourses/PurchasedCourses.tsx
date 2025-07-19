@@ -13,11 +13,11 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
 import { Link } from 'react-router-dom';
-import { useAuthContext } from '../../Context/AuthContext';
 import { useCourseContext } from '../../Context/CourseContext';
 import { useEnrollmentContext } from '../../Context/EnrollmentContext';
 import { Course, SyllabusItem } from '../../types/types';
 import moment from 'moment-jalaali';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 
 moment.loadPersian({ dialect: 'persian-modern' });
 

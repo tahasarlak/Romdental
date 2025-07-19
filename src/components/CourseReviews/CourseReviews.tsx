@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import styles from './CourseReviews.module.css';
 import ReviewForm from '../ReviewForm/ReviewForm';
-import { useAuthContext } from '../../Context/AuthContext';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 import { useReviewContext } from '../../Context/ReviewContext';
 
 interface User {

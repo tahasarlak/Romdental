@@ -17,7 +17,8 @@
         "aria-valid-attr-value": "off",
         "aria-progressbar-name": "off",
         "aria-required-children": "off",
-        "aria-required-parent": "off"
+        "aria-required-parent": "off",
+        "aria-valid-attr": "off"
       }
     ],
     "compat-api/html": [

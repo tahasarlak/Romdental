@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode, useEffect } from 'react';
 import DOMPurify from 'dompurify';
-import { useAuthContext } from './AuthContext';
+import { useAuthContext } from './Auth/UserAuthContext';
 import { useNotificationContext } from './NotificationContext';
 import { useReviewContext } from './ReviewContext';
 import { useCourseContext } from './CourseContext';
@@ -21,11 +21,11 @@ const InstructorContext = createContext<InstructorContextType | undefined>(undef
 const initialInstructors: Instructor[] = [
   {
     id: 3,
-    name: 'مریم حسینی',
-    specialty: 'ترمیمی',
-    bio: 'استاد ترمیمی دندانپزشکی با تمرکز بر روش‌های مدرن ترمیمی.',
-    image: '/assets/instructors/ahmad-rasteh.jpg',
-    experience: '8 سال',
+    name: DOMPurify.sanitize('مریم حسینی'),
+    specialty: DOMPurify.sanitize('ترمیمی'),
+    bio: DOMPurify.sanitize('استاد ترمیمی دندانپزشکی با تمرکز بر روش‌های مدرن ترمیمی.'),
+    image: '/assets/instructors/maryam-hosseini.jpg',
+    experience: DOMPurify.sanitize('8 سال'),
     coursesTaught: ['دوره ترمیمی دندانپزشکی'],
     averageRating: '4.2',
     totalStudents: 0,
@@ -34,42 +34,47 @@ const initialInstructors: Instructor[] = [
     instagramLink: 'https://instagram.com/maryam_hosseini_dentist',
     bankAccounts: [
       {
-        bankName: 'بانک ملت',
-        accountHolder: 'مریم حسینی',
-        accountNumber: '1234-5678-9012-3456',
+        bankName: DOMPurify.sanitize('بانک ملت'),
+        accountHolder: DOMPurify.sanitize('مریم حسینی'),
+        accountNumber: DOMPurify.sanitize('1234-5678-9012-3456'),
       },
     ],
+    email: DOMPurify.sanitize('maryam.hosseini@example.com'),
+    phone: DOMPurify.sanitize('09123456788'),
+    university: DOMPurify.sanitize('دانشگاه تهران'),
+    gender: 'زن',
+    password: DOMPurify.sanitize('hashedPassword123'),
   },
 ];
 
 export const InstructorProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { user } = useAuthContext();
   const { showNotification } = useNotificationContext();
-  const [instructors, setInstructors] = useState<Instructor[]>(initialInstructors);
+  const [instructors, setInstructors] = useState<Instructor[]>(() => {
+    const savedInstructors = localStorage.getItem('instructors');
+    return savedInstructors ? JSON.parse(savedInstructors) : initialInstructors;
+  });
   const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('instructors', JSON.stringify(instructors));
+    } catch (error) {
+      showNotification('خطا در ذخیره‌سازی اساتید!', 'error');
+    }
+  }, [instructors, showNotification]);
 
   const fetchInstructors = useCallback(async () => {
     try {
       setLoading(true);
-      const data = initialInstructors.map((instructor) => ({
-        ...instructor,
-        reviewCount: instructor.reviewCount ?? 0,
-        totalStudents: instructor.totalStudents ?? 0,
-        bankAccounts: instructor.bankAccounts ?? [],
-      }));
-      setInstructors((prev) => {
-        if (JSON.stringify(prev) !== JSON.stringify(data)) {
-          return data;
-        }
-        return prev;
-      });
-      if (!data.length) {
+      if (!instructors.length) {
         showNotification('هیچ استادی یافت نشد.', 'info');
+      } else {
+        showNotification('اساتید با موفقیت بارگذاری شدند.', 'success');
       }
     } catch (error: any) {
-      console.error('Failed to fetch instructors:', error);
       showNotification(error.message || 'خطا در بارگذاری اساتید', 'error');
-      setInstructors([]);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -99,9 +104,14 @@ export const InstructorProvider: React.FC<{ children: ReactNode }> = ({ children
             accountHolder: DOMPurify.sanitize(account.accountHolder),
             accountNumber: DOMPurify.sanitize(account.accountNumber),
           })),
+          email: DOMPurify.sanitize(instructor.email),
+          phone: DOMPurify.sanitize(instructor.phone),
+          university: DOMPurify.sanitize(instructor.university),
+          gender: instructor.gender,
+          password: DOMPurify.sanitize(instructor.password),
         };
-        if (instructors.some((inst) => inst.name === sanitizedInstructor.name)) {
-          throw new Error(`استاد با نام ${sanitizedInstructor.name} قبلاً وجود دارد`);
+        if (instructors.some((inst) => inst.email === sanitizedInstructor.email)) {
+          throw new Error(`استاد با ایمیل ${sanitizedInstructor.email} قبلاً وجود دارد`);
         }
         const newInstructor: Instructor = {
           ...sanitizedInstructor,
@@ -110,7 +120,6 @@ export const InstructorProvider: React.FC<{ children: ReactNode }> = ({ children
         setInstructors((prev) => [...prev, newInstructor]);
         showNotification(`استاد "${newInstructor.name}" با موفقیت اضافه شد`, 'success');
       } catch (error: any) {
-        console.error('Error adding instructor:', error);
         showNotification(error.message || 'خطا در افزودن استاد', 'error');
         throw error;
       }
@@ -142,6 +151,11 @@ export const InstructorProvider: React.FC<{ children: ReactNode }> = ({ children
             accountHolder: DOMPurify.sanitize(account.accountHolder),
             accountNumber: DOMPurify.sanitize(account.accountNumber),
           })),
+          email: DOMPurify.sanitize(instructor.email),
+          phone: DOMPurify.sanitize(instructor.phone),
+          university: DOMPurify.sanitize(instructor.university),
+          gender: instructor.gender,
+          password: DOMPurify.sanitize(instructor.password),
         };
         const existingInstructor = instructors.find((inst) => inst.id === instructorId);
         if (!existingInstructor) {
@@ -154,7 +168,6 @@ export const InstructorProvider: React.FC<{ children: ReactNode }> = ({ children
         );
         showNotification(`استاد "${sanitizedInstructor.name}" با موفقیت به‌روزرسانی شد`, 'success');
       } catch (error: any) {
-        console.error('Error updating instructor:', error);
         showNotification(error.message || 'خطا در به‌روزرسانی استاد', 'error');
         throw error;
       }
@@ -179,7 +192,6 @@ export const InstructorProvider: React.FC<{ children: ReactNode }> = ({ children
         setInstructors((prev) => prev.filter((inst) => inst.id !== instructorId));
         showNotification(`استاد "${DOMPurify.sanitize(instructor.name)}" با موفقیت حذف شد`, 'success');
       } catch (error: any) {
-        console.error('Error deleting instructor:', error);
         showNotification(error.message || 'خطا در حذف استاد', 'error');
         throw error;
       }
@@ -229,6 +241,11 @@ export const useInstructorMetrics = (instructor: Instructor | null): Instructor 
       telegramLink: undefined,
       instagramLink: undefined,
       bankAccounts: [],
+      email: '',
+      phone: '',
+      university: '',
+      gender: 'مرد',
+      password: '',
     };
   }
 

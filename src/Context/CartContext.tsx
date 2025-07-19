@@ -1,20 +1,20 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useAuthContext } from './AuthContext';
+import { useAuthContext } from './Auth/UserAuthContext';
 import { useNotificationContext } from './NotificationContext';
 import { CartItem, User } from '../types/types';
 
 interface CartItemExtended extends CartItem {
-  status?: 'pending' | 'approved' | 'rejected'; // Add status to track payment state
+  status?: 'pending' | 'approved' | 'rejected';
 }
 
 interface CartContextType {
   cartItems: CartItemExtended[];
-  addToCart: (courseId: number, quantity?: number) => Promise<void>;  
+  addToCart: (courseId: number, quantity?: number) => Promise<void>;
   removeFromCart: (itemId: string) => Promise<void>;
   updateCartItemQuantity: (itemId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
-  clearApprovedItems: () => Promise<void>; // New function to clear approved items
+  clearApprovedItems: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -41,7 +41,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  useEffect(() => {
+  const syncCartWithUser = useCallback(() => {
     if (isAuthenticated && user) {
       const storedCart = JSON.parse(localStorage.getItem('cart') || '[]') as CartItemExtended[];
       const userCart = Array.isArray(user.cart) ? user.cart : [];
@@ -56,13 +56,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUser({ ...user, cart: mergedCart });
         }
       }
-    } else {
-      const storedCart = JSON.parse(localStorage.getItem('cart') || '[]') as CartItemExtended[];
-      if (JSON.stringify(storedCart) !== JSON.stringify(cartItems)) {
-        setCartItems(storedCart);
-      }
     }
   }, [isAuthenticated, user, setUser, cartItems]);
+
+  useEffect(() => {
+    syncCartWithUser();
+  }, [syncCartWithUser]);
 
   const addToCart = async (courseId: number, quantity: number = 1) => {
     try {

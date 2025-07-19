@@ -12,7 +12,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Tooltip from '@mui/material/Tooltip';
 import Button from '@mui/material/Button';
 import { useNotificationContext } from '../../Context/NotificationContext';
-import { useAuthContext } from '../../Context/AuthContext';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 import { Instructor } from '../../types/types';
 import styles from './InstructorCard.module.css';
 

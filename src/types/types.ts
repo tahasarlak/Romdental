@@ -34,6 +34,11 @@ export interface Instructor {
   telegramLink?: string;
   instagramLink?: string;
   bankAccounts: BankAccount[];
+  email: string; 
+  phone: string; 
+  university: string; 
+  gender: 'مرد' | 'زن'; 
+  password: string;
 }
 
 export interface User {
@@ -51,6 +56,7 @@ export interface User {
   cart: CartItem[];
   token?: string;
   course?: string;
+  
 }
 
 export interface BlogPost {
@@ -67,8 +73,10 @@ export interface BlogPost {
 }
 
 export interface CategorizedUsers {
-  bloggers: User[];
   students: User[];
+  instructors: User[];
+  bloggers: User[];
+  admins: User[];
 }
 
 export interface ContentItem {
@@ -155,6 +163,17 @@ export interface Enrollment {
   status: 'active' | 'inactive';
   group?: string;
   enrollmentDate: string;
+}// src/types/types.ts
+export interface Blogger {
+  id: number;
+  name: string;
+  bio: string;
+  image: string;
+  email: string; // اضافه کردن
+  phone: string; // اضافه کردن
+  university: string; // اضافه کردن
+  gender: 'مرد' | 'زن'; // اضافه کردن
+  password: string; // اضافه کردن
 }
 
 export const VALID_COURSE_TYPES = ['Online', 'Offline', 'In-Person', 'Hybrid'] as const;

@@ -24,7 +24,7 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useAuthContext } from '../../../Context/AuthContext';
+import { useAuthContext } from '../../../Context/Auth/UserAuthContext';
 import { useCourseContext } from '../../../Context/CourseContext';
 import { useEnrollmentContext } from '../../../Context/EnrollmentContext';
 import { useNotificationContext } from '../../../Context/NotificationContext';

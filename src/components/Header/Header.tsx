@@ -1,7 +1,7 @@
   import React, { useState, useEffect, useCallback } from 'react';
   import { NavLink, useNavigate, useLocation } from 'react-router-dom';
   import styles from './Header.module.css';
-  import { useAuthContext } from '../../Context/AuthContext';
+  import { useAuthContext } from '../../Context/Auth/UserAuthContext';
   import { useCartContext } from '../../Context/CartContext';
   import { useCourseContext } from '../../Context/CourseContext';
   import { useScheduleContext } from '../../Context/ScheduleContext';

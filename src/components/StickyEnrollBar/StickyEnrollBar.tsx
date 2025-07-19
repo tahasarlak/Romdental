@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { Button } from '@mui/material';
 import DOMPurify from 'dompurify';
 import styles from './StickyEnrollBar.module.css';
-import { useAuthContext } from '../../Context/AuthContext';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 import { useCartContext } from '../../Context/CartContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import { Course } from '../../types/types';

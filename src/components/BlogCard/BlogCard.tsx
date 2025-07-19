@@ -8,7 +8,7 @@ import TagIcon from '@mui/icons-material/Tag';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import styles from './BlogCard.module.css';
-import { useAuthContext } from '../../Context/AuthContext';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import { BlogPost } from '../../Context/BlogContext';
 

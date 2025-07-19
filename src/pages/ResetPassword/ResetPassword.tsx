@@ -1,24 +1,19 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Helmet } from 'react-helmet';
 import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { useForm, Controller, FieldValues } from 'react-hook-form';
-import styles from './Login.module.css';
+import styles from './ResetPassword.module.css';
 import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 
 interface FormData {
   identifier: string;
-  password: string;
 }
 
 interface Errors {
   identifier?: string;
-  password?: string;
   root?: string;
 }
 
@@ -32,8 +27,6 @@ interface FormFieldProps {
   Icon?: React.ElementType;
   children?: React.ReactNode;
   ariaDescribedBy?: string;
-  showPassword?: boolean;
-  toggleShowPassword?: () => void;
   inputRef?: React.RefObject<HTMLInputElement>;
 }
 
@@ -48,8 +41,6 @@ const FormField: React.FC<FormFieldProps> = React.memo(
     Icon,
     children,
     ariaDescribedBy,
-    showPassword,
-    toggleShowPassword,
     inputRef,
   }) => (
     <div className={styles.formGroup}>
@@ -68,18 +59,8 @@ const FormField: React.FC<FormFieldProps> = React.memo(
             aria-invalid={!!error}
             aria-describedby={ariaDescribedBy || (error ? `${name}-error` : undefined)}
             ref={inputRef}
-            maxLength={name === 'identifier' ? 100 : name === 'password' ? 50 : undefined}
+            maxLength={100}
           />
-        )}
-        {name === 'password' && (
-          <button
-            type="button"
-            onClick={toggleShowPassword}
-            className={styles.togglePassword}
-            aria-label={showPassword ? 'مخفی کردن رمز عبور' : 'نمایش رمز عبور'}
-          >
-            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-          </button>
         )}
       </div>
       {error && (
@@ -91,33 +72,20 @@ const FormField: React.FC<FormFieldProps> = React.memo(
   )
 );
 
-const Login: React.FC = () => {
-  const { login, isAuthenticated } = useAuthContext();
+const ResetPassword: React.FC = () => {
+  const { forgotPassword } = useAuthContext(); // Changed from resetPassword to forgotPassword
   const { showNotification } = useNotificationContext();
   const navigate = useNavigate();
   const { control, handleSubmit, formState: { errors }, reset, setError } = useForm<FormData>({
     defaultValues: {
       identifier: '',
-      password: '',
     },
     mode: 'onChange',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [retryAfter, setRetryAfter] = useState<number | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
   const identifierRef = useRef<HTMLInputElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
-
-  const redirectRoutes = useMemo(
-    () => ({
-      SuperAdmin: '/admin',
-      Admin: '/admin',
-      Instructor: '/instructor',
-      Blogger: '/blogger',
-      default: '/',
-    }),
-    []
-  );
 
   useEffect(() => {
     identifierRef.current?.focus();
@@ -133,20 +101,10 @@ const Login: React.FC = () => {
   }, [retryAfter]);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
-    const route = redirectRoutes.default;
-    navigate(route, { replace: true });
-  }, [isAuthenticated, navigate, redirectRoutes]);
-
-  useEffect(() => {
-    if (errors.root || errors.identifier || errors.password) {
+    if (errors.root || errors.identifier) {
       errorRef.current?.focus();
     }
   }, [errors]);
-
-  const toggleShowPassword = useCallback(() => {
-    setShowPassword((prev) => !prev);
-  }, []);
 
   const onSubmit = useCallback(
     async (data: FormData) => {
@@ -159,7 +117,6 @@ const Login: React.FC = () => {
       setIsLoading(true);
       try {
         const sanitizedIdentifier = DOMPurify.sanitize(data.identifier.trim());
-        const sanitizedPassword = DOMPurify.sanitize(data.password);
 
         const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitizedIdentifier);
         const isPhone = /^\+?\d{10,15}$/.test(sanitizedIdentifier);
@@ -170,15 +127,10 @@ const Login: React.FC = () => {
           return;
         }
 
-        if (sanitizedPassword.length < 8 || sanitizedPassword.length > 50) {
-          setError('password', { message: 'رمز عبور باید بین ۸ تا ۵۰ کاراکتر باشد' });
-          showNotification('رمز عبور باید بین ۸ تا ۵۰ کاراکتر باشد', 'error');
-          return;
-        }
-
-        await login(sanitizedIdentifier, sanitizedPassword);
+        await forgotPassword(sanitizedIdentifier); // Changed from resetPassword to forgotPassword
+        showNotification('ایمیل بازنشانی رمز عبور با رمز جدید ارسال شد. لطفاً ایمیل خود را بررسی کنید.', 'success');
         reset();
-        showNotification('ورود با موفقیت انجام شد!', 'success');
+        navigate('/login');
       } catch (error: any) {
         let errorMessage = 'خطایی رخ داد. لطفاً دوباره تلاش کنید.';
         let field: keyof FormData | 'root' = 'root';
@@ -186,16 +138,10 @@ const Login: React.FC = () => {
         if (error.message?.includes('NetworkError')) {
           errorMessage = 'اتصال به سرور برقرار نشد. لطفاً اینترنت خود را بررسی کنید.';
         } else if (error.message?.includes('ایمیل') || error.message?.includes('شماره تلفن')) {
-          errorMessage = 'ایمیل یا شماره تلفن نامعتبر است.';
+          errorMessage = 'ایمیل یا شماره تلفن ثبت‌نشده است.';
           field = 'identifier';
-        } else if (error.message?.includes('رمز عبور')) {
-          errorMessage = 'رمز عبور اشتباه است.';
-          field = 'password';
         } else if (error.response?.status === 400) {
-          errorMessage = 'داده‌های ورودی نامعتبر هستند. لطفاً اطلاعات را بررسی کنید.';
-          field = 'identifier';
-        } else if (error.response?.status === 401) {
-          errorMessage = 'ایمیل، شماره تلفن یا رمز عبور اشتباه است.';
+          errorMessage = 'ایمیل یا شماره تلفن نامعتبر است.';
           field = 'identifier';
         } else if (error.response?.status === 429) {
           const retrySec = parseInt(error.response.headers['retry-after'] || '300', 10);
@@ -216,33 +162,29 @@ const Login: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [login, showNotification, setError, reset, retryAfter]
+    [forgotPassword, showNotification, setError, reset, retryAfter, navigate] // Updated dependency
   );
-
-  const handleForgotPassword = useCallback(() => {
-    navigate('/reset-password');
-  }, [navigate]);
 
   return (
     <>
       <Helmet>
-        <title>ورود به سامانه آموزشی | روم دنتال</title>
-        <meta name="description" content="برای دسترسی به دوره‌های آموزشی، وارد حساب کاربری خود شوید." />
-        <meta name="keywords" content="ورود به سامانه, آموزش آنلاین, دوره‌های آموزشی, سامانه آموزشی" />
+        <title>بازنشانی رمز عبور | روم دنتال</title>
+        <meta name="description" content="برای بازنشانی رمز عبور، ایمیل یا شماره تلفن خود را وارد کنید." />
+        <meta name="keywords" content="بازنشانی رمز عبور, آموزش آنلاین, سامانه آموزشی, روم دنتال" />
         <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="ورود به سامانه آموزشی | روم دنتال" />
-        <meta property="og:description" content="برای دسترسی به دوره‌های آموزشی، وارد حساب کاربری خود شوید." />
+        <meta property="og:title" content="بازنشانی رمز عبور | روم دنتال" />
+        <meta property="og:description" content="برای بازنشانی رمز عبور، ایمیل یا شماره تلفن خود را وارد کنید." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://yourwebsite.com/login" />
+        <meta property="og:url" content="https://yourwebsite.com/reset-password" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="ورود به سامانه آموزشی | روم دنتال" />
-        <meta name="twitter:description" content="برای دسترسی به دوره‌های آموزشی، وارد حساب کاربری خود شوید." />
+        <meta name="twitter:title" content="بازنشانی رمز عبور | روم دنتال" />
+        <meta name="twitter:description" content="برای بازنشانی رمز عبور، ایمیل یا شماره تلفن خود را وارد کنید." />
       </Helmet>
-      <section className={styles.loginSection} aria-label="فرم ورود به سامانه آموزشی">
+      <section className={styles.resetPasswordSection} aria-label="فرم بازنشانی رمز عبور">
         <div className={styles.container}>
           <header>
-            <h1 className={styles.title}>ورود به سامانه آموزشی</h1>
-            <p className={styles.subtitle}>برای دسترسی به دوره‌های آموزشی وارد حساب کاربری خود شوید</p>
+            <h1 className={styles.title}>بازنشانی رمز عبور</h1>
+            <p className={styles.subtitle}>ایمیل یا شماره تلفن خود را وارد کنید تا رمز عبور جدید برای شما ارسال شود.</p>
           </header>
 
           <div ref={errorRef} tabIndex={-1} aria-live="assertive">
@@ -258,7 +200,7 @@ const Login: React.FC = () => {
             )}
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className={styles.loginForm} role="form" noValidate>
+          <form onSubmit={handleSubmit(onSubmit)} className={styles.resetPasswordForm} role="form" noValidate>
             <Controller
               name="identifier"
               control={control}
@@ -288,38 +230,6 @@ const Login: React.FC = () => {
                 </FormField>
               )}
             />
-            <Controller
-              name="password"
-              control={control}
-              rules={{
-                required: 'رمز عبور الزامی است',
-                minLength: { value: 8, message: 'رمز عبور باید حداقل ۸ کاراکتر باشد' },
-                maxLength: { value: 50, message: 'رمز عبور نمی‌تواند بیش از ۵۰ کاراکتر باشد' },
-                pattern: {
-                  value: /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,50}$/,
-                  message: 'رمز عبور باید شامل حرف بزرگ، عدد و کاراکتر خاص باشد',
-                },
-              }}
-              render={({ field }: { field: FieldValues }) => (
-                <FormField
-                  label="رمز عبور"
-                  name="password"
-                  error={errors.password?.message}
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="رمز عبور خود را وارد کنید"
-                  required
-                  Icon={LockIcon}
-                  ariaDescribedBy="password-desc"
-                  showPassword={showPassword}
-                  toggleShowPassword={toggleShowPassword}
-                >
-                  <input {...field} type={showPassword ? 'text' : 'password'} className={styles.input} />
-                  <span id="password-desc" className={styles.hidden}>
-                    رمز عبور باید بین ۸ تا ۵۰ کاراکتر، شامل حرف بزرگ، عدد و کاراکتر خاص باشد
-                  </span>
-                </FormField>
-              )}
-            />
             <p className={styles.captchaNote}>
               توجه: برای جلوگیری از ربات‌ها، لطفاً از سیستم کپچای سرور (مانند reCAPTCHA) استفاده کنید.
             </p>
@@ -327,30 +237,25 @@ const Login: React.FC = () => {
               type="submit"
               className={`${styles.submitButton} ${isLoading || retryAfter ? styles.disabled : ''}`}
               disabled={isLoading || !!retryAfter}
-              aria-label="ورود به سامانه آموزشی"
+              aria-label="ارسال درخواست بازنشانی رمز عبور"
             >
               {isLoading ? (
                 <>
-                  <span className={styles.loader} aria-hidden="true"></span> در حال ورود...
+                  <span className={styles.loader} aria-hidden="true"></span> در حال ارسال...
                 </>
               ) : (
-                'ورود'
+                'ارسال درخواست'
               )}
             </button>
-            <p className={styles.subtitle}>
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                className={styles.link}
-                aria-label="فراموشی رمز عبور"
-              >
-                رمز عبور خود را فراموش کرده‌اید؟
-              </button>
-            </p>
             <p className={styles.subtitle}>
               حساب کاربری ندارید؟{' '}
               <RouterLink to="/signup">
                 ثبت‌نام در سامانه آموزشی
+              </RouterLink>
+            </p>
+            <p className={styles.subtitle}>
+              <RouterLink to="/login">
+                بازگشت به ورود
               </RouterLink>
             </p>
           </form>
@@ -360,4 +265,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default ResetPassword;

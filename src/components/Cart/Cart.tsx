@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import { useCourseContext } from '../../Context/CourseContext';
 import { useCartContext } from '../../Context/CartContext';
-import { useAuthContext } from '../../Context/AuthContext';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import { useCheckoutContext } from '../../Context/CheckoutContext';
 import { useNavigate } from 'react-router-dom';

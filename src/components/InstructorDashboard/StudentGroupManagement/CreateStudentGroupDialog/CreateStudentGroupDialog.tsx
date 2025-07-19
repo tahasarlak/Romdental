@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { useEnrollmentContext } from '../../../../Context/EnrollmentContext';
 import { useNotificationContext } from '../../../../Context/NotificationContext';
-import { useAuthContext } from '../../../../Context/AuthContext';
+import { useAuthContext } from '../../../../Context/Auth/UserAuthContext';
 import { Course } from '../../../../types/types';
 import DOMPurify from 'dompurify';
 import styles from './CreateStudentGroupDialog.module.css';

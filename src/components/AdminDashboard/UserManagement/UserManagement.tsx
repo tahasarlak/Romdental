@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useAuthContext } from '../../../Context/AuthContext';
+import { useAuthContext } from '../../../Context/Auth/UserAuthContext';
 import { useNotificationContext } from '../../../Context/NotificationContext';
 import UserDialog from './UserDialog/UserDialog';
 import EditUserDialog from './EditUserDialog/EditUserDialog';
@@ -27,10 +27,10 @@ const UserManagement: React.FC = () => {
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const handleDeleteUser = async (userId: number) => {
+  const handleDelete = async (user: User) => {
     if (window.confirm('آیا مطمئن هستید که می‌خواهید این کاربر را حذف کنید؟')) {
       try {
-        await deleteUser(userId);
+        await deleteUser(user.email);
         showNotification('کاربر با موفقیت حذف شد', 'success');
       } catch (error: any) {
         showNotification('خطایی در حذف کاربر رخ داد', 'error');
@@ -97,7 +97,7 @@ const UserManagement: React.FC = () => {
                   </IconButton>
                   <IconButton
                     color="error"
-                    onClick={() => handleDeleteUser(u.id)}
+                    onClick={() => handleDelete(u)}
                     className={styles.deleteButton}
                     disabled={user?.role !== 'SuperAdmin' || u.role === 'SuperAdmin'}
                     title="حذف"

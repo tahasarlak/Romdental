@@ -4,7 +4,6 @@ import { Helmet } from 'react-helmet-async';
 import DOMPurify from 'dompurify';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import styles from './CourseDetails.module.css';
-import { useAuthContext } from '../../../Context/AuthContext';
 import { useCartContext } from '../../../Context/CartContext';
 import { useCourseContext } from '../../../Context/CourseContext';
 import { useInstructorContext } from '../../../Context/InstructorContext';
@@ -23,6 +22,7 @@ import CourseSyllabus from '../../../components/CourseSyllabus/CourseSyllabus';
 import PreviewModal from '../../../components/PreviewModal/PreviewModal';
 import StickyEnrollBar from '../../../components/StickyEnrollBar/StickyEnrollBar';
 import moment from 'moment-jalaali';
+import { useAuthContext } from '../../../Context/Auth/UserAuthContext';
 
 moment.loadPersian({ dialect: 'persian-modern' });
 
@@ -63,18 +63,19 @@ const CourseDetails: React.FC = memo(() => {
   const instructor = course ? instructors.find((i) => i.name === course.instructor) : null;
   const instructorId = instructor ? instructor.id : 0;
 
-  useEffect(() => {
-    console.log('Courses:', courses);
-    console.log('Slug:', decodedSlug);
-    console.log('Course:', course);
-    if (!courses.length && !loading) {
-      fetchCourses().catch((error) => {
-        console.error('Failed to fetch courses:', error);
-        showNotification('خطایی در بارگذاری دوره‌ها رخ داد. لطفاً دوباره تلاش کنید.', 'error');
-      });
+useEffect(() => {
+  console.log('Courses:', courses);
+  console.log('Slug:', decodedSlug);
+  console.log('Course:', course);
+  if (!courses.length && !loading) {
+    try {
+      fetchCourses();
+    } catch (error: unknown) {
+      console.error('Failed to fetch courses:', error);
+      showNotification('خطایی در بارگذاری دوره‌ها رخ داد. لطفاً دوباره تلاش کنید.', 'error');
     }
-  }, [courses, loading, fetchCourses, showNotification, decodedSlug, course]);
-
+  }
+}, [courses, loading, fetchCourses, showNotification, decodedSlug, course]);
   useEffect(() => {
     if (user && course) {
       const validEnrolledCourses = user.enrolledCourses.filter((id) => courseIds.has(id));

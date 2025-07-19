@@ -1,9 +1,8 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import DOMPurify from 'dompurify';
-import { useNotificationContext } from './NotificationContext';
-import { useInstructorContext } from './InstructorContext';
-import { Instructor, BankAccount, User } from '../types/types';
-import { useAuthContext } from './AuthContext';
+import { useNotificationContext } from '../NotificationContext';
+import { useAuthContext } from './UserAuthContext';
+import { Instructor, BankAccount } from '../../types/types';
 
 interface InstructorRegistrationData {
   name: string;
@@ -19,6 +18,7 @@ interface InstructorRegistrationData {
   phone: string;
   university: string;
   gender: 'مرد' | 'زن';
+  password: string;
 }
 
 interface InstructorAuthContextType {
@@ -27,16 +27,6 @@ interface InstructorAuthContextType {
 
 const InstructorAuthContext = createContext<InstructorAuthContextType | undefined>(undefined);
 
-const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
-const validatePhone = (phone: string): boolean => {
-  const phoneRegex = /^09[0-9]{9}$/;
-  return phoneRegex.test(phone);
-};
-
 const validateBankAccount = (accountNumber: string): boolean => {
   const regex = /^\d{16}$/;
   return regex.test(accountNumber.replace(/\D/g, ''));
@@ -44,48 +34,35 @@ const validateBankAccount = (accountNumber: string): boolean => {
 
 export const InstructorAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { showNotification } = useNotificationContext();
-  const { addInstructor } = useInstructorContext();
-  const { setUser } = useAuthContext();
+  const { signup } = useAuthContext();
 
   const registerInstructor = async (instructorData: InstructorRegistrationData) => {
     try {
-      if (!instructorData.name.trim()) throw new Error('نام نمی‌تواند خالی باشد.');
-      if (!validateEmail(instructorData.email)) throw new Error('ایمیل نامعتبر است.');
-      if (!validatePhone(instructorData.phone)) throw new Error('شماره تلفن باید با فرمت ۰۹xxxxxxxxx باشد.');
-      if (!instructorData.university.trim()) throw new Error('دانشگاه نمی‌تواند خالی باشد.');
-      if (!['مرد', 'زن'].includes(instructorData.gender)) throw new Error('جنسیت باید "مرد" یا "زن" باشد.');
+      if (!instructorData.specialty.trim()) throw new Error('تخصص نمی‌تواند خالی باشد.');
+      if (!instructorData.bio.trim()) throw new Error('بیوگرافی نمی‌تواند خالی باشد.');
+      if (!instructorData.experience.trim()) throw new Error('تجربه نمی‌تواند خالی باشد.');
       if (!instructorData.bankAccounts || instructorData.bankAccounts.length === 0) {
-        throw new Error('حداقل یک شماره حساب بانکی لازم است');
+        throw new Error('حداقل یک شماره حساب بانکی لازم است.');
       }
       if (instructorData.bankAccounts.some((account) => !validateBankAccount(account.accountNumber))) {
-        throw new Error('شماره حساب بانکی نامعتبر است');
+        throw new Error('شماره حساب بانکی نامعتبر است.');
       }
 
-      const response = await fetch('/api/instructors/check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: instructorData.email, phone: instructorData.phone }),
-      });
-      if (response.status === 409) throw new Error('ایمیل یا شماره تلفن قبلاً ثبت شده است');
+      await signup(
+        instructorData.name,
+        instructorData.email,
+        instructorData.password,
+        instructorData.phone,
+        instructorData.university,
+        instructorData.gender,
+        '',
+        'Instructor'
+      );
 
-      const newUser: User = {
-        id: Math.floor(Math.random() * 10000) + 1,
-        name: DOMPurify.sanitize(instructorData.name),
-        email: DOMPurify.sanitize(instructorData.email),
-        phone: DOMPurify.sanitize(instructorData.phone),
-        university: DOMPurify.sanitize(instructorData.university),
-        gender: instructorData.gender,
-        profilePicture: instructorData.image || '/assets/Profile/default-instructor.jpg',
-        wishlist: [],
-        enrolledCourses: [],
-        cart: [],
-        password: `hashed_${Math.random().toString(36).substring(2)}`,
-        token: `instructor-token-${Date.now()}`,
-        role: 'Instructor',
-      };
+      const instructorId = Math.floor(Math.random() * 1000000) + 1;
 
-      await addInstructor({
-        ...instructorData,
+      const instructorDetails: Instructor = {
+        id: instructorId,
         name: DOMPurify.sanitize(instructorData.name),
         specialty: DOMPurify.sanitize(instructorData.specialty),
         bio: DOMPurify.sanitize(instructorData.bio),
@@ -100,9 +77,12 @@ export const InstructorAuthProvider: React.FC<{ children: ReactNode }> = ({ chil
         averageRating: '0.0',
         totalStudents: 0,
         reviewCount: 0,
-      });
-
-      setUser(newUser);
+        email: DOMPurify.sanitize(instructorData.email),
+        phone: DOMPurify.sanitize(instructorData.phone),
+        university: DOMPurify.sanitize(instructorData.university),
+        gender: instructorData.gender,
+        password: DOMPurify.sanitize(instructorData.password),
+      };
 
       showNotification('استاد با موفقیت ثبت شد.', 'success');
     } catch (error: any) {

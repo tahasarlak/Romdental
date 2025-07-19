@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Tabs, Tab } from '@mui/material';
-import { useAuthContext } from '../../Context/AuthContext';
+import { useAuthContext } from '../../Context/Auth/UserAuthContext';
 import { useNotificationContext } from '../../Context/NotificationContext';
 import BlogManagement from '../../components/AdminDashboard/BlogManagement/BlogManagement';
 import CourseManagement from '../../components/AdminDashboard/CourseManagement/CourseManagement';

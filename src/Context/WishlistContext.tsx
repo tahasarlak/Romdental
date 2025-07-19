@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuthContext } from './AuthContext';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import { useAuthContext } from './Auth/UserAuthContext';
 import { useNotificationContext } from './NotificationContext';
 import { useCourseContext } from './CourseContext';
 import { useInstructorContext } from './InstructorContext';
@@ -26,10 +26,13 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [isWishlistLoading, setIsWishlistLoading] = useState<boolean>(false);
 
-  // بارگذاری اولیه لیست علاقه‌مندی‌ها از localStorage یا user.wishlist
+  // Memoize user to prevent unnecessary changes
+  const stableUser = useMemo(() => user, [user]);
+
+  // Load initial wishlist from localStorage or user.wishlist
   useEffect(() => {
-    if (isAuthenticated && user) {
-      const userWishlist = Array.isArray(user.wishlist) ? user.wishlist : [];
+    if (isAuthenticated && stableUser) {
+      const userWishlist = Array.isArray(stableUser.wishlist) ? stableUser.wishlist : [];
       setWishlistItems(userWishlist);
     } else {
       const storedWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
@@ -52,30 +55,30 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
         );
       setWishlistItems(validWishlist);
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, stableUser]);
 
-  // ذخیره تغییرات wishlist در localStorage
+  // Save wishlist changes to localStorage and update user
   useEffect(() => {
     localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
-    if (isAuthenticated && user) {
+    if (isAuthenticated && stableUser) {
       const updatedUser: User = {
-        ...user,
+        ...stableUser,
         wishlist: wishlistItems,
       };
       setUser(updatedUser);
     }
-  }, [wishlistItems, isAuthenticated, user, setUser]);
+  }, [wishlistItems, isAuthenticated, stableUser, setUser]);
 
-  // بررسی وجود آیتم در لیست علاقه‌مندی‌ها
+  // Check if item is in wishlist
   const isInWishlist = (id: number, type: 'course' | 'instructor' | 'blog'): boolean => {
     return wishlistItems.some((item) => item.id === id && item.type === type);
   };
 
-  // افزودن یا حذف آیتم از لیست علاقه‌مندی‌ها
+  // Add or remove item from wishlist
   const toggleWishlist = async (itemId: number, type: 'course' | 'instructor' | 'blog', name: string) => {
     setIsWishlistLoading(true);
     try {
-      // اعتبارسنجی آیتم
+      // Validate item
       if (type === 'course' && !courses.some((course) => course.id === itemId)) {
         throw new Error('دوره موردنظر یافت نشد.');
       }
@@ -95,17 +98,17 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
           return;
         }
 
-        // حذف آیتم از wishlist
+        // Remove item from wishlist
         const newWishlist = wishlistItems.filter((item) => item.id !== itemId || item.type !== type);
         setWishlistItems(newWishlist);
         showNotification(`"${DOMPurify.sanitize(name)}" از علاقه‌مندی‌ها حذف شد.`, 'success');
       } else {
-        // افزودن آیتم به wishlist
+        // Add item to wishlist
         const newWishlistItem: WishlistItem = {
           id: itemId,
           type,
           name,
-          userId: isAuthenticated && user ? user.id : 0,
+          userId: isAuthenticated && stableUser ? stableUser.id : 0,
           likeDate: new Date().toLocaleDateString('fa-IR'),
         };
 

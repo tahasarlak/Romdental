@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useCourseContext } from './CourseContext';
-import { useAuthContext } from './AuthContext';
+import { useAuthContext } from './Auth/UserAuthContext';
 import DOMPurify from 'dompurify';
 import { ReviewItem, ReplyItem } from '../types/types';
 

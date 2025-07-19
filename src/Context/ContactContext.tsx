@@ -1,10 +1,8 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import DOMPurify from 'dompurify';
 import { v4 as uuidv4 } from 'uuid';
+import { useNotificationContext } from './NotificationContext';
 
-/**
- * Interface for a contact message
- */
 interface ContactMessage {
   id: string;
   name: string;
@@ -14,9 +12,6 @@ interface ContactMessage {
   date: string;
 }
 
-/**
- * Interface for contact information
- */
 interface ContactInfo {
   phone: string;
   email: string;
@@ -29,49 +24,38 @@ interface ContactInfo {
   };
 }
 
-/**
- * Interface for ContactContext
- */
 interface ContactContextType {
   messages: ContactMessage[];
-  addMessage: (message: Omit<ContactMessage, 'id' | 'date'>) => boolean;
+  addMessage: (message: Omit<ContactMessage, 'id' | 'date'>) => Promise<boolean>;
+  deleteMessage: (id: string) => Promise<void>;
   setMessages: React.Dispatch<React.SetStateAction<ContactMessage[]>>;
   contactInfo: ContactInfo;
 }
 
-/**
- * Create Context
- */
 const ContactContext = createContext<ContactContextType | undefined>(undefined);
 
-/**
- * ContactProvider Component
- * Manages contact messages and provides contact information
- */
 export const ContactProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { showNotification } = useNotificationContext();
   const [messages, setMessages] = useState<ContactMessage[]>(() => {
-    // Load messages from localStorage on mount
     const savedMessages = localStorage.getItem('contactMessages');
     let initialMessages: ContactMessage[] = [];
-    
+
     if (savedMessages) {
       try {
         initialMessages = JSON.parse(savedMessages);
-        console.log('Loaded messages from localStorage:', initialMessages);
       } catch (error) {
-        console.error('Error parsing localStorage messages:', error);
+        showNotification('خطا در بارگذاری پیام‌ها از localStorage!', 'error');
       }
     }
-    
-    // If no valid messages in localStorage, use sample data
+
     if (!initialMessages.length) {
       initialMessages = [
         {
           id: uuidv4(),
-          name: 'علی',
-          email: 'ali@example.com',
-          subject: 'سوال درباره خدمات',
-          message: 'لطفاً اطلاعات بیشتری درباره خدمات دندانپزشکی ارائه دهید.',
+          name: DOMPurify.sanitize('علی'),
+          email: DOMPurify.sanitize('ali@example.com'),
+          subject: DOMPurify.sanitize('سوال درباره خدمات'),
+          message: DOMPurify.sanitize('لطفاً اطلاعات بیشتری درباره خدمات دندانپزشکی ارائه دهید.'),
           date: new Date().toLocaleDateString('fa-IR', {
             year: 'numeric',
             month: 'long',
@@ -80,10 +64,10 @@ export const ContactProvider: React.FC<{ children: ReactNode }> = ({ children })
         },
         {
           id: uuidv4(),
-          name: 'مریم',
-          email: 'maryam@example.com',
-          subject: 'وقت ملاقات',
-          message: 'می‌خواهم وقت ملاقاتی برای هفته آینده رزرو کنم.',
+          name: DOMPurify.sanitize('مریم'),
+          email: DOMPurify.sanitize('maryam@example.com'),
+          subject: DOMPurify.sanitize('وقت ملاقات'),
+          message: DOMPurify.sanitize('می‌خواهم وقت ملاقاتی برای هفته آینده رزرو کنم.'),
           date: new Date().toLocaleDateString('fa-IR', {
             year: 'numeric',
             month: 'long',
@@ -91,13 +75,11 @@ export const ContactProvider: React.FC<{ children: ReactNode }> = ({ children })
           }),
         },
       ];
-      console.log('Initialized with sample messages:', initialMessages);
     }
-    
+
     return initialMessages;
   });
 
-  // Contact information
   const contactInfo: ContactInfo = {
     phone: '۰۲۱-۱۲۳۴۵۶۷۸',
     email: 'info@roomdental.com',
@@ -110,70 +92,64 @@ export const ContactProvider: React.FC<{ children: ReactNode }> = ({ children })
     },
   };
 
-  // Save messages to localStorage whenever they change
   useEffect(() => {
-    console.log('Saving messages to localStorage:', messages);
-    localStorage.setItem('contactMessages', JSON.stringify(messages));
-  }, [messages]);
+    try {
+      localStorage.setItem('contactMessages', JSON.stringify(messages));
+    } catch (error) {
+      showNotification('خطا در ذخیره‌سازی پیام‌ها!', 'error');
+    }
+  }, [messages, showNotification]);
 
-  /**
-   * Validates and adds a new message to the context
-   * @param message - The message to add
-   * @returns {boolean} - True if the message was added successfully
-   */
-  const addMessage = (message: Omit<ContactMessage, 'id' | 'date'>): boolean => {
-    // Validate inputs
-    if (!message.name.trim()) {
-      console.log('Validation failed: Name is empty');
-      return false;
-    }
-    if (!message.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      console.log('Validation failed: Invalid email');
-      return false;
-    }
-    if (!message.subject.trim()) {
-      console.log('Validation failed: Subject is empty');
-      return false;
-    }
-    if (!message.message.trim() || message.message.length > 500) {
-      console.log('Validation failed: Message is empty or too long');
-      return false;
-    }
+  const addMessage = async (message: Omit<ContactMessage, 'id' | 'date'>): Promise<boolean> => {
+    try {
+      if (!message.name.trim()) throw new Error('نام نمی‌تواند خالی باشد.');
+      if (!message.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) throw new Error('ایمیل نامعتبر است.');
+      if (!message.subject.trim()) throw new Error('موضوع نمی‌تواند خالی باشد.');
+      if (!message.message.trim() || message.message.length > 500) throw new Error('پیام نمی‌تواند خالی باشد یا بیش از ۵۰۰ کاراکتر باشد.');
 
-    // Sanitize inputs
-    const sanitizedMessage = {
-      id: uuidv4(),
-      name: DOMPurify.sanitize(message.name),
-      email: DOMPurify.sanitize(message.email),
-      subject: DOMPurify.sanitize(message.subject),
-      message: DOMPurify.sanitize(message.message),
-      date: new Date().toLocaleDateString('fa-IR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      }),
-    };
+      const sanitizedMessage: ContactMessage = {
+        id: uuidv4(),
+        name: DOMPurify.sanitize(message.name),
+        email: DOMPurify.sanitize(message.email),
+        subject: DOMPurify.sanitize(message.subject),
+        message: DOMPurify.sanitize(message.message),
+        date: new Date().toLocaleDateString('fa-IR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
+      };
 
-    console.log('Adding new message:', sanitizedMessage);
-    setMessages((prev) => [...prev, sanitizedMessage]);
-    return true;
+      setMessages((prev) => [...prev, sanitizedMessage]);
+      showNotification('پیام با موفقیت ارسال شد.', 'success');
+      return true;
+    } catch (error: any) {
+      showNotification(error.message || 'خطا در ارسال پیام!', 'error');
+      return false;
+    }
+  };
+
+  const deleteMessage = async (id: string) => {
+    try {
+      setMessages((prev) => prev.filter((msg) => msg.id !== id));
+      showNotification('پیام با موفقیت حذف شد.', 'success');
+    } catch (error: any) {
+      showNotification(error.message || 'خطا در حذف پیام!', 'error');
+      throw error;
+    }
   };
 
   return (
-    <ContactContext.Provider value={{ messages, addMessage, setMessages, contactInfo }}>
+    <ContactContext.Provider value={{ messages, addMessage, deleteMessage, setMessages, contactInfo }}>
       {children}
     </ContactContext.Provider>
   );
 };
 
-/**
- * Custom hook to access ContactContext
- */
 export const useContactContext = (): ContactContextType => {
   const context = useContext(ContactContext);
   if (!context) {
     throw new Error('useContactContext must be used within a ContactProvider');
   }
-  console.log('Current context messages:', context.messages);
   return context;
 };

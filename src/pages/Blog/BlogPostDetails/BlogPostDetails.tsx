@@ -13,7 +13,7 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import ShareIcon from '@mui/icons-material/Share';
 import Breadcrumb from '../../../components/Breadcrumb/Breadcrumb';
 import { useBlogContext, BlogPost } from '../../../Context/BlogContext';
-import { useAuthContext } from '../../../Context/AuthContext';
+import { useAuthContext } from '../../../Context/Auth/UserAuthContext';
 import { useWishlistContext } from '../../../Context/WishlistContext';
 import { useNotificationContext } from '../../../Context/NotificationContext';
 import styles from './BlogPostDetails.module.css';
